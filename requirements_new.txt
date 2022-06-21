@@ -1,5 +1,0 @@
-# PyPI
-Django==3.2.9
-djangorestframework==3.12.4
-py2neo
-requests==2.27.1
