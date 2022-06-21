@@ -175,7 +175,7 @@ cython_debug/
 
 # my stuff
 todo.md
-requirements_local.txt
+custom.txt
 
 # scripts
 start.sh
