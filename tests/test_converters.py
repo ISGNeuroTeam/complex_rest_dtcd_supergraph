@@ -1,7 +1,6 @@
 import configparser
 import json
 import unittest
-from operator import itemgetter
 from pathlib import Path
 
 from django.test import SimpleTestCase, tag
@@ -9,7 +8,7 @@ from django.test import SimpleTestCase, tag
 from complex_rest_dtcd_supergraph.converters import Converter
 
 from .misc import generate_data, sort_payload
-
+from .misc import KEYS, LABELS, TYPES
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
@@ -33,7 +32,7 @@ class TestConverter(SimpleTestCase):
         tree = converter._load_data(data)
         self.assertEqual(len(tree.subgraph.nodes), 2)
         self.assertEqual(len(tree.subgraph.relationships), 1)
-        self.assertTrue(tree.root.has_label("_Data"))
+        self.assertTrue(tree.root.has_label(LABELS["data"]))
 
     def test_load_entity(self):
         data = {
@@ -46,8 +45,8 @@ class TestConverter(SimpleTestCase):
         tree = converter._load_entity(data)
         self.assertEqual(len(tree.subgraph.nodes), 3)
         self.assertEqual(len(tree.subgraph.relationships), 2)
-        self.assertTrue(tree.root.has_label("_Entity"))
-        self.assertIn("HAS_DATA", tree.subgraph.types())
+        self.assertTrue(tree.root.has_label(LABELS["entity"]))
+        self.assertIn(TYPES["has_data"], tree.subgraph.types())
 
     def test_load_vertex(self):
         data = {
@@ -61,9 +60,10 @@ class TestConverter(SimpleTestCase):
         tree = converter._load_vertex(data)
         self.assertEqual(len(tree.subgraph.nodes), 3)
         self.assertEqual(len(tree.subgraph.relationships), 2)
-        self.assertTrue(tree.root.has_label("Node"))
-        self.assertIn("primitiveID", tree.root)
-        self.assertEqual(tree.root["primitiveID"], "abc")
+        self.assertTrue(tree.root.has_label(LABELS["node"]))
+        key = KEYS["yfiles_id"]
+        self.assertIn(key, tree.root)
+        self.assertEqual(tree.root[key], "abc")
 
     def test_load_edge(self):
         data = {
@@ -76,7 +76,8 @@ class TestConverter(SimpleTestCase):
         tree = converter._load_edge(data)
         self.assertEqual(len(tree.subgraph.nodes), 2)
         self.assertEqual(len(tree.subgraph.relationships), 1)
-        self.assertTrue(tree.root.has_label("Edge"))
+        self.assertTrue(tree.root.has_label(LABELS["edge"]))
+        # TODO replace hard-coded stuff
         self.assertIn("sourceNode", tree.root)
         self.assertIn("sourcePort", tree.root)
         self.assertIn("targetNode", tree.root)
@@ -102,7 +103,6 @@ class TestConverter(SimpleTestCase):
         self.assertEqual(len(subgraph.nodes), 19)
         self.assertEqual(len(subgraph.relationships), 18)
 
-    @unittest.expectedFailure
     def test_dump(self):
         d = generate_data()
         data = d["data"]
@@ -158,7 +158,6 @@ class TestConverter(SimpleTestCase):
 
         self.assertTrue(ok)
 
-    @unittest.expectedFailure
     def test_load_dump_large(self):
         self._check_load_dump_from_json(DATA_DIR / "graph-sample-large.json")
 

@@ -3,7 +3,6 @@ import json
 from pathlib import Path
 
 from core.settings.ini_config import merge_ini_config_with_defaults, merge_dicts
-from neotools.serializers import DEFAULTS
 
 
 PROJECT_DIR = Path(__file__).parent
@@ -30,12 +29,46 @@ ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
 NEO4J = ini_config["neo4j"]
 
 # settings for custom data design
-with open(PROJECT_DIR / "serialization.json") as f:
-    serialization_conf = json.load(f)
-SERIALIZATION_SCHEMA = merge_dicts(serialization_conf, DEFAULTS)
+SERIALIZATION_SCHEMA = {
+    "keys": {
+        "parent_key": "key",
+        "position": "pos"
+    },
+    "labels": {
+        "array": "Array",
+        "attribute": "Attribute",
+        "composite": "Composite",
+        "data": "Data",
+        "entity": "Entity",
+        "fragment": "Fragment",
+        "item": "Item"
+    },
+    "types": {
+        "contains_item": "CONTAINS_ITEM",
+        "contains_entity": "CONTAINS_ENTITY",
+        "has_attribute": "HAS_ATTRIBUTE",
+        "has_data": "HAS_DATA"
+    }
+}
 
-with open(PROJECT_DIR / "exchange.json") as f:
-    exchange_conf = json.load(f)
-EXCHANGE_SCHEMA = exchange_conf
+EXCHANGE_SCHEMA = {
+    "keys": {
+        "edges": "edges",
+        "nodes": "nodes",
+        "source_node": "sourceNode",
+        "source_port": "sourcePort",
+        "target_node": "targetNode",
+        "target_port": "targetPort",
+        "yfiles_id": "primitiveID"
+    },
+    "labels": {
+        "edge": "Edge",
+        "node": "Node"
+    },
+    "types": {
+        "out": "OUT",
+        "in": "IN"
+    }
+}
 
 SCHEMA = merge_dicts(SERIALIZATION_SCHEMA, EXCHANGE_SCHEMA)

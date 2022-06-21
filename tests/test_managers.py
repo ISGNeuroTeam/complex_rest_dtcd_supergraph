@@ -42,6 +42,10 @@ class TestFragmentManager(SimpleTestCase):
     def setUpClass(cls) -> None:
         GRAPH.delete_all()  # clear the db
         cls.manager = FragmentManager(GRAPH)
+    
+    @classmethod
+    def tearDownClass(cls) -> None:
+        pass
 
     def tearDown(self) -> None:
         GRAPH.delete_all()
@@ -109,6 +113,10 @@ class TestContentManager(SimpleTestCase):
         cls.fragment_manager.save(cls.fragment)
 
         cls.content_manager = ContentManager(GRAPH)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        pass
 
     def tearDown(self) -> None:
         GRAPH.delete_all()

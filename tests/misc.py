@@ -6,20 +6,34 @@ from operator import itemgetter
 
 from py2neo import Node, Relationship
 
+from complex_rest_dtcd_supergraph.settings import SCHEMA
+
+
+KEYS = SCHEMA["keys"]
+LABELS = SCHEMA["labels"]
+TYPES = SCHEMA["types"]
+
 
 def sort_payload(data: dict) -> None:
     """Sort payload dict according to spec in-place."""
 
-    nodes = data["nodes"]
+    nodes = data[KEYS["nodes"]]
 
     for node in nodes:
         if "initPorts" in node:
-            node["initPorts"] = sorted(node["initPorts"], key=itemgetter("primitiveID"))
+            node["initPorts"] = sorted(
+                node["initPorts"], key=itemgetter(KEYS["yfiles_id"])
+            )
 
-    data["nodes"] = sorted(nodes, key=itemgetter("primitiveID"))
-    data["edges"] = sorted(
-        data["edges"],
-        key=itemgetter("sourceNode", "sourcePort", "targetNode", "targetPort"),
+    data[KEYS["nodes"]] = sorted(nodes, key=itemgetter(KEYS["yfiles_id"]))
+    data[KEYS["edges"]] = sorted(
+        data[KEYS["edges"]],
+        key=itemgetter(
+            KEYS["source_node"],
+            KEYS["source_port"],
+            KEYS["target_node"],
+            KEYS["target_port"],
+        ),
     )
 
 
@@ -82,64 +96,64 @@ def generate_dummy():
 
 def generate_data():
     data = {
-        "nodes": [
-            {"primitiveID": "n1", "layout": {"x": 0, "y": 0}},
-            {"primitiveID": "n2", "initPorts": [{"primitiveID": "p3"}]},
-            {"primitiveID": "n3"},
-            {"primitiveID": "n4"},
+        KEYS["nodes"]: [
+            {KEYS["yfiles_id"]: "n1", "layout": {"x": 0, "y": 0}},
+            {KEYS["yfiles_id"]: "n2", "initPorts": [{KEYS["yfiles_id"]: "p3"}]},
+            {KEYS["yfiles_id"]: "n3"},
+            {KEYS["yfiles_id"]: "n4"},
         ],
-        "edges": [
+        KEYS["edges"]: [
             {
-                "sourceNode": "n1",
-                "sourcePort": "p1",
-                "targetNode": "n2",
-                "targetPort": "p3",
+                KEYS["source_node"]: "n1",
+                KEYS["source_port"]: "p1",
+                KEYS["target_node"]: "n2",
+                KEYS["target_port"]: "p3",
             },
             {
-                "sourceNode": "n1",
-                "sourcePort": "p2",
-                "targetNode": "n3",
-                "targetPort": "p4",
+                KEYS["source_node"]: "n1",
+                KEYS["source_port"]: "p2",
+                KEYS["target_node"]: "n3",
+                KEYS["target_port"]: "p4",
             },
             {
-                "sourceNode": "n3",
-                "sourcePort": "p5",
-                "targetNode": "n4",
-                "targetPort": "p6",
+                KEYS["source_node"]: "n3",
+                KEYS["source_port"]: "p5",
+                KEYS["target_node"]: "n4",
+                KEYS["target_port"]: "p6",
             },
         ],
     }
 
     # TODO replace with values from config
-    n1 = Node("Node", "Entity", primitiveID="n1")  # root
+    n1 = Node(LABELS["node"], LABELS["entity"], primitiveID="n1")  # root
     # data tree
-    n1d = Node("Data", "Composite", primitiveID="n1")
-    attr = Node("Attribute", x=0, y=0)
-    n1d_has_attr = Relationship(n1d, "HAS_ATTRIBUTE", attr, key="layout")
+    n1d = Node(LABELS["data"], LABELS["composite"], primitiveID="n1")
+    attr = Node(LABELS["attribute"], x=0, y=0)
+    n1d_has_attr = Relationship(n1d, TYPES["has_attribute"], attr, key="layout")
     ###
-    n1_n1d = Relationship(n1, "HAS_DATA", n1d)
+    n1_n1d = Relationship(n1, TYPES["has_data"], n1d)
 
-    n2 = Node("Node", "Entity", primitiveID="n2")
+    n2 = Node(LABELS["node"], LABELS["entity"], primitiveID="n2")
     # data tree
-    n2d = Node("Data", "Composite", primitiveID="n2")
-    ports = Node("Array", "Attribute")
-    item0 = Node("Item", primitiveID="p3")
-    ports_contains_item0 = Relationship(ports, "CONTAINS_ITEM", item0, pos=0)
-    n2d_has_ports = Relationship(n2d, "HAS_ATTRIBUTE", ports, key="initPorts")
+    n2d = Node(LABELS["data"], LABELS["composite"], primitiveID="n2")
+    ports = Node(LABELS["array"], LABELS["attribute"])
+    item0 = Node(LABELS["item"], primitiveID="p3")
+    ports_contains_item0 = Relationship(ports, TYPES["contains_item"], item0, pos=0)
+    n2d_has_ports = Relationship(n2d, TYPES["has_attribute"], ports, key="initPorts")
     ###
-    n2_n2d = Relationship(n2, "HAS_DATA", n2d)
+    n2_n2d = Relationship(n2, TYPES["has_data"], n2d)
 
-    n3 = Node("Node", "Entity", primitiveID="n3")
-    n3d = Node("Data", primitiveID="n3")  # data tree
-    n3_n3d = Relationship(n3, "HAS_DATA", n3d)
+    n3 = Node(LABELS["node"], LABELS["entity"], primitiveID="n3")
+    n3d = Node(LABELS["data"], primitiveID="n3")  # data tree
+    n3_n3d = Relationship(n3, TYPES["has_data"], n3d)
 
-    n4 = Node("Node", "Entity", primitiveID="n4")
-    n4d = Node("Data", primitiveID="n4")  # data tree
-    n4_n4d = Relationship(n4, "HAS_DATA", n4d)
+    n4 = Node(LABELS["node"], LABELS["entity"], primitiveID="n4")
+    n4d = Node(LABELS["data"], primitiveID="n4")  # data tree
+    n4_n4d = Relationship(n4, TYPES["has_data"], n4d)
 
     e1 = Node(
-        "Edge",
-        "Entity",
+        LABELS["edge"],
+        LABELS["entity"],
         sourceNode="n1",
         targetNode="n2",
         sourcePort="p1",
@@ -147,17 +161,21 @@ def generate_data():
     )
     # data tree
     e1d = Node(
-        "Data", sourceNode="n1", targetNode="n2", sourcePort="p1", targetPort="p3"
+        LABELS["data"],
+        sourceNode="n1",
+        targetNode="n2",
+        sourcePort="p1",
+        targetPort="p3",
     )
     ###
-    e1_e1d = Relationship(e1, "HAS_DATA", e1d)
+    e1_e1d = Relationship(e1, TYPES["has_data"], e1d)
     # link vertex to edge
-    n1_e1 = Relationship(n1, "OUT", e1)
-    e1_n2 = Relationship(e1, "IN", n2)
+    n1_e1 = Relationship(n1, TYPES["out"], e1)
+    e1_n2 = Relationship(e1, TYPES["in"], n2)
 
     e2 = Node(
-        "Edge",
-        "Entity",
+        LABELS["edge"],
+        LABELS["entity"],
         sourceNode="n1",
         targetNode="n3",
         sourcePort="p2",
@@ -165,17 +183,21 @@ def generate_data():
     )
     # data tree
     e2d = Node(
-        "Data", sourceNode="n1", targetNode="n3", sourcePort="p2", targetPort="p4"
+        LABELS["data"],
+        sourceNode="n1",
+        targetNode="n3",
+        sourcePort="p2",
+        targetPort="p4",
     )
     ###
-    e2_e2d = Relationship(e2, "HAS_DATA", e2d)
+    e2_e2d = Relationship(e2, TYPES["has_data"], e2d)
     # link vertex to edge
-    n1_e2 = Relationship(n1, "OUT", e2)
-    e2_n3 = Relationship(e2, "IN", n3)
+    n1_e2 = Relationship(n1, TYPES["out"], e2)
+    e2_n3 = Relationship(e2, TYPES["in"], n3)
 
     e3 = Node(
-        "Edge",
-        "Entity",
+        LABELS["edge"],
+        LABELS["entity"],
         sourceNode="n3",
         targetNode="n4",
         sourcePort="p5",
@@ -183,13 +205,17 @@ def generate_data():
     )
     # data tree
     e3d = Node(
-        "Data", sourceNode="n3", targetNode="n4", sourcePort="p5", targetPort="p6"
+        LABELS["data"],
+        sourceNode="n3",
+        targetNode="n4",
+        sourcePort="p5",
+        targetPort="p6",
     )
     ###
-    e3_e3d = Relationship(e3, "HAS_DATA", e3d)
+    e3_e3d = Relationship(e3, TYPES["has_data"], e3d)
     # link vertex to edge
-    n3_e3 = Relationship(n3, "OUT", e3)
-    e3_n4 = Relationship(e3, "IN", n4)
+    n3_e3 = Relationship(n3, TYPES["out"], e3)
+    e3_n4 = Relationship(e3, TYPES["in"], n4)
 
     subgraph = (
         n1_n1d
