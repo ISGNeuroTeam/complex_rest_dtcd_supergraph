@@ -1,9 +1,9 @@
 .SILENT:
 SHELL = /bin/bash
 
-plugin_name := complex_rest_dtcd_supergraph
+plugin := complex_rest_dtcd_supergraph
 build_dir := make_build
-target_dir := $(build_dir)/$(plugin_name)
+target_dir := $(build_dir)/$(plugin)
 requirements_file := production.txt
 url_neo4j := https://neo4j.com/artifact.php?name=neo4j-community-4.4.6-unix.tar.gz
 # url_drive_neo4j := https://drive.google.com/uc?export=download&id=1YipGGkmYhEveSSJ4ZsPC0pIjxivBKxYu
@@ -16,7 +16,7 @@ all:
  build - build project into build directory, with configuration file and environment\n\
  clean - clean all addition file, build directory and output archive file\n\
  test - run all tests\n\
- pack - make output archive, file name format \"$(plugin_name)_vX.Y.Z_BRANCHNAME.tar.gz\"\n\
+ pack - make output archive, file name format \"$(plugin)_vX.Y.Z_BRANCHNAME.tar.gz\"\n\
 Addition section:\n\
  venv - create conda virtual environment, then install requirements\n\
 "
@@ -24,15 +24,15 @@ Addition section:\n\
 
 .PHONY: pack
 pack: make_build
-	rm $(plugin_name)-*.tar.gz
-	cd $(build_dir); tar -czf ../$(plugin_name)-$(version)-$(branch).tar.gz $(plugin_name)
+	rm $(plugin)-*.tar.gz
+	cd $(build_dir); tar -czf ../$(plugin)-$(version)-$(branch).tar.gz $(plugin)
 
 .PHONY: clean_pack
 clean_pack: clean_build
-	rm $(plugin_name)-*.tar.gz
+	rm $(plugin)-*.tar.gz
 
 complex_rest_dtcd_supergraph.tar.gz: build
-	cd $(build_dir); tar -czf ../$(plugin_name).tar.gz $(plugin_name) && rm -r ../$(build_dir)
+	cd $(build_dir); tar -czf ../$(plugin).tar.gz $(plugin) && rm -r ../$(build_dir)
 
 .PHONY: build
 build: make_build
@@ -40,7 +40,7 @@ build: make_build
 make_build: venv.tar.gz
 	mkdir $(build_dir)
 #   copy content and config files (symlinks)
-	cp -ru $(plugin_name) $(build_dir)
+	cp -ru $(plugin) $(build_dir)
 #	cp -u docs/proc.conf.example $(target_dir)/proc.conf  # TODO deployment
 	cp -u *.md $(target_dir)
 	cp -u *.py $(target_dir)
@@ -75,3 +75,7 @@ test: venv
 .PHONY: clean_test
 clean_test:
 	echo "Clean tests"
+
+.PHONY: format
+format:
+	python3 -m black $(plugin) tests
