@@ -3,7 +3,7 @@ import unittest
 from operator import itemgetter
 from pathlib import Path
 
-from complex_rest_dtcd_supergraph.utils.converters import Converter
+from complex_rest_dtcd_supergraph.converters import Converter
 
 from .. import fixtures
 

@@ -11,9 +11,9 @@ from rest.response import SuccessResponse
 from . import settings
 from .models import Fragment
 from .serializers import GraphSerializer, FragmentSerializer
-from .utils.exceptions import FragmentDoesNotExist, LoadingError
-from .utils.neo4j_graphmanager import Neo4jGraphManager
-from .utils.converters import Converter
+from .exceptions import FragmentDoesNotExist, LoadingError
+from .neo4j_graphmanager import Neo4jGraphManager
+from .converters import Converter
 
 
 logger = logging.getLogger("complex_rest_dtcd_supergraph")

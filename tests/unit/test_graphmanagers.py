@@ -6,11 +6,11 @@ from py2neo import Graph
 
 from complex_rest_dtcd_supergraph import settings
 from complex_rest_dtcd_supergraph.models import Fragment
-from complex_rest_dtcd_supergraph.utils.exceptions import (
+from complex_rest_dtcd_supergraph.exceptions import (
     FragmentDoesNotExist,
     FragmentIsNotBound,
 )
-from complex_rest_dtcd_supergraph.utils.neo4j_graphmanager import (
+from complex_rest_dtcd_supergraph.neo4j_graphmanager import (
     FragmentManager,
     ContentManager,
 )

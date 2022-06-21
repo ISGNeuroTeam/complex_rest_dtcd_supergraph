@@ -4,7 +4,7 @@ from neotools.serializers import RecursiveSerializer
 from neotools.structures import Tree
 from py2neo import Node, Relationship, Subgraph
 
-from ..settings import SCHEMA
+from .settings import SCHEMA
 
 
 class Converter:

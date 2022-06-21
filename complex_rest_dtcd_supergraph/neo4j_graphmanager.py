@@ -11,8 +11,8 @@ from .exceptions import (
     FragmentDoesNotExist,
     FragmentIsNotBound,
 )
-from ..models import Fragment
-from ..settings import SCHEMA
+from .models import Fragment
+from .settings import SCHEMA
 
 # TODO custom type aliases
 FragmentID = int
