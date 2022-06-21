@@ -12,7 +12,7 @@ from . import settings
 from .models import Fragment
 from .serializers import GraphSerializer, FragmentSerializer
 from .exceptions import FragmentDoesNotExist, LoadingError
-from .neo4j_graphmanager import Neo4jGraphManager
+from .managers import Neo4jGraphManager
 from .converters import Converter
 
 

@@ -1,3 +1,7 @@
+"""
+Custom managers designed to work with Neo4j database.
+"""
+
 from itertools import chain
 from typing import Generator, List, Set, Tuple, Union
 

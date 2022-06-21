@@ -10,7 +10,7 @@ from complex_rest_dtcd_supergraph.exceptions import (
     FragmentDoesNotExist,
     FragmentIsNotBound,
 )
-from complex_rest_dtcd_supergraph.neo4j_graphmanager import (
+from complex_rest_dtcd_supergraph.managers import (
     FragmentManager,
     ContentManager,
 )
