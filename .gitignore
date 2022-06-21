@@ -102,11 +102,24 @@ GitHub.sublime-settings
 # redis dump
 *.rdb
 
+# VS Code internals
+.vscode/
+
+# local tools configurations
+.flake8
+.isort.cfg
+
+# my stuff
+todo.md
+requirements_local.txt
 
 start.sh
 stop.sh
-complex_rest_dtcd_supergraph-*.tar.gz
-complex_rest_dtcd_supergraph.conf
+test.sh
+*.tar.gz
+# symlinks to config files in plugin directory
+complex_rest_dtcd_supergraph/*.conf
+complex_rest_dtcd_supergraph/*.json
+*.conf
+make_build/
 venv.tar.gz
-
-nginx/

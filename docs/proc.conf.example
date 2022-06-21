@@ -1,0 +1,5 @@
+[program: neo4j]
+command = .%(here)s/venv/apps/neo4j-community-4.4.6-unix/bin/neo4j console
+startsecs = 5
+autorestart = True
+autostart = True

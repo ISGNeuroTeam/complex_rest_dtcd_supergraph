@@ -1,0 +1,10 @@
+# PyPI
+py2neo
+
+# add isgneuro archive
+# see https://pip.pypa.io/en/latest/reference/requirements-file-format/#global-options
+--extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple
+--trusted-host s.dev.isgneuro.com
+
+# isgneuro archive
+neo-tools

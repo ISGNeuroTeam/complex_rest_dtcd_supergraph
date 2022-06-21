@@ -1,0 +1,37 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "initPorts": [
+                {
+                    "primitiveID": "fax"
+                },
+                {
+                    "primitiveID": "mobile"
+                },
+                {
+                    "primitiveID": "pc"
+                }
+            ]
+        },
+        {
+            "primitiveID": "bob",
+            "initPorts": [
+                {
+                    "primitiveID": "laptop"
+                },
+                {
+                    "primitiveID": "mainframe"
+                }
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "sourceNode": "amy",
+            "sourcePort": "mobile",
+            "targetNode": "bob",
+            "targetPort": "laptop"
+        }
+    ]
+}

@@ -1,0 +1,68 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "n1",
+            "primitiveName": "amy",
+            "extensionName": "p",
+            "nodeTitle": "Amy Rock",
+            "properties": {
+                "height": {
+                    "type": "cm",
+                    "status": "completed",
+                    "expression": "get height (n1)",
+                    "value": 167
+                },
+                "age": {
+                    "type": "days",
+                    "status": "completed",
+                    "expression": "get age (n1)",
+                    "value": 9754
+                }
+            },
+            "initPorts": [
+                {
+                    "primitiveID": "p1",
+                    "primitiveName": "personal_email",
+                    "type": "out",
+                    "properties": {
+                        "email": {
+                            "type": "connection",
+                            "status": "online",
+                            "expression": "get status (p1)",
+                            "value": true
+                        }
+                    }
+                },
+                {
+                    "primitiveID": "p2",
+                    "primitiveName": "postal_address1",
+                    "type": "in",
+                    "properties": {}
+                }
+            ]
+        },
+        {
+            "primitiveID": "n2",
+            "primitiveName": "bob",
+            "extensionName": "p",
+            "nodeTitle": "Bob Ham",
+            "properties": {},
+            "initPorts": [
+                {
+                    "primitiveID": "p3",
+                    "primitiveName": "corporate_email",
+                    "type": "in",
+                    "properties": {}
+                }
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "sourceNode": "n1",
+            "sourcePort": "p1",
+            "targetNode": "n2",
+            "targetPort": "p3"
+        }
+    ]
+}

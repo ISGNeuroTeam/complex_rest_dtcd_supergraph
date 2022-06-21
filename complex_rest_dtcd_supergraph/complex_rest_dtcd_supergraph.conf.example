@@ -1,9 +1,0 @@
-[logging]
-level = INFO
-
-[db_conf]
-host = localhost
-port = 5432
-database = complex_rest_dtcd_supergraph
-user = complex_rest_dtcd_supergraph
-password = complex_rest_dtcd_supergraph

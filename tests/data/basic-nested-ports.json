@@ -1,0 +1,55 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "initPorts": [
+                {
+                    "primitiveID": "mobile",
+                    "properties": {
+                        "ip": {
+                            "value": "0.0.0.1"
+                        },
+                        "mac": {
+                            "id": 100
+                        }
+                    }
+                },
+                {
+                    "primitiveID": "pc",
+                    "properties": {
+                        "ip": {
+                            "value": "0.0.0.2"
+                        },
+                        "mac": {
+                            "id": 200
+                        }
+                    }
+                }
+            ]
+        },
+        {
+            "primitiveID": "bob",
+            "initPorts": [
+                {
+                    "primitiveID": "laptop",
+                    "properties": {
+                        "ip": {
+                            "value": "192.168.1.1"
+                        },
+                        "mac": {
+                            "id": 312
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "sourceNode": "amy",
+            "sourcePort": "mobile",
+            "targetNode": "bob",
+            "targetPort": "laptop"
+        }
+    ]
+}

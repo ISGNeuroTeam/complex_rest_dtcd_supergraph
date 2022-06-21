@@ -1,0 +1,42 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy"
+        },
+        {
+            "primitiveID": "bob"
+        },
+        {
+            "primitiveID": "cloe"
+        },
+        {
+            "primitiveID": "dan"
+        }
+    ],
+    "edges": [
+        {
+            "sourceNode": "amy",
+            "sourcePort": "o1",
+            "targetNode": "bob",
+            "targetPort": "i1"
+        },
+        {
+            "sourceNode": "amy",
+            "sourcePort": "o2",
+            "targetNode": "cloe",
+            "targetPort": "i2"
+        },
+        {
+            "sourceNode": "bob",
+            "sourcePort": "o1",
+            "targetNode": "cloe",
+            "targetPort": "i1"
+        },
+        {
+            "sourceNode": "cloe",
+            "sourcePort": "o1",
+            "targetNode": "dan",
+            "targetPort": "i1"
+        }
+    ]
+}

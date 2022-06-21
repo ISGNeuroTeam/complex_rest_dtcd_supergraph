@@ -1,36 +1,41 @@
 import configparser
-
+import json
 from pathlib import Path
-from core.settings.ini_config import merge_ini_config_with_defaults
+
+from core.settings.ini_config import merge_ini_config_with_defaults, merge_dicts
+from neotools.serializers import DEFAULTS
+
+
+PROJECT_DIR = Path(__file__).parent
 
 default_ini_config = {
-    'logging': {
-        'level': 'INFO'
+    "logging": {"level": "INFO"},
+    "graph": {},
+    "workspace": {},
+    "neo4j": {
+        "uri": "bolt://localhost:7687",
+        "user": "neo4j",
+        "password": "password",
+        "name": "neo4j",
     },
-    'db_conf': {
-        'host': 'localhost',
-        'port': '5432',
-        'database':  'complex_rest_dtcd_supergraph',
-        'user': 'complex_rest_dtcd_supergraph',
-        'password': 'complex_rest_dtcd_supergraph'
-    }
 }
 
+# main config
 config_parser = configparser.ConfigParser()
+config_parser.read(PROJECT_DIR / "complex_rest_dtcd_supergraph.conf")
+# FIXME option false in config gets converted from 'false' to True
+ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
 
-config_parser.read(Path(__file__).parent / 'complex_rest_dtcd_supergraph.conf')
+# neo4j config
+NEO4J = ini_config["neo4j"]
 
-# convert to dictionary
-config = {s: dict(config_parser.items(s)) for s in config_parser.sections()}
+# settings for custom data design
+with open(PROJECT_DIR / "serialization.json") as f:
+    serialization_conf = json.load(f)
+SERIALIZATION_SCHEMA = merge_dicts(serialization_conf, DEFAULTS)
 
-ini_config = merge_ini_config_with_defaults(config, default_ini_config)
+with open(PROJECT_DIR / "exchange.json") as f:
+    exchange_conf = json.load(f)
+EXCHANGE_SCHEMA = exchange_conf
 
-# configure your own database if you need
-# DATABASE = {
-#         "ENGINE": 'django.db.backends.postgresql',
-#         "NAME": ini_config['db_conf']['database'],
-#         "USER": ini_config['db_conf']['user'],
-#         "PASSWORD": ini_config['db_conf']['password'],
-#         "HOST": ini_config['db_conf']['host'],
-#         "PORT": ini_config['db_conf']['port']
-# }
+SCHEMA = merge_dicts(SERIALIZATION_SCHEMA, EXCHANGE_SCHEMA)

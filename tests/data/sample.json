@@ -1,0 +1,3976 @@
+{
+  "nodes": [
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "Кредитный портфель"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_1_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_1_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "7",
+              "type": "expression",
+              "status": "complete",
+              "value": 7
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode21",
+      "primitiveID": "ControlledRichLabelNode21_1",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>КИР</u></strong></p><p>Средневзвешенная стоимость \"$inPort1$\": <strong>$outPort1$</strong> % </p>",
+      "layout": {
+        "x": -797.75,
+        "y": -59.75,
+        "height": 127,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_3_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_3_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "24000\n",
+              "type": "expression",
+              "status": "complete",
+              "value": 24000
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_3_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode21",
+      "primitiveID": "ControlledRichLabelNode21_3",
+      "nodeTitle": "<p>Объем лизингового портфеля <strong>$outPort1$</strong> млн. руб</p>",
+      "layout": {
+        "x": 862,
+        "y": -74.375,
+        "height": 127,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_4_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_4_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "7.5",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_4_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode21",
+      "primitiveID": "ControlledRichLabelNode21_4",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>КИР</u></strong></p><p>Средневзвешенная стоимость лизиногового портфеля   <strong>$outPort1$</strong>%</p>",
+      "layout": {
+        "x": 113.25,
+        "y": -59.75,
+        "height": 127,
+        "width": 216.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_1_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "Кредитный портфель"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_1_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_1_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_1_inPort1.status/100*ControlledRichLabelNode31_1_inPort3.status*1/4",
+              "type": "expression",
+              "status": "complete",
+              "value": 1050
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_1",
+      "nodeTitle": "<p>$inPort2$ 1 квартал </p><p><strong>$outPort1$ </strong>млн. руб</p>",
+      "layout": {
+        "x": -336.25,
+        "y": -214.375,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "процентные расходы и лизиновые платежи"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_2_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1050
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_2_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 450
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_2_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_2_inPort2.status+ControlledRichLabelNode31_2_inPort3.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 1500
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_2_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_2",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>КИР</u></strong></p><p>Итого $inPort1$ <strong style=\"color: rgb(205, 93, 103);\">1</strong> квартал <strong>$outPort1$</strong> млн руб.</p>",
+      "layout": {
+        "x": -154.75,
+        "y": -409.75,
+        "height": 113.5,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_4_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_4_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 24000
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_4_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_4_inPort1.status/100*ControlledRichLabelNode31_4_inPort3.status*1/4",
+              "type": "expression",
+              "status": "complete",
+              "value": 450
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_4_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_4",
+      "nodeTitle": "<p>Лизинговый портфель 1 квартал </p><p><strong>$outPort1$ </strong>млн. руб</p>",
+      "layout": {
+        "x": 52.25,
+        "y": -214.375,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "7.5\n",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_1",
+      "nodeTitle": "<p>Средневзвешенная стоимость кредитного портфеля <strong>$outPort1$</strong>% </p>",
+      "layout": {
+        "x": 1927.2124999999996,
+        "y": 143.828125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "8",
+              "type": "expression",
+              "status": "complete",
+              "value": 8
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_3_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_3",
+      "nodeTitle": "<p>Объём лизиногового портфеля   <strong>$outPort1$</strong>%</p>",
+      "layout": {
+        "x": 2459.875,
+        "y": 143.828125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_3_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_3_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_3_inPort1.status*UncontrolledRichLabelNode21_3_inPort2.status/100*1/4",
+              "type": "expression",
+              "status": "complete",
+              "value": 1125
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_3_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_3",
+      "nodeTitle": "<p>Обслуживание кредитного портфеля 1 квартал </p><p><strong>$outPort1$ </strong>млн. руб</p>",
+      "layout": {
+        "x": 1811.5,
+        "y": -10.796875,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 24000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_4_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 8
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_4_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_4_inPort1.status*UncontrolledRichLabelNode21_4_inPort2.status/100*1/4",
+              "type": "expression",
+              "status": "complete",
+              "value": 480
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_4_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_4",
+      "nodeTitle": "<p>Обслуживание лизиногового портфель 1 квартал </p><p><strong>$outPort1$ </strong>млн. руб</p>",
+      "layout": {
+        "x": 2320.2250000000004,
+        "y": -10.796875,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "24000",
+              "type": "expression",
+              "status": "complete",
+              "value": 24000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_5_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_5",
+      "nodeTitle": "<p>Объём лизиногового портфеля <strong>$outPort1$</strong> млн. руб</p>",
+      "layout": {
+        "x": 2193.375,
+        "y": 143.828125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1125
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_5_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 480
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_5_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_5_inPort1.status+UncontrolledRichLabelNode21_5_inPort2.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 1605
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_5_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_5",
+      "nodeTitle": "<p><u style=\"color: rgb(255, 149, 0);\"><large style=\"font-size: 1.5em;\">Критический сценарий</large></u></p><p>Итого процентные расходы и лизиновые платежи 1 квартал</p><p> <strong>$outPort1$</strong> млн руб.</p>",
+      "layout": {
+        "x": 1993.125,
+        "y": -288.046875,
+        "height": 148,
+        "width": 380.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1500
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_6_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1605
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_6_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_6_inPort2.status-UncontrolledRichLabelNode21_6_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 105
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_6_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_6",
+      "nodeTitle": "<p>Оценка риска первичная</p><p><strong style=\"color: rgb(255, 149, 0);\"><u>Текущий риск</u></strong></p><p>$outPort1$ млн. руб.</p>",
+      "layout": {
+        "x": 470.75,
+        "y": -772.125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "\"Кредитный портфель\"",
+              "type": "expression",
+              "status": "complete",
+              "value": "Кредитный портфель"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_1",
+      "nodeTitle": "<p><u>Показатель:</u></p><p>$outPort1$</p>",
+      "layout": {
+        "x": -473.75,
+        "y": 440.625,
+        "height": 93,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "Кредитный портфель"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_1_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_1_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode22_1_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": "Кредитный портфель"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_1_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode22_1_inPort2.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_1_outPort2"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode22",
+      "primitiveID": "ControlledRichLabelNode22_1",
+      "nodeTitle": "<p>Объем $inPort1$: <strong>$outPort2$</strong> млн.руб</p>",
+      "layout": {
+        "x": -194.25,
+        "y": -59.75,
+        "height": 127,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "24000",
+              "type": "expression",
+              "status": "complete",
+              "value": 24000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_7_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_7",
+      "nodeTitle": "<p>Объём лизиногового портфеля лизиногового портфеля <strong>$outPort1$</strong> млн. руб</p>",
+      "layout": {
+        "x": 3349.875,
+        "y": 150.1875,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "7.7",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.7
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_8_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_8",
+      "nodeTitle": "<p>Средневзвешенная стоимость лизиногового портфеля   <strong>$outPort1$</strong> %</p>",
+      "layout": {
+        "x": 3636.0375000000004,
+        "y": 150.1875,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "7.4",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.4
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_9_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_9",
+      "nodeTitle": "<p>Средневзвешенная стоимость кредитного портфеля <strong>$outPort1$</strong> % </p>",
+      "layout": {
+        "x": 3063.7124999999996,
+        "y": 156.125,
+        "height": 81.125,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode11_1_inPort1"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode11_1_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode11_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode11",
+      "primitiveID": "UncontrolledRichLabelNode11_1",
+      "nodeTitle": "<p>Объем кредитного портфеля  <strong>$outPort1$</strong> млн. руб</p>",
+      "layout": {
+        "x": 2797.55,
+        "y": 156.125,
+        "height": 81.125,
+        "width": 216.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode11_2_inPort1"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode11_2_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode11_2_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode11",
+      "primitiveID": "UncontrolledRichLabelNode11_2",
+      "nodeTitle": "<p>Объем кредитного портфеля  <strong>$outPort1$</strong> млн. руб</p>",
+      "layout": {
+        "x": 1661.0500000000002,
+        "y": 143.828125,
+        "height": 93,
+        "width": 216.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "Кредитный портфель"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode11_1_inPort1"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "60000",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode11_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode11",
+      "primitiveID": "ControlledRichLabelNode11_1",
+      "nodeTitle": "<p><strong><u>Загружено из КХД </u></strong></p><p>Для показателя \"$inPort1$\": $outPort1$</p>",
+      "layout": {
+        "x": 248.25,
+        "y": 303.75,
+        "height": 93,
+        "width": 685.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "\"процентные расходы и лизиновые платежи\"",
+              "type": "expression",
+              "status": "complete",
+              "value": "процентные расходы и лизиновые платежи"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_4_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_4",
+      "nodeTitle": "<p><u>Показатель:</u></p><p>$outPort1$</p>",
+      "layout": {
+        "x": -59.25,
+        "y": -758,
+        "height": 113.5,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 60000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_7_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.4
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_7_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_7_inPort1.status*UncontrolledRichLabelNode21_7_inPort2.status/100*1/4",
+              "type": "expression",
+              "status": "complete",
+              "value": 1110
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_7_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_7",
+      "nodeTitle": "<p>Обслуживание кредитного портфеля 1 квартал </p><p><strong>$outPort1$ </strong>млн. руб</p>",
+      "layout": {
+        "x": 2916.25,
+        "y": -5.28125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 24000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_8_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.7
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_8_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_8_inPort1.status*UncontrolledRichLabelNode21_8_inPort2.status/100*1/4",
+              "type": "expression",
+              "status": "complete",
+              "value": 462
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_8_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_8",
+      "nodeTitle": "<p>Обслуживание лизиногового портфеля 1 квартал </p><p><strong>$outPort1$ </strong>млн. руб</p>",
+      "layout": {
+        "x": 3456.7250000000004,
+        "y": -10.796875,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1110
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_9_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 462
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_9_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_9_inPort1.status+UncontrolledRichLabelNode21_9_inPort2.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 1572
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_9_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_9",
+      "nodeTitle": "<p><u style=\"color: rgb(0, 199, 190);\"><large style=\"font-size: 1.5em;\">Риск-сценарий с учётом мероприятий</large></u></p><p>(оценка остаточного риска)</p><p>Итого процентные расходы и лизиновые платежи 1 квартал</p><p> <strong>$outPort1$</strong> млн руб.</p>",
+      "layout": {
+        "x": 3090.875,
+        "y": -282.53125,
+        "height": 148,
+        "width": 380.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1500
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_10_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1572
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_10_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode21_10_inPort2.status-UncontrolledRichLabelNode21_10_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 72
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode21_10_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode21",
+      "primitiveID": "UncontrolledRichLabelNode21_10",
+      "nodeTitle": "<p>Оценка риска первичная</p><p><strong style=\"color: rgb(0, 199, 190);\"><u>Остаточный риск</u></strong></p><p>$outPort1$ млн. руб.</p>",
+      "layout": {
+        "x": 742.9499999999998,
+        "y": -772.125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_1_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_1_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode21_1_inPort2.status-StepRichLabelNode21_1_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 0.5
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode21",
+      "primitiveID": "StepRichLabelNode21_1",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>Риск-фактор 1: </u></strong></p><p>Изменение средневзвешеной стоимости кредитного портфеля на <strong>$outPort1$</strong> п.п.</p><p><br></p>",
+      "layout": {
+        "x": 775,
+        "y": -521.25,
+        "height": 93,
+        "width": 323.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_2_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 8
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_2_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode21_2_inPort2.status-StepRichLabelNode21_2_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 0.5
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_2_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode21",
+      "primitiveID": "StepRichLabelNode21_2",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>Риск-фактор 2: </u></strong></p><p>Изменение средневзвешеной стоимости лизингового портфеля на <strong>$outPort1$</strong> п.п.</p>",
+      "layout": {
+        "x": 775,
+        "y": -398.25,
+        "height": 93,
+        "width": 323.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "51",
+              "type": "expression",
+              "status": "complete",
+              "value": 51
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_1_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "75",
+              "type": "expression",
+              "status": "complete",
+              "value": 75
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_1_outPort2"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode02",
+      "primitiveID": "ControlledRichLabelNode02_1",
+      "nodeTitle": "<p>Вероятность реализации риска (текущий), %</p><p>Минимум: <strong>$outPort1$%</strong></p><p>Максимум: <strong>$outPort2$%</strong></p>",
+      "layout": {
+        "x": 144.625,
+        "y": -1140.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "процентные расходы и лизиновые платежи"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_5_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 105
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_5_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1.4287857
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_5_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "Math.round(ControlledRichLabelNode31_5_inPort2.status*4*ControlledRichLabelNode31_5_inPort3.status*100)/100",
+              "type": "expression",
+              "status": "complete",
+              "value": 600.09
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_5_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_5",
+      "nodeTitle": "<p>Оценка риска первичная накопительный итог </p><p>$inPort1$ <strong style=\"color: rgb(205, 93, 103);\">за год</strong> <strong>$outPort1$</strong> млн руб.</p><p><em>(для демонстрации умножили первый квартал на 4), в реальности будет рассчитываться честно</em></p>",
+      "layout": {
+        "x": -213.875,
+        "y": -1140.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "1.4287857",
+              "type": "expression",
+              "status": "complete",
+              "value": 1.4287857
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_5_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_5",
+      "nodeTitle": "<p>Поправочный коэффициент <strong>$outPort1$</strong>, который имитирует расчёт риска накопительым итогом за год,</p><p>в данной модели оценка за 1 квартал умножается на 4 и на этот коэффициент.</p>",
+      "layout": {
+        "x": -646.75,
+        "y": -853.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 600.09
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_6_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 51
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_6_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 75
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_6_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_6_inPort1.status*Math.max( ControlledRichLabelNode31_6_inPort2.status,ControlledRichLabelNode31_6_inPort3.status)/100",
+              "type": "expression",
+              "status": "complete",
+              "value": 450.0675
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_6_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_6",
+      "nodeTitle": "<p><strong style=\"color: rgb(255, 149, 0);\"><u>Оценка риска - текущий риск</u></strong></p><p><strong>$outPort1$</strong></p>",
+      "layout": {
+        "x": -2.75,
+        "y": -1331,
+        "height": 93,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "51",
+              "type": "expression",
+              "status": "complete",
+              "value": 51
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_2_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "75",
+              "type": "expression",
+              "status": "complete",
+              "value": 75
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_2_outPort2"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode02",
+      "primitiveID": "ControlledRichLabelNode02_2",
+      "nodeTitle": "<p>Вероятность реализации риска (текущий), %</p><p>Минимум: <strong>$outPort1$%</strong></p><p>Максимум: <strong>$outPort2$%</strong></p>",
+      "layout": {
+        "x": 1085.4499999999998,
+        "y": -1140.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 325.53
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_7_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 51
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_7_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 75
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_7_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_7_inPort1.status*Math.max( ControlledRichLabelNode31_7_inPort2.status,ControlledRichLabelNode31_7_inPort3.status)/100",
+              "type": "expression",
+              "status": "complete",
+              "value": 244.14749999999995
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_7_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_7",
+      "nodeTitle": "<p><strong style=\"color: rgb(48, 176, 199);\"><u>Оценка риска - остаточный риск</u></strong></p><p><strong>$outPort1$</strong></p>",
+      "layout": {
+        "x": 657.5,
+        "y": -1331,
+        "height": 93,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "1.1303125\n",
+              "type": "expression",
+              "status": "complete",
+              "value": 1.1303125
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_6_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_6",
+      "nodeTitle": "<p>Поправочный коэффициент <strong>$outPort1$</strong>, который имитирует расчёт риска накопительым итогом за год,</p><p>в данной модели оценка за 1 квартал умножается на 4 и на этот коэффициент.</p>",
+      "layout": {
+        "x": 1222.9499999999998,
+        "y": -923.5,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "процентные расходы и лизиновые платежи"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_8_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 72
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_8_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1.1303125
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_8_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "Math.round(ControlledRichLabelNode31_8_inPort2.status*4*ControlledRichLabelNode31_8_inPort3.status*100)/100",
+              "type": "expression",
+              "status": "complete",
+              "value": 325.53
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_8_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_8",
+      "nodeTitle": "<p>Оценка риска остаточный накопительный итог </p><p>$inPort1$ <strong style=\"color: rgb(205, 93, 103);\">за год</strong> <strong>$outPort1$</strong> млн руб.</p><p><em>(для демонстрации умножили первый квартал на 4), в реальности будет рассчитываться честно</em></p>",
+      "layout": {
+        "x": 714.1999999999998,
+        "y": -1140.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 450.0675
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_3_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 244.14749999999995
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_3_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "Math.round((StepRichLabelNode21_3_inPort1.status-StepRichLabelNode21_3_inPort2.status)*100)/100",
+              "type": "expression",
+              "status": "complete",
+              "value": 205.92
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_3_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode21",
+      "primitiveID": "StepRichLabelNode21_3",
+      "nodeTitle": "<p>Ожидаемый эффект от выполнения мероприятий<strong> $outPort1$</strong> млн. руб</p>",
+      "layout": {
+        "x": 191.5,
+        "y": -1652.125,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 205.92
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_1_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 5
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_1_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 17
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_1_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode31_1_inPort1.status*StepRichLabelNode31_1_inPort2.status/(StepRichLabelNode31_1_inPort2.status+StepRichLabelNode31_1_inPort3.status)",
+              "type": "expression",
+              "status": "complete",
+              "value": 46.8
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_1_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode31",
+      "primitiveID": "StepRichLabelNode31_1",
+      "nodeTitle": "<p>1. Мониторинг рынка капитала и последующее проведение закупочных процедур на наиболее выгодных стоимостных условиях, рассмотрение необходимости рефинансирования действующих кредитов.</p><p>Вклад в эффект от выполнения мероприятий<strong> $outPort1$</strong> млн. руб.</p>",
+      "layout": {
+        "x": 716.625,
+        "y": -1876.5,
+        "height": 148,
+        "width": 395.75
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 205.92
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_2_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 17
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_2_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 5
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_2_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode31_2_inPort1.status*StepRichLabelNode31_2_inPort2.status/(StepRichLabelNode31_2_inPort2.status+StepRichLabelNode31_2_inPort3.status)",
+              "type": "expression",
+              "status": "complete",
+              "value": 159.12
+            }
+          },
+          "primitiveID": "StepRichLabelNode31_2_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode31",
+      "primitiveID": "StepRichLabelNode31_2",
+      "nodeTitle": "<p>2. Анализ действующего кредитного портфеля и его диверсификация: наличие кредитов как по фиксированной, так и плавающей процентным ставкам</p><p>Вклад в эффект от выполнения мероприятий <strong>$outPort1$</strong> млн. руб.</p>",
+      "layout": {
+        "x": 1170.25,
+        "y": -1876.5,
+        "height": 148,
+        "width": 395.75
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "5",
+              "type": "expression",
+              "status": "complete",
+              "value": 5
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_7_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_7",
+      "nodeTitle": "<p>Удельный вес мероприятия <strong>$outPort1$</strong></p>",
+      "layout": {
+        "x": 767.5,
+        "y": -1624.625,
+        "height": 93,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "17",
+              "type": "expression",
+              "status": "complete",
+              "value": 17
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_8_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_8",
+      "nodeTitle": "<p>Удельный вес мероприятия <strong>$outPort1$</strong></p>",
+      "layout": {
+        "x": 1170.25,
+        "y": -1624.625,
+        "height": 93,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "1510",
+              "type": "expression",
+              "status": "complete",
+              "value": 1510
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_10_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_10",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>КИР фактическое значение (из переоценки 1 квартрал)</u></strong></p><p>Итого процентные расходы и лизиновые платежи, <strong>$outPort1$ </strong>млн руб.</p>",
+      "layout": {
+        "x": 145.5,
+        "y": -409.75,
+        "height": 113.5,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "8",
+              "type": "expression",
+              "status": "complete",
+              "value": 8
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_11_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_11",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>КИР фактическое значение (из переоценки 1 квартрал)</u></strong></p><p>Средневзвешенная стоимость кредитного портфеля <strong>$outPort1$</strong>%</p>",
+      "layout": {
+        "x": -531.25,
+        "y": -59.75,
+        "height": 127,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "8.5",
+              "type": "expression",
+              "status": "complete",
+              "value": 8.5
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_12_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_12",
+      "nodeTitle": "<p><strong style=\"color: rgb(205, 93, 103);\"><u>КИР фактическое значение (из переоценки 1 квартрал)</u></strong></p><p>Средневзвешенная стоимость лизингового портфеля <strong>$outPort1$</strong>%</p>",
+      "layout": {
+        "x": 359.75,
+        "y": -59.75,
+        "height": 127,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1500
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_4_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1510
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_4_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode21_4_inPort2.status-StepRichLabelNode21_4_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 10
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_4_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode21",
+      "primitiveID": "StepRichLabelNode21_4",
+      "nodeTitle": "<p>Факт реализации риска 1 квартал</p><p><strong>$outPort1$</strong> млн. руб.</p>",
+      "layout": {
+        "x": -1701.75,
+        "y": -775.25,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_5_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 8
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_5_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode21_5_inPort2.status-StepRichLabelNode21_5_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 1
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_5_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode21",
+      "primitiveID": "StepRichLabelNode21_5",
+      "nodeTitle": "<p><u>Причина реализации риска</u></p><p>1. Рост средневзвешенной ставки по кредитному портфелю на <strong>$outPort1$</strong> п.п.</p>",
+      "layout": {
+        "x": -1896.25,
+        "y": -548.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 7.5
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_6_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 8.5
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_6_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "StepRichLabelNode21_6_inPort2.status-StepRichLabelNode21_6_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 1
+            }
+          },
+          "primitiveID": "StepRichLabelNode21_6_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "StepRichLabelNode21",
+      "primitiveID": "StepRichLabelNode21_6",
+      "nodeTitle": "<p><u>Причина реализации риска</u></p><p>2. Рост средневзвешенной ставки по лизинговому портфелю на <strong>$outPort1$</strong> п.п.</p>",
+      "layout": {
+        "x": -1501,
+        "y": -548.75,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "10000",
+              "type": "expression",
+              "status": "complete",
+              "value": 10000
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode03_1_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "2",
+              "type": "expression",
+              "status": "complete",
+              "value": 2
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode03_1_outPort2"
+        },
+        {
+          "primitiveName": "outPort3",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "UncontrolledRichLabelNode03_1_outPort1.status*UncontrolledRichLabelNode03_1_outPort2.status/100",
+              "type": "expression",
+              "status": "complete",
+              "value": 200
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode03_1_outPort3"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode03",
+      "primitiveID": "UncontrolledRichLabelNode03_1",
+      "nodeTitle": "<p><strong style=\"color: rgb(175, 82, 222);\"><u><large style=\"font-size: 1.5em\">Решение правления:</large></u></strong></p><p>Чистая прибыль, <strong>$outPort1$ </strong>млн. рублей</p><p>%  риск-аппетита <strong>$outPort2$</strong></p><p>Целевой риск-аппетит, <strong>$outPort3$</strong> млн. руб</p>",
+      "layout": {
+        "x": -1982.875,
+        "y": -1832.25,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "600",
+              "type": "expression",
+              "status": "complete",
+              "value": 600
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_3_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "280",
+              "type": "expression",
+              "status": "complete",
+              "value": 280
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_3_outPort2"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode02",
+      "primitiveID": "ControlledRichLabelNode02_3",
+      "nodeTitle": "<p><strong><u>Пример второго риска</u></strong></p><p><span style=\"color: rgb(255, 149, 0);\">Текущий риск $outPort1$</span></p><p><span style=\"color: rgb(48, 176, 199);\">Остаточный риск $outPort2$</span></p>",
+      "layout": {
+        "x": -1016.625,
+        "y": -1567.625,
+        "height": 93,
+        "width": 283.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "10",
+              "type": "expression",
+              "status": "complete",
+              "value": 10
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_4_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "7",
+              "type": "expression",
+              "status": "complete",
+              "value": 7
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode02_4_outPort2"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode02",
+      "primitiveID": "ControlledRichLabelNode02_4",
+      "nodeTitle": "<p><strong><u>Пример третьего риска</u></strong></p><p><span style=\"color: rgb(255, 149, 0);\">Текущий риск $outPort1$</span></p><p><span style=\"color: rgb(48, 176, 199);\">Остаточный риск $outPort2$</span></p>",
+      "layout": {
+        "x": -1016.625,
+        "y": -1397.375,
+        "height": 93,
+        "width": 283.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 200
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_9_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 450.0675
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_9_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 600
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_9_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_9_inPort1.status*ControlledRichLabelNode31_9_inPort2.status/(ControlledRichLabelNode31_9_inPort2.status+ControlledRichLabelNode31_9_inPort3.status)",
+              "type": "expression",
+              "status": "complete",
+              "value": 85.72163218078838
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_9_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_9",
+      "nodeTitle": "<p>Риск-аппетит текущего риска</p><p>$outPort1$ млн. руб</p>",
+      "layout": {
+        "x": -1472.25,
+        "y": -1900.125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 200
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_10_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 600
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_10_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 450.0675
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_10_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_10_inPort1.status*ControlledRichLabelNode31_10_inPort2.status/(ControlledRichLabelNode31_10_inPort2.status+ControlledRichLabelNode31_10_inPort3.status)",
+              "type": "expression",
+              "status": "complete",
+              "value": 114.27836781921161
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_10_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_10",
+      "nodeTitle": "<p>Риск-аппетит второго риска</p><p>$outPort1$ млн. руб</p>",
+      "layout": {
+        "x": -1472.25,
+        "y": -1595.125,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_9_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_9",
+      "nodeTitle": "<p><small>Изменяем для демонстрации рекомендаций системы на</small></p><p><small>3 % - риск Ок</small></p><p><small>7.4% - нужны мероприятия</small></p>",
+      "layout": {
+        "x": 3129.6312499999995,
+        "y": 237.25,
+        "height": 156.5,
+        "width": 104.66250000000036
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "\"1. Проведение конкурсных процедур по рефинансированию действующего кредитного портфеля\"+\"<br/>\"+\"2. Проведение конкурсных процедур по рефинансированию действующего лизингово портфеля\"",
+              "type": "expression",
+              "status": "complete",
+              "value": "1. Проведение конкурсных процедур по рефинансированию действующего кредитного портфеля<br/>2. Проведение конкурсных процедур по рефинансированию действующего лизингово портфеля"
+            }
+          },
+          "primitiveID": "UncontrolledRichLabelNode01_13_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "UncontrolledRichLabelNode01",
+      "primitiveID": "UncontrolledRichLabelNode01_13",
+      "nodeTitle": "<p><u>Справочник: перечень дополнительных мероприятий</u></p><p>$outPort1$</p>",
+      "layout": {
+        "x": 479.25,
+        "y": -2265.5,
+        "height": 192.25,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 85.72163218078838
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_11_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 244.14749999999995
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_11_inPort2"
+        },
+        {
+          "primitiveName": "inPort3",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": "1. Проведение конкурсных процедур по рефинансированию действующего кредитного портфеля<br/>2. Проведение конкурсных процедур по рефинансированию действующего лизингово портфеля"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_11_inPort3"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode31_11_inPort2.status > ControlledRichLabelNode31_11_inPort1.status ? ControlledRichLabelNode31_11_inPort3.status :\"Риск Ок, в пределах риск-аппетита\"",
+              "type": "expression",
+              "status": "complete",
+              "value": "1. Проведение конкурсных процедур по рефинансированию действующего кредитного портфеля<br/>2. Проведение конкурсных процедур по рефинансированию действующего лизингово портфеля"
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode31_11_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode31",
+      "primitiveID": "ControlledRichLabelNode31_11",
+      "nodeTitle": "<p><u>Рекомендации системы по текущему риску:</u></p><p><span style=\"color: rgb(255, 149, 0);\"><large style=\"font-size: 1.5em\">$outPort1$</large></span></p>",
+      "layout": {
+        "x": -943.9375,
+        "y": -2212.375,
+        "height": 192.25,
+        "width": 369.375
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 450.0675
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_2_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 244.14749999999995
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_2_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode22_2_inPort1.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 450.0675
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_2_outPort1"
+        },
+        {
+          "primitiveName": "outPort2",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode22_2_inPort2.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 244.14749999999995
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode22_2_outPort2"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode22",
+      "primitiveID": "ControlledRichLabelNode22_2",
+      "nodeTitle": "<p><strong><u>Риск Р.021 </u></strong></p><p><span style=\"color: rgb(255, 149, 0);\">Текущий риск $outPort1$</span></p><p><span style=\"color: rgb(48, 176, 199);\">Остаточный риск $outPort2$</span></p>",
+      "layout": {
+        "x": -1022,
+        "y": -1900.125,
+        "height": 148,
+        "width": 294
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_10_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_10",
+      "nodeTitle": "<p><small>Изменяем для демонстрации рекомендаций системы на</small></p><p><small>2 % - Нужны мероприятия</small></p><p><small>10% - Всё Ок</small></p>",
+      "layout": {
+        "x": -1889.375,
+        "y": -1684.25,
+        "height": 148,
+        "width": 107
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_11_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_11",
+      "nodeTitle": "<p><small>Попадает в отчёт (паспорт риска), заполняется Владелцем риска на основании дельты между бюджетной моделью и фактом по каждому из элементов расчётной модели риска</small></p>",
+      "layout": {
+        "x": -1846.75,
+        "y": -779.75,
+        "height": 231,
+        "width": 145
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "",
+              "type": "expression",
+              "status": "complete",
+              "value": ""
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode01_12_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode01",
+      "primitiveID": "ControlledRichLabelNode01_12",
+      "nodeTitle": "<p><small>Будет являться причиной изменения в оценке, а не производным</small></p>",
+      "layout": {
+        "x": 1098.5,
+        "y": -521.25,
+        "height": 223.5,
+        "width": 124
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression",
+          "status": "complete",
+          "value": ""
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1605
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_5_inPort1"
+        },
+        {
+          "primitiveName": "inPort2",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression",
+              "status": "complete",
+              "value": 1572
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_5_inPort2"
+        },
+        {
+          "primitiveName": "outPort1",
+          "type": "OUT",
+          "properties": {
+            "status": {
+              "expression": "ControlledRichLabelNode21_5_inPort1.status-ControlledRichLabelNode21_5_inPort2.status",
+              "type": "expression",
+              "status": "complete",
+              "value": 33
+            }
+          },
+          "primitiveID": "ControlledRichLabelNode21_5_outPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "ControlledRichLabelNode21",
+      "primitiveID": "ControlledRichLabelNode21_5",
+      "nodeTitle": "<p>Эффект от применения мероприятий <strong>$outPort1$</strong> млн. руб.</p>",
+      "layout": {
+        "x": 1713.75,
+        "y": -1849,
+        "height": 93,
+        "width": 236.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression"
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression"
+            }
+          },
+          "primitiveID": "TargetRichLabelNode1_2_inPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "TargetRichLabelNode1",
+      "primitiveID": "TargetRichLabelNode1_2",
+      "nodeTitle": "TargetRichLabelNode1_2",
+      "layout": {
+        "x": -644.0625,
+        "y": -2265.5,
+        "height": 93,
+        "width": 106.5
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression"
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression"
+            }
+          },
+          "primitiveID": "TargetRichLabelNode1_3_inPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "TargetRichLabelNode1",
+      "primitiveID": "TargetRichLabelNode1_3",
+      "nodeTitle": "TargetRichLabelNode1_3",
+      "layout": {
+        "x": -774,
+        "y": -1900.125,
+        "height": 61,
+        "width": 186.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression"
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression"
+            }
+          },
+          "primitiveID": "TargetRichLabelNode1_4_inPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "TargetRichLabelNode1",
+      "primitiveID": "TargetRichLabelNode1_4",
+      "nodeTitle": "TargetRichLabelNode1_4",
+      "layout": {
+        "x": -812.625,
+        "y": -1608.625,
+        "height": 61,
+        "width": 186.25
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression"
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression"
+            }
+          },
+          "primitiveID": "TargetRichLabelNode1_5_inPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "TargetRichLabelNode1",
+      "primitiveID": "TargetRichLabelNode1_5",
+      "nodeTitle": "TargetRichLabelNode1_5",
+      "layout": {
+        "x": -799.75,
+        "y": -1424.875,
+        "height": 61,
+        "width": 212
+      }
+    },
+    {
+      "properties": {
+        "testField": {
+          "expression": "",
+          "type": "expression"
+        }
+      },
+      "initPorts": [
+        {
+          "primitiveName": "inPort1",
+          "type": "IN",
+          "properties": {
+            "status": {
+              "expression": "let portOwner = graph.ports.find(port => port.tag.primitiveID === primitiveID).owner;\nlet inEdges = graph.inEdgesAt(portOwner).filter(edge => edge.targetPort.tag.primitiveID === primitiveID).toArray()\nif (inEdges.length < 1) ''\nelse {\neval(inEdges[0].sourcePort.tag.primitiveID).status\n}",
+              "type": "expression"
+            }
+          },
+          "primitiveID": "TargetRichLabelNode1_6_inPort1"
+        }
+      ],
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "TargetRichLabelNode1",
+      "primitiveID": "TargetRichLabelNode1_6",
+      "nodeTitle": "TargetRichLabelNode1_6",
+      "layout": {
+        "x": -1471.875,
+        "y": -821.4375,
+        "height": 83.375,
+        "width": 191.25
+      }
+    }
+  ],
+  "edges": [
+    {
+      "sourceNode": "ControlledRichLabelNode21_1",
+      "sourcePort": "ControlledRichLabelNode21_1_outPort1",
+      "targetNode": "ControlledRichLabelNode31_1",
+      "targetPort": "ControlledRichLabelNode31_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode21_4",
+      "sourcePort": "ControlledRichLabelNode21_4_outPort1",
+      "targetNode": "ControlledRichLabelNode31_4",
+      "targetPort": "ControlledRichLabelNode31_4_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode21_3",
+      "sourcePort": "ControlledRichLabelNode21_3_outPort1",
+      "targetNode": "ControlledRichLabelNode31_4",
+      "targetPort": "ControlledRichLabelNode31_4_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_4",
+      "sourcePort": "ControlledRichLabelNode31_4_outPort1",
+      "targetNode": "ControlledRichLabelNode31_2",
+      "targetPort": "ControlledRichLabelNode31_2_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_5",
+      "sourcePort": "UncontrolledRichLabelNode01_5_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_4",
+      "targetPort": "UncontrolledRichLabelNode21_4_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_1",
+      "sourcePort": "UncontrolledRichLabelNode01_1_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_3",
+      "targetPort": "UncontrolledRichLabelNode21_3_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_3",
+      "sourcePort": "UncontrolledRichLabelNode01_3_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_4",
+      "targetPort": "UncontrolledRichLabelNode21_4_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_3",
+      "sourcePort": "UncontrolledRichLabelNode21_3_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_5",
+      "targetPort": "UncontrolledRichLabelNode21_5_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_4",
+      "sourcePort": "UncontrolledRichLabelNode21_4_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_5",
+      "targetPort": "UncontrolledRichLabelNode21_5_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_2",
+      "sourcePort": "ControlledRichLabelNode31_2_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_6",
+      "targetPort": "UncontrolledRichLabelNode21_6_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_5",
+      "sourcePort": "UncontrolledRichLabelNode21_5_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_6",
+      "targetPort": "UncontrolledRichLabelNode21_6_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_1",
+      "sourcePort": "ControlledRichLabelNode01_1_outPort1",
+      "targetNode": "ControlledRichLabelNode21_1",
+      "targetPort": "ControlledRichLabelNode21_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_1",
+      "sourcePort": "ControlledRichLabelNode01_1_outPort1",
+      "targetNode": "ControlledRichLabelNode22_1",
+      "targetPort": "ControlledRichLabelNode22_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode22_1",
+      "sourcePort": "ControlledRichLabelNode22_1_outPort2",
+      "targetNode": "ControlledRichLabelNode31_1",
+      "targetPort": "ControlledRichLabelNode31_1_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode11_2",
+      "sourcePort": "UncontrolledRichLabelNode11_2_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_3",
+      "targetPort": "UncontrolledRichLabelNode21_3_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_1",
+      "sourcePort": "ControlledRichLabelNode01_1_outPort1",
+      "targetNode": "ControlledRichLabelNode11_1",
+      "targetPort": "ControlledRichLabelNode11_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode11_1",
+      "sourcePort": "ControlledRichLabelNode11_1_outPort1",
+      "targetNode": "ControlledRichLabelNode22_1",
+      "targetPort": "ControlledRichLabelNode22_1_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_1",
+      "sourcePort": "ControlledRichLabelNode01_1_outPort1",
+      "targetNode": "ControlledRichLabelNode31_1",
+      "targetPort": "ControlledRichLabelNode31_1_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_1",
+      "sourcePort": "ControlledRichLabelNode31_1_outPort1",
+      "targetNode": "ControlledRichLabelNode31_2",
+      "targetPort": "ControlledRichLabelNode31_2_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_4",
+      "sourcePort": "ControlledRichLabelNode01_4_outPort1",
+      "targetNode": "ControlledRichLabelNode31_2",
+      "targetPort": "ControlledRichLabelNode31_2_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode11_1",
+      "sourcePort": "ControlledRichLabelNode11_1_outPort1",
+      "targetNode": "UncontrolledRichLabelNode11_2",
+      "targetPort": "UncontrolledRichLabelNode11_2_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode11_1",
+      "sourcePort": "ControlledRichLabelNode11_1_outPort1",
+      "targetNode": "UncontrolledRichLabelNode11_1",
+      "targetPort": "UncontrolledRichLabelNode11_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode11_1",
+      "sourcePort": "UncontrolledRichLabelNode11_1_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_7",
+      "targetPort": "UncontrolledRichLabelNode21_7_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_9",
+      "sourcePort": "UncontrolledRichLabelNode01_9_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_7",
+      "targetPort": "UncontrolledRichLabelNode21_7_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_7",
+      "sourcePort": "UncontrolledRichLabelNode01_7_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_8",
+      "targetPort": "UncontrolledRichLabelNode21_8_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_8",
+      "sourcePort": "UncontrolledRichLabelNode01_8_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_8",
+      "targetPort": "UncontrolledRichLabelNode21_8_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_7",
+      "sourcePort": "UncontrolledRichLabelNode21_7_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_9",
+      "targetPort": "UncontrolledRichLabelNode21_9_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_8",
+      "sourcePort": "UncontrolledRichLabelNode21_8_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_9",
+      "targetPort": "UncontrolledRichLabelNode21_9_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_9",
+      "sourcePort": "UncontrolledRichLabelNode21_9_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_10",
+      "targetPort": "UncontrolledRichLabelNode21_10_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_2",
+      "sourcePort": "ControlledRichLabelNode31_2_outPort1",
+      "targetNode": "UncontrolledRichLabelNode21_10",
+      "targetPort": "UncontrolledRichLabelNode21_10_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode21_1",
+      "sourcePort": "ControlledRichLabelNode21_1_outPort1",
+      "targetNode": "StepRichLabelNode21_1",
+      "targetPort": "StepRichLabelNode21_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_1",
+      "sourcePort": "UncontrolledRichLabelNode01_1_outPort1",
+      "targetNode": "StepRichLabelNode21_1",
+      "targetPort": "StepRichLabelNode21_1_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_3",
+      "sourcePort": "UncontrolledRichLabelNode01_3_outPort1",
+      "targetNode": "StepRichLabelNode21_2",
+      "targetPort": "StepRichLabelNode21_2_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode21_4",
+      "sourcePort": "ControlledRichLabelNode21_4_outPort1",
+      "targetNode": "StepRichLabelNode21_2",
+      "targetPort": "StepRichLabelNode21_2_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_5",
+      "sourcePort": "ControlledRichLabelNode01_5_outPort1",
+      "targetNode": "ControlledRichLabelNode31_5",
+      "targetPort": "ControlledRichLabelNode31_5_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_4",
+      "sourcePort": "ControlledRichLabelNode01_4_outPort1",
+      "targetNode": "ControlledRichLabelNode31_5",
+      "targetPort": "ControlledRichLabelNode31_5_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_6",
+      "sourcePort": "UncontrolledRichLabelNode21_6_outPort1",
+      "targetNode": "ControlledRichLabelNode31_5",
+      "targetPort": "ControlledRichLabelNode31_5_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_5",
+      "sourcePort": "ControlledRichLabelNode31_5_outPort1",
+      "targetNode": "ControlledRichLabelNode31_6",
+      "targetPort": "ControlledRichLabelNode31_6_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode02_1",
+      "sourcePort": "ControlledRichLabelNode02_1_outPort1",
+      "targetNode": "ControlledRichLabelNode31_6",
+      "targetPort": "ControlledRichLabelNode31_6_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode02_1",
+      "sourcePort": "ControlledRichLabelNode02_1_outPort2",
+      "targetNode": "ControlledRichLabelNode31_6",
+      "targetPort": "ControlledRichLabelNode31_6_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode02_2",
+      "sourcePort": "ControlledRichLabelNode02_2_outPort2",
+      "targetNode": "ControlledRichLabelNode31_7",
+      "targetPort": "ControlledRichLabelNode31_7_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode02_2",
+      "sourcePort": "ControlledRichLabelNode02_2_outPort1",
+      "targetNode": "ControlledRichLabelNode31_7",
+      "targetPort": "ControlledRichLabelNode31_7_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_6",
+      "sourcePort": "ControlledRichLabelNode01_6_outPort1",
+      "targetNode": "ControlledRichLabelNode31_8",
+      "targetPort": "ControlledRichLabelNode31_8_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_10",
+      "sourcePort": "UncontrolledRichLabelNode21_10_outPort1",
+      "targetNode": "ControlledRichLabelNode31_8",
+      "targetPort": "ControlledRichLabelNode31_8_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_4",
+      "sourcePort": "ControlledRichLabelNode01_4_outPort1",
+      "targetNode": "ControlledRichLabelNode31_8",
+      "targetPort": "ControlledRichLabelNode31_8_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_8",
+      "sourcePort": "ControlledRichLabelNode31_8_outPort1",
+      "targetNode": "ControlledRichLabelNode31_7",
+      "targetPort": "ControlledRichLabelNode31_7_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_6",
+      "sourcePort": "ControlledRichLabelNode31_6_outPort1",
+      "targetNode": "StepRichLabelNode21_3",
+      "targetPort": "StepRichLabelNode21_3_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_7",
+      "sourcePort": "ControlledRichLabelNode31_7_outPort1",
+      "targetNode": "StepRichLabelNode21_3",
+      "targetPort": "StepRichLabelNode21_3_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_7",
+      "sourcePort": "ControlledRichLabelNode01_7_outPort1",
+      "targetNode": "StepRichLabelNode31_1",
+      "targetPort": "StepRichLabelNode31_1_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "StepRichLabelNode21_3",
+      "sourcePort": "StepRichLabelNode21_3_outPort1",
+      "targetNode": "StepRichLabelNode31_1",
+      "targetPort": "StepRichLabelNode31_1_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "StepRichLabelNode21_3",
+      "sourcePort": "StepRichLabelNode21_3_outPort1",
+      "targetNode": "StepRichLabelNode31_2",
+      "targetPort": "StepRichLabelNode31_2_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_8",
+      "sourcePort": "ControlledRichLabelNode01_8_outPort1",
+      "targetNode": "StepRichLabelNode31_1",
+      "targetPort": "StepRichLabelNode31_1_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_8",
+      "sourcePort": "ControlledRichLabelNode01_8_outPort1",
+      "targetNode": "StepRichLabelNode31_2",
+      "targetPort": "StepRichLabelNode31_2_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode01_7",
+      "sourcePort": "ControlledRichLabelNode01_7_outPort1",
+      "targetNode": "StepRichLabelNode31_2",
+      "targetPort": "StepRichLabelNode31_2_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_10",
+      "sourcePort": "UncontrolledRichLabelNode01_10_outPort1",
+      "targetNode": "StepRichLabelNode21_4",
+      "targetPort": "StepRichLabelNode21_4_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_2",
+      "sourcePort": "ControlledRichLabelNode31_2_outPort1",
+      "targetNode": "StepRichLabelNode21_4",
+      "targetPort": "StepRichLabelNode21_4_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode21_1",
+      "sourcePort": "ControlledRichLabelNode21_1_outPort1",
+      "targetNode": "StepRichLabelNode21_5",
+      "targetPort": "StepRichLabelNode21_5_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_11",
+      "sourcePort": "UncontrolledRichLabelNode01_11_outPort1",
+      "targetNode": "StepRichLabelNode21_5",
+      "targetPort": "StepRichLabelNode21_5_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode21_4",
+      "sourcePort": "ControlledRichLabelNode21_4_outPort1",
+      "targetNode": "StepRichLabelNode21_6",
+      "targetPort": "StepRichLabelNode21_6_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_12",
+      "sourcePort": "UncontrolledRichLabelNode01_12_outPort1",
+      "targetNode": "StepRichLabelNode21_6",
+      "targetPort": "StepRichLabelNode21_6_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode03_1",
+      "sourcePort": "UncontrolledRichLabelNode03_1_outPort3",
+      "targetNode": "ControlledRichLabelNode31_9",
+      "targetPort": "ControlledRichLabelNode31_9_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode02_3",
+      "sourcePort": "ControlledRichLabelNode02_3_outPort1",
+      "targetNode": "ControlledRichLabelNode31_9",
+      "targetPort": "ControlledRichLabelNode31_9_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode03_1",
+      "sourcePort": "UncontrolledRichLabelNode03_1_outPort3",
+      "targetNode": "ControlledRichLabelNode31_10",
+      "targetPort": "ControlledRichLabelNode31_10_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode02_3",
+      "sourcePort": "ControlledRichLabelNode02_3_outPort1",
+      "targetNode": "ControlledRichLabelNode31_10",
+      "targetPort": "ControlledRichLabelNode31_10_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_9",
+      "sourcePort": "ControlledRichLabelNode31_9_outPort1",
+      "targetNode": "ControlledRichLabelNode31_11",
+      "targetPort": "ControlledRichLabelNode31_11_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode01_13",
+      "sourcePort": "UncontrolledRichLabelNode01_13_outPort1",
+      "targetNode": "ControlledRichLabelNode31_11",
+      "targetPort": "ControlledRichLabelNode31_11_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_6",
+      "sourcePort": "ControlledRichLabelNode31_6_outPort1",
+      "targetNode": "ControlledRichLabelNode22_2",
+      "targetPort": "ControlledRichLabelNode22_2_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode22_2",
+      "sourcePort": "ControlledRichLabelNode22_2_outPort1",
+      "targetNode": "ControlledRichLabelNode31_9",
+      "targetPort": "ControlledRichLabelNode31_9_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode22_2",
+      "sourcePort": "ControlledRichLabelNode22_2_outPort1",
+      "targetNode": "ControlledRichLabelNode31_10",
+      "targetPort": "ControlledRichLabelNode31_10_inPort3",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode31_7",
+      "sourcePort": "ControlledRichLabelNode31_7_outPort1",
+      "targetNode": "ControlledRichLabelNode22_2",
+      "targetPort": "ControlledRichLabelNode22_2_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "ControlledRichLabelNode22_2",
+      "sourcePort": "ControlledRichLabelNode22_2_outPort2",
+      "targetNode": "ControlledRichLabelNode31_11",
+      "targetPort": "ControlledRichLabelNode31_11_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_5",
+      "sourcePort": "UncontrolledRichLabelNode21_5_outPort1",
+      "targetNode": "ControlledRichLabelNode21_5",
+      "targetPort": "ControlledRichLabelNode21_5_inPort1",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    },
+    {
+      "sourceNode": "UncontrolledRichLabelNode21_9",
+      "sourcePort": "UncontrolledRichLabelNode21_9_outPort1",
+      "targetNode": "ControlledRichLabelNode21_5",
+      "targetPort": "ControlledRichLabelNode21_5_inPort2",
+      "extensionName": "ExtensionCommonPrimitives",
+      "primitiveName": "SimpleEdge"
+    }
+  ]
+}

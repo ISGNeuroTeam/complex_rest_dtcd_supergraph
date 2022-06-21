@@ -1,0 +1,18 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy"
+        },
+        {
+            "primitiveID": "bob"
+        }
+    ],
+    "edges": [
+        {
+            "sourceNode": "amy",
+            "sourcePort": "mobile",
+            "targetNode": "bob",
+            "targetPort": "laptop"
+        }
+    ]
+}
