@@ -13,3 +13,11 @@ Initialized from `dtcd_server` plugin repository.
 ### Added
 - Fragment management and full support for graph-related operations via Neo4j.
 - OpenAPI documentation for endpoints (manual).
+
+### Changed
+- Simplify general layout of source code folder.
+- Incorporate new version of `neo-tools=0.2.0`.
+- Split requirements into multiple files.
+
+### Removed
+- Workspace-related functionality.
