@@ -19,7 +19,6 @@ N = config["general"].getint("num_iter")
 
 
 class TestConverter(SimpleTestCase):
-
     def test_load_data(self):
         data = {
             "name": "amy",

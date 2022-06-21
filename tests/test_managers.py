@@ -42,7 +42,7 @@ class TestFragmentManager(SimpleTestCase):
     def setUpClass(cls) -> None:
         GRAPH.delete_all()  # clear the db
         cls.manager = FragmentManager(GRAPH)
-    
+
     @classmethod
     def tearDownClass(cls) -> None:
         pass
