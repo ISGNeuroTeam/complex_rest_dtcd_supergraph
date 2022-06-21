@@ -1,3 +1,7 @@
+"""
+Helper module for tests.
+"""
+
 from operator import itemgetter
 
 from py2neo import Node, Relationship
@@ -107,35 +111,35 @@ def generate_data():
     }
 
     # TODO replace with values from config
-    n1 = Node("Node", "_Entity", primitiveID="n1")  # root
+    n1 = Node("Node", "Entity", primitiveID="n1")  # root
     # data tree
-    n1d = Node("_Data", "_Composite", primitiveID="n1")
-    attr = Node("_Attribute", x=0, y=0)
-    n1d_has_attr = Relationship(n1d, "HAS_ATTRIBUTE", attr, _key="layout")
+    n1d = Node("Data", "Composite", primitiveID="n1")
+    attr = Node("Attribute", x=0, y=0)
+    n1d_has_attr = Relationship(n1d, "HAS_ATTRIBUTE", attr, key="layout")
     ###
     n1_n1d = Relationship(n1, "HAS_DATA", n1d)
 
-    n2 = Node("Node", "_Entity", primitiveID="n2")
+    n2 = Node("Node", "Entity", primitiveID="n2")
     # data tree
-    n2d = Node("_Data", "_Composite", primitiveID="n2")
-    ports = Node("_Array", "_Attribute")
-    item0 = Node("_Item", primitiveID="p3")
-    ports_contains_item0 = Relationship(ports, "CONTAINS_ITEM", item0, _pos=0)
-    n2d_has_ports = Relationship(n2d, "HAS_ATTRIBUTE", ports, _key="initPorts")
+    n2d = Node("Data", "Composite", primitiveID="n2")
+    ports = Node("Array", "Attribute")
+    item0 = Node("Item", primitiveID="p3")
+    ports_contains_item0 = Relationship(ports, "CONTAINS_ITEM", item0, pos=0)
+    n2d_has_ports = Relationship(n2d, "HAS_ATTRIBUTE", ports, key="initPorts")
     ###
     n2_n2d = Relationship(n2, "HAS_DATA", n2d)
 
-    n3 = Node("Node", "_Entity", primitiveID="n3")
-    n3d = Node("_Data", primitiveID="n3")  # data tree
+    n3 = Node("Node", "Entity", primitiveID="n3")
+    n3d = Node("Data", primitiveID="n3")  # data tree
     n3_n3d = Relationship(n3, "HAS_DATA", n3d)
 
-    n4 = Node("Node", "_Entity", primitiveID="n4")
-    n4d = Node("_Data", primitiveID="n4")  # data tree
+    n4 = Node("Node", "Entity", primitiveID="n4")
+    n4d = Node("Data", primitiveID="n4")  # data tree
     n4_n4d = Relationship(n4, "HAS_DATA", n4d)
 
     e1 = Node(
         "Edge",
-        "_Entity",
+        "Entity",
         sourceNode="n1",
         targetNode="n2",
         sourcePort="p1",
@@ -143,7 +147,7 @@ def generate_data():
     )
     # data tree
     e1d = Node(
-        "_Data", sourceNode="n1", targetNode="n2", sourcePort="p1", targetPort="p3"
+        "Data", sourceNode="n1", targetNode="n2", sourcePort="p1", targetPort="p3"
     )
     ###
     e1_e1d = Relationship(e1, "HAS_DATA", e1d)
@@ -153,7 +157,7 @@ def generate_data():
 
     e2 = Node(
         "Edge",
-        "_Entity",
+        "Entity",
         sourceNode="n1",
         targetNode="n3",
         sourcePort="p2",
@@ -161,7 +165,7 @@ def generate_data():
     )
     # data tree
     e2d = Node(
-        "_Data", sourceNode="n1", targetNode="n3", sourcePort="p2", targetPort="p4"
+        "Data", sourceNode="n1", targetNode="n3", sourcePort="p2", targetPort="p4"
     )
     ###
     e2_e2d = Relationship(e2, "HAS_DATA", e2d)
@@ -171,7 +175,7 @@ def generate_data():
 
     e3 = Node(
         "Edge",
-        "_Entity",
+        "Entity",
         sourceNode="n3",
         targetNode="n4",
         sourcePort="p5",
@@ -179,7 +183,7 @@ def generate_data():
     )
     # data tree
     e3d = Node(
-        "_Data", sourceNode="n3", targetNode="n4", sourcePort="p5", targetPort="p6"
+        "Data", sourceNode="n3", targetNode="n4", sourcePort="p5", targetPort="p6"
     )
     ###
     e3_e3d = Relationship(e3, "HAS_DATA", e3d)

@@ -8,21 +8,20 @@ from django.test import tag
 from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 
-from .. import fixtures
+from .misc import generate_data, sort_payload
 
 
-TEST_DIR = Path(__file__).resolve().parent.parent
-FIXTURES_DIR = TEST_DIR / "fixtures"
+TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
 # testing config
 config = configparser.ConfigParser()
 config.read(TEST_DIR / "config.ini")
 USE_DB = config["general"].getboolean("use_db")
-N = config["general"].getint("num_iter")
 URL_RESET = reverse("complex_rest_dtcd_supergraph:reset")  # post here resets the db
 
 
-@tag("api", "neo4j")
+@unittest.skipUnless(USE_DB, "use_db=False")
+@tag("neo4j")
 class TestFragmentListView(APISimpleTestCase):
     def setUp(self) -> None:
         # reset db
@@ -50,7 +49,8 @@ class TestFragmentListView(APISimpleTestCase):
         self.assertEqual({f["name"] for f in fragments}, names)
 
 
-@tag("api", "neo4j")
+@unittest.skipUnless(USE_DB, "use_db=False")
+@tag("neo4j")
 class TestFragmentDetailView(APISimpleTestCase):
     def setUp(self) -> None:
         # reset db
@@ -96,14 +96,14 @@ class TestFragmentDetailView(APISimpleTestCase):
 
 @unittest.skip("deprecated")
 @unittest.skipUnless(USE_DB, "use_db=False")
-@tag("api", "neo4j")
+@tag("neo4j")
 class TestNeo4jGraphView(APISimpleTestCase):
     @classmethod
     def setUpClass(cls):
         cls.url_fragments = reverse("complex_rest_dtcd_supergraph:fragments")
         cls.url_reset = reverse("complex_rest_dtcd_supergraph:reset")
-        cls.data = fixtures.generate_data()["data"]
-        fixtures.sort_payload(cls.data)
+        cls.data = generate_data()["data"]
+        sort_payload(cls.data)
 
     @classmethod
     def tearDownClass(cls):
@@ -126,7 +126,7 @@ class TestNeo4jGraphView(APISimpleTestCase):
     def _put(self, data):
         """Shortcut to upload graph data to pre-created fragment."""
 
-        fixtures.sort_payload(data)
+        sort_payload(data)
         response = self.client.put(self.url_graph, data={"graph": data}, format="json")
         return response
 
@@ -150,7 +150,7 @@ class TestNeo4jGraphView(APISimpleTestCase):
     def _check_put_get(self, data):
         self._check_put(data)
         freshdata = self._check_get().data["graph"]
-        fixtures.sort_payload(freshdata)
+        sort_payload(freshdata)
         self.assertEqual(freshdata, data)
 
     def _check_put_get_from_json(self, path):
@@ -204,7 +204,7 @@ class TestNeo4jGraphView(APISimpleTestCase):
 
     @tag("slow")
     def test_put_get_large(self):
-        self._check_put_get_from_json(FIXTURES_DIR / "graph-sample-large.json")
+        self._check_put_get_from_json(DATA_DIR / "graph-sample-large.json")
 
     def test_put_get_empty(self):
         self._check_put_get_from_json(DATA_DIR / "empty.json")
