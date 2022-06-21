@@ -1,11 +1,12 @@
 import logging
 
+from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
+from rest_framework.views import APIView
 
-from rest.views import APIView
-from rest.response import status, SuccessResponse
-from rest.permissions import AllowAny
+from rest.response import SuccessResponse
 
 from . import settings
 from .models import Fragment
