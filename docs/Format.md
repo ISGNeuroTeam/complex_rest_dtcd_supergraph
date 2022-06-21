@@ -13,7 +13,7 @@ The (sub)graph is represented using JSON with the following structure:
 
 Top-level `nodes` key corresponds to an *array* of objects, each representing a particular node.
 
-Each object is a *mapping* that may contain variable amount of keys and values of arbitrary nesting. Every node object **must** have a `primitiveID` key with unique ID.
+Each object is a *mapping* that may contain a variable amount of keys and values of arbitrary nesting. Every node object **must** have a `primitiveID` key with **unique** ID.
 
 Example of a valid node object
 
@@ -41,7 +41,9 @@ Example of a valid node object
 
 `edges` is an array of objects which represent edges.
 
-Every edge object **must** have `sourceNode` and `targetNode` keys corresponding to valid node object IDs.
+Every edge object **must** have:
+- `sourceNode` and `targetNode` keys corresponding to valid node object IDs.
+- `sourcePort` and `targetPort` keys corresponding to valid port IDs on start and end nodes.
 
 Example of a valid edge object
 
