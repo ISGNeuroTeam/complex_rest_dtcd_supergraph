@@ -9,7 +9,7 @@ This module is a collection of such queries.
 
 from py2neo.cypher import cypher_join
 
-from ..settings import SCHEMA
+from .settings import SCHEMA
 
 
 LABELS = SCHEMA["labels"]

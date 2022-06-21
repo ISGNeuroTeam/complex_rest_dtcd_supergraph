@@ -1,18 +1,19 @@
 import logging
 
+from rest_framework import status
 from rest_framework.exceptions import NotFound
+from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
+from rest_framework.views import APIView
 
-from rest.views import APIView
-from rest.response import status, SuccessResponse
-from rest.permissions import AllowAny
+from rest.response import SuccessResponse
 
 from . import settings
 from .models import Fragment
 from .serializers import GraphSerializer, FragmentSerializer
-from .utils.exceptions import FragmentDoesNotExist, LoadingError
-from .utils.neo4j_graphmanager import Neo4jGraphManager
-from .utils.converters import Converter
+from .exceptions import FragmentDoesNotExist, LoadingError
+from .managers import Neo4jGraphManager
+from .converters import Converter
 
 
 logger = logging.getLogger("complex_rest_dtcd_supergraph")

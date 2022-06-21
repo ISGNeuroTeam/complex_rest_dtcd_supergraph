@@ -2,21 +2,22 @@ import configparser
 import unittest
 from pathlib import Path
 
+from django.test import SimpleTestCase, tag
 from py2neo import Graph
 
 from complex_rest_dtcd_supergraph import settings
 from complex_rest_dtcd_supergraph.models import Fragment
-from complex_rest_dtcd_supergraph.utils.exceptions import (
+from complex_rest_dtcd_supergraph.exceptions import (
     FragmentDoesNotExist,
     FragmentIsNotBound,
 )
-from complex_rest_dtcd_supergraph.utils.neo4j_graphmanager import (
+from complex_rest_dtcd_supergraph.managers import (
     FragmentManager,
     ContentManager,
 )
 
 
-TEST_DIR = Path(__file__).resolve().parent.parent
+TEST_DIR = Path(__file__).resolve().parent
 # testing config
 config = configparser.ConfigParser()
 config.read(TEST_DIR / "config.ini")
@@ -26,19 +27,25 @@ KEYS = settings.SCHEMA["keys"]
 LABELS = settings.SCHEMA["labels"]
 TYPES = settings.SCHEMA["types"]
 # connection to Neo4j db
-GRAPH = Graph(
-    settings.NEO4J["uri"],
-    settings.NEO4J["name"],
-    auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
-)
-GRAPH.delete_all()  # clear the db
+if USE_DB:
+    GRAPH = Graph(
+        settings.NEO4J["uri"],
+        settings.NEO4J["name"],
+        auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
+    )
 
 
 @unittest.skipUnless(USE_DB, "use_db=False")
-class TestFragmentManager(unittest.TestCase):
+@tag("neo4j")
+class TestFragmentManager(SimpleTestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        GRAPH.delete_all()  # clear the db
         cls.manager = FragmentManager(GRAPH)
+    
+    @classmethod
+    def tearDownClass(cls) -> None:
+        pass
 
     def tearDown(self) -> None:
         GRAPH.delete_all()
@@ -94,15 +101,22 @@ class TestFragmentManager(unittest.TestCase):
 
 
 @unittest.skipUnless(USE_DB, "use_db=False")
-class TestContentManager(unittest.TestCase):
+@tag("neo4j")
+class TestContentManager(SimpleTestCase):
     @classmethod
     def setUpClass(cls) -> None:
+        GRAPH.delete_all()  # clear the db
+
         # create default fragment
         cls.fragment_manager = FragmentManager(GRAPH)
         cls.fragment = Fragment(name="sales")
         cls.fragment_manager.save(cls.fragment)
 
         cls.content_manager = ContentManager(GRAPH)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        pass
 
     def tearDown(self) -> None:
         GRAPH.delete_all()

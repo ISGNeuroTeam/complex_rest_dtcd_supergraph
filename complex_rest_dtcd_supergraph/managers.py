@@ -1,3 +1,7 @@
+"""
+Custom managers designed to work with Neo4j database.
+"""
+
 from itertools import chain
 from typing import Generator, List, Set, Tuple, Union
 
@@ -11,8 +15,8 @@ from .exceptions import (
     FragmentDoesNotExist,
     FragmentIsNotBound,
 )
-from ..models import Fragment
-from ..settings import SCHEMA
+from .models import Fragment
+from .settings import SCHEMA
 
 # TODO custom type aliases
 FragmentID = int

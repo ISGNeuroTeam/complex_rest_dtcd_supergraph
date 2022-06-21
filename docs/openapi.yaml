@@ -1,0 +1,293 @@
+openapi: 3.0.0
+
+info:
+  title: REST API for dtcd plugin
+  description: |
+    This API allows interaction with Neo4j graph database.
+  # TODO better version handling?
+  version: 0.2.0
+  contact:
+    name: Aleksei Tsysin
+    email: atsysin@isgneuro.com
+  license:
+    name: OT.PLATFORM License agreement
+    url: https://github.com/ISGNeuroTeam/Guidelines/blob/master/LICENSE.md
+
+components:
+  schemas:
+    id:
+      type: integer
+      minimum: 0
+    fragment:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+    node:
+      # TODO better schema
+      type: object
+      properties:
+        primaryID:
+          # TODO move to schema
+          # TODO special type?
+          type: string
+    edge:
+      # TODO better schema
+      type: object
+      properties:
+        sourceNode:
+          type: string
+        targetNode:
+          type: string
+        sourcePort:
+          type: string
+        targetPort:
+          type: string
+    graph:
+      # TODO better schema
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: "#/components/schemas/node"
+        edges:
+          type: array
+          items:
+            $ref: "#/components/schemas/edge"
+    # TODO schema for errors and status in responses?
+
+  parameters:
+    id:
+      name: id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/id"
+
+# TODO responses?
+
+tags:
+  - name: list
+  - name: detail
+  - name: graph
+  - name: root
+  - name: admin
+
+paths:
+  /fragments:
+    summary: Fragment list
+    get:
+      summary: Get all fragments
+      description: Retrieves an array of all existing fragments.
+      tags:
+        - list
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/fragment"
+    post:
+      summary: Create a new fragment
+      description: Create a new fragment with a given name.
+      tags:
+        - list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragment:
+                    $ref: "#/components/schemas/fragment"
+
+  /fragments/{id}:
+    summary: Fragment details
+    description: Operations on a single fragment.
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      summary: Get fragment detail
+      tags:
+        - detail
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragment:
+                    $ref: "#/components/schemas/fragment"
+        "404":
+          description: Not found
+    put:
+      summary: Update a fragment
+      tags:
+        - detail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragment:
+                    $ref: "#/components/schemas/fragment"
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+        "404":
+          description: Not found
+    delete:
+      summary: Delete a fragment and its content
+      tags:
+        - detail
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not found
+
+  /fragments/{id}/graph:
+    summary: Graph content of a fragment
+    description: Operations on fragment's graph.
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      summary: Get fragment's graph
+      tags:
+        - graph
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  graph:
+                    $ref: "#/components/schemas/graph"
+        "404":
+          description: Not found
+    put:
+      summary: Update a graph of this fragment
+      description: |
+        We update the graph by *merging* on vertex and edge IDs.
+      tags:
+        - graph
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graph:
+                  $ref: "#/components/schemas/graph"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+          # TODO problems with graph loading
+        "404":
+          description: Not found
+    delete:
+      summary: Delete a graph of this fragment
+      tags:
+        - graph
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not found
+
+  /fragments/root/graph:
+    summary: Full graph content
+    description: Operations on full graph content.
+    get:
+      summary: Get full content graph
+      tags:
+        - root
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  graph:
+                    $ref: "#/components/schemas/graph"
+    put:
+      summary: Update a content's graph
+      description: |
+        We update the graph by *merging* on vertex and edge IDs.
+      tags:
+        - root
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graph:
+                  $ref: "#/components/schemas/graph"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+          # TODO problems with graph loading
+    delete:
+      summary: Delete graph content
+      tags:
+        - root
+      responses:
+        "200":
+          description: OK
+
+  /reset:
+    post:
+      summary: Reset Neo4j database
+      description: Delete all nodes and relationships from Neo4j database.
+      tags:
+        - admin
+      responses:
+        "200":
+          description: Database reset

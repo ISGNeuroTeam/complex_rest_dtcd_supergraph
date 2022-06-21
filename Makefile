@@ -1,12 +1,14 @@
-#.SILENT:
+.SILENT:
 SHELL = /bin/bash
 
-plugin_name := dtcd_server
+plugin := complex_rest_dtcd_supergraph
 build_dir := make_build
-plugin_dir := $(build_dir)/$(plugin_name)
-requirements_file := requirements.txt
+target_dir := $(build_dir)/$(plugin)
+requirements_file := production.txt
 url_neo4j := https://neo4j.com/artifact.php?name=neo4j-community-4.4.6-unix.tar.gz
 # url_drive_neo4j := https://drive.google.com/uc?export=download&id=1YipGGkmYhEveSSJ4ZsPC0pIjxivBKxYu
+version := $(shell fgrep -m 1 __version__ setup.py | cut -d = -f 2 | tr -d " '\"" )
+branch := $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
 
 
 all:
@@ -14,89 +16,66 @@ all:
  build - build project into build directory, with configuration file and environment\n\
  clean - clean all addition file, build directory and output archive file\n\
  test - run all tests\n\
- pack - make output archive, file name format \"$(plugin_name)_vX.Y.Z_BRANCHNAME.tar.gz\"\n\
+ pack - make output archive, file name format \"$(plugin)_vX.Y.Z_BRANCHNAME.tar.gz\"\n\
 Addition section:\n\
- venv\n\
+ venv - create conda virtual environment, then install requirements\n\
 "
 
-GENERATE_VERSION = $(shell cat setup.py | grep __version__ | head -n 1 | sed -re 's/[^"]+//' | sed -re 's/"//g' )
-GENERATE_BRANCH = $(shell git name-rev $$(git rev-parse HEAD) | cut -d\  -f2 | cut -d ^ -f1 | sed -re 's/^(remotes\/)?origin\///' | tr '/' '_')
-SET_VERSION = $(eval VERSION=$(GENERATE_VERSION))
-SET_BRANCH = $(eval BRANCH=$(GENERATE_BRANCH))
 
+.PHONY: pack
 pack: make_build
-	$(SET_VERSION)
-	$(SET_BRANCH)
-	rm -f $(plugin_name)-*.tar.gz
-	cd $(build_dir); tar czf ../$(plugin_name)-$(VERSION)-$(BRANCH).tar.gz $(plugin_name)
+	rm $(plugin)-*.tar.gz
+	cd $(build_dir); tar -czf ../$(plugin)-$(version)-$(branch).tar.gz $(plugin)
 
+.PHONY: clean_pack
 clean_pack: clean_build
-	rm -f $(plugin_name)-*.tar.gz
+	rm $(plugin)-*.tar.gz
 
-dtcd_server.tar.gz: build
-	cd $(build_dir); tar czf ../$(plugin_name).tar.gz $(plugin_name) && rm -rf ../$(build_dir)
+complex_rest_dtcd_supergraph.tar.gz: build
+	cd $(build_dir); tar -czf ../$(plugin).tar.gz $(plugin) && rm -r ../$(build_dir)
 
+.PHONY: build
 build: make_build
 
 make_build: venv.tar.gz
 	mkdir $(build_dir)
-	cp -r $(plugin_name) $(build_dir)
+#   copy content and config files (symlinks)
+	cp -ru $(plugin) $(build_dir)
+#	cp -u docs/proc.conf.example $(target_dir)/proc.conf  # TODO deployment
+	cp -u *.md $(target_dir)
+	cp -u *.py $(target_dir)
+#   virtual environment
+	mkdir $(target_dir)/venv
+	tar -xzf ./venv.tar.gz -C $(target_dir)/venv
 
-	# copy configuration files
-	rm -rf $(plugin_dir)/serialization.json 2> /dev/null
-	rm -rf $(plugin_dir)/exchange.json 2> /dev/null
-	cp docs/dtcd_server.conf.example $(plugin_dir)/dtcd_server.conf
-	cp docs/log_configuration.json.example $(plugin_dir)/log_configuration.json
-	cp docs/serialization.json.example $(plugin_dir)/serialization.json
-	cp docs/exchange.json.example $(plugin_dir)/exchange.json
-#	cp docs/proc.conf.example $(plugin_dir)/proc.conf  # TODO deployment
-
-	mkdir $(plugin_dir)/tmp
-	mkdir $(plugin_dir)/pages
-	mkdir $(plugin_dir)/plugins
-	mkdir $(plugin_dir)/public
-	mkdir $(plugin_dir)/workspaces
-
-	cp *.md $(plugin_dir)
-	cp *.py $(plugin_dir)
-
-	# virtual environment
-	mkdir $(plugin_dir)/venv
-	tar -xzf ./venv.tar.gz -C $(plugin_dir)/venv
-
+.PHONY: clean_build
 clean_build: clean_venv
-	rm -rf $(build_dir)
+	rm -r $(build_dir)
 
 venv:
 	conda create --copy -p ./venv -y
 	conda install -p ./venv python==3.9.7 -y
-	./venv/bin/pip install --no-input -r $(requirements_file)
+	./venv/bin/pip install --no-input -r requirements/$(requirements_file)
 
 venv.tar.gz: venv
 	conda pack -p ./venv -o ./venv.tar.gz
 
+.PHONY: clean_venv
 clean_venv:
-	rm -rf venv
-	rm -f ./venv.tar.gz
+	rm -r venv
+	rm ./venv.tar.gz
 
-complex_rest:
-	@echo "Should clone complex_rest repository in future..."
-# 	git clone git@github.com:ISGNeuroTeam/complex_rest.git
-# 	{ cd ./complex_rest; git checkout develop; make venv; make redis; }
-# 	ln -s ../../../../dtcd_server/dtcd_server ./complex_rest/complex_rest/plugins/dtcd_server
+.PHONY: clean
+clean: clean_build clean_venv clean_pack clean_test
 
-clean_complex_rest:
-ifneq (,$(wildcard ./complex_rest))
-	{ cd ./complex_rest; make clean;}
-	rm -f ./complex_rest/plugins/dtcd_server
-	rm -rf ./complex_rest
-endif
+.PHONY: test
+test: venv
+	echo "Testing..."
 
-clean: clean_build clean_venv clean_pack clean_test clean_complex_rest
+.PHONY: clean_test
+clean_test:
+	echo "Clean tests"
 
-test: venv complex_rest
-	@echo "Testing..."
-# 	./complex_rest/venv/bin/python ./complex_rest/complex_rest/manage.py test ./tests --settings=core.settings.test
-
-clean_test: clean_complex_rest
-	@echo "Clean tests"
+.PHONY: format
+format:
+	python3 -m black $(plugin) tests
