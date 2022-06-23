@@ -4,4 +4,4 @@
 --trusted-host s.dev.isgneuro.com
 
 # packages from isgneuro nexus
-neo-tools=0.2.0
+neo-tools==0.2.0
