@@ -56,6 +56,8 @@ venv:
 	conda create --copy -p ./venv -y
 	conda install -p ./venv python==3.9.7 -y
 	./venv/bin/pip install --no-input -r requirements/$(requirements_file)
+# fix py2neo bug
+	python docs/fix_py2neo.py venv/lib/python3.9
 
 venv.tar.gz: venv
 	conda pack -p ./venv -o ./venv.tar.gz
