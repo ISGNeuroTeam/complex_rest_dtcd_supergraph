@@ -23,24 +23,20 @@ Addition section:\n\
 
 
 .PHONY: pack
-pack: make_build
-	rm $(plugin)-*.tar.gz
+pack: build
 	cd $(build_dir); tar -czf ../$(plugin)-$(version)-$(branch).tar.gz $(plugin)
 
 .PHONY: clean_pack
 clean_pack: clean_build
 	rm $(plugin)-*.tar.gz
 
-complex_rest_dtcd_supergraph.tar.gz: build
-	cd $(build_dir); tar -czf ../$(plugin).tar.gz $(plugin) && rm -r ../$(build_dir)
-
 .PHONY: build
-build: make_build
+build: $(build_dir)
 
-make_build: venv.tar.gz
+$(build_dir): venv.tar.gz
 	mkdir $(build_dir)
-#   copy content and config files (symlinks)
-	cp -ru $(plugin) $(build_dir)
+#   copy content and config files (dereference symlinks)
+	cp -ruL $(plugin) $(build_dir)
 #	cp -u docs/proc.conf.example $(target_dir)/proc.conf  # TODO deployment
 	cp -u *.md $(target_dir)
 	cp -u *.py $(target_dir)
