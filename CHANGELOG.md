@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.1] - 2022-06-27
+### Added
+- Script for fixing py2neo bug.
+
+### Fixed
+- Typo / bug in requirements files.
+- Freeze package versions in requirements files.
+
 ## [0.1.0] - 2022-06-21
 Initialized from `dtcd_server` plugin repository.
 

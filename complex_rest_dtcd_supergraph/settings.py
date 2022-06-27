@@ -8,7 +8,9 @@ from core.settings.ini_config import merge_ini_config_with_defaults, merge_dicts
 PROJECT_DIR = Path(__file__).parent
 
 default_ini_config = {
-    "logging": {"level": "INFO"},
+    "logging": {
+        "level": "INFO",
+    },
     "graph": {},
     "workspace": {},
     "neo4j": {
@@ -32,7 +34,7 @@ NEO4J = ini_config["neo4j"]
 SERIALIZATION_SCHEMA = {
     "keys": {
         "parent_key": "key",
-        "position": "pos"
+        "position": "pos",
     },
     "labels": {
         "array": "Array",
@@ -41,14 +43,14 @@ SERIALIZATION_SCHEMA = {
         "data": "Data",
         "entity": "Entity",
         "fragment": "Fragment",
-        "item": "Item"
+        "item": "Item",
     },
     "types": {
         "contains_item": "CONTAINS_ITEM",
         "contains_entity": "CONTAINS_ENTITY",
         "has_attribute": "HAS_ATTRIBUTE",
-        "has_data": "HAS_DATA"
-    }
+        "has_data": "HAS_DATA",
+    },
 }
 
 EXCHANGE_SCHEMA = {
@@ -59,16 +61,16 @@ EXCHANGE_SCHEMA = {
         "source_port": "sourcePort",
         "target_node": "targetNode",
         "target_port": "targetPort",
-        "yfiles_id": "primitiveID"
+        "yfiles_id": "primitiveID",
     },
     "labels": {
         "edge": "Edge",
-        "node": "Node"
+        "node": "Node",
     },
     "types": {
         "out": "OUT",
-        "in": "IN"
-    }
+        "in": "IN",
+    },
 }
 
 SCHEMA = merge_dicts(SERIALIZATION_SCHEMA, EXCHANGE_SCHEMA)
