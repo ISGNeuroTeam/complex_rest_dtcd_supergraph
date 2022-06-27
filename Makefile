@@ -8,7 +8,7 @@ requirements_file := production.txt
 url_neo4j := https://neo4j.com/artifact.php?name=neo4j-community-4.4.6-unix.tar.gz
 # url_drive_neo4j := https://drive.google.com/uc?export=download&id=1YipGGkmYhEveSSJ4ZsPC0pIjxivBKxYu
 version := $(shell fgrep -m 1 __version__ setup.py | cut -d = -f 2 | tr -d " '\"" )
-branch := $(shell git rev-parse --abbrev-ref HEAD | tr '/' '_')
+branch := $(shell git name-rev $$(git rev-parse HEAD) | cut -d\  -f2 | cut -d ^ -f1 | sed -re 's/^(remotes\/)?origin\///' | tr '/' '_')
 
 
 all:
