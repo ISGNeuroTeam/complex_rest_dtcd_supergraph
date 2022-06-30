@@ -16,7 +16,7 @@ from .managers import Neo4jGraphManager
 from .converters import Converter
 
 
-logger = logging.getLogger("complex_rest_dtcd_supergraph")
+logger = logging.getLogger("dtcd_supergraph")
 
 GRAPH_MANAGER = Neo4jGraphManager(
     settings.NEO4J["uri"],

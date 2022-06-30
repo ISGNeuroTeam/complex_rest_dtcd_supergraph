@@ -5,7 +5,7 @@ from pathlib import Path
 
 from django.test import SimpleTestCase, tag
 
-from complex_rest_dtcd_supergraph.converters import Converter
+from dtcd_supergraph.converters import Converter
 
 from .misc import generate_data, sort_payload
 from .misc import KEYS, LABELS, TYPES

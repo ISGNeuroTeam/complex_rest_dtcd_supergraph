@@ -1,7 +1,7 @@
 .SILENT:
 SHELL = /bin/bash
 
-plugin := complex_rest_dtcd_supergraph
+plugin := dtcd_supergraph
 build_dir := make_build
 target_dir := $(build_dir)/$(plugin)
 requirements_file := production.txt
