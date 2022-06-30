@@ -183,8 +183,8 @@ stop.sh
 test.sh
 
 # symlinks to config files in plugin directory
-complex_rest_dtcd_supergraph/*.conf
-complex_rest_dtcd_supergraph/*.json
+dtcd_supergraph/*.conf
+dtcd_supergraph/*.json
 
 # build stuff
 make_build/

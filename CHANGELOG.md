@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.2] - 2022-06-30
+### Changed
+- Name of the source folder with code is now `dtcd_supergraph`.
+
+### Fixed
+- Bug in branch generation on Jenkins.
+- Symlink copy problems on Jenkins.
+
 ## [0.1.1] - 2022-06-27
 ### Added
 - Script for fixing py2neo bug.
