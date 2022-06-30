@@ -8,7 +8,7 @@ from .views import (
     RootGraphView,
 )
 
-app_name = "dtcd_supergraph"
+app_name = "complex_rest_dtcd_supergraph"
 urlpatterns = [
     path("fragments", FragmentListView.as_view(), name="fragments"),
     path("fragments/<int:pk>", FragmentDetailView.as_view(), name="fragment-detail"),
