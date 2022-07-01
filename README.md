@@ -53,10 +53,10 @@ For this plugin, you can get the latest build from Nexus.
     ```sh
     git clone https://github.com/ISGNeuroTeam/complex_rest_dtcd_supergraph.git
     ```
-2. Enter the folder, copy configuration files from `docs/` to `dtcd_supergraph/` with the following command:
+2. Enter the folder, copy configuration files from `docs/` to `complex_rest_dtcd_supergraph/` with the following command:
     ```sh
     cd complex_rest_dtcd_supergraph
-    cp docs/supergraph.conf.example  dtcd_supergraph/supergraph.conf
+    cp docs/supergraph.conf.example  complex_rest_dtcd_supergraph/supergraph.conf
     ```
 3. Create virtual environment
     ```sh
@@ -72,7 +72,7 @@ For this plugin, you can get the latest build from Nexus.
     python docs/fix_py2neo.py venv/lib/python3.9
     python docs/fix_py2neo.py venv/lib64/python3.9
     ```
-6. Make a **symlink** for `./complex_rest_dtcd_supergraph/dtcd_supergraph` in `complex_rest/plugins` directory.
+6. Make a **symlink** for `./complex_rest_dtcd_supergraph/complex_rest_dtcd_supergraph` in `complex_rest/plugins` directory.
 7. Run complex rest server.
 
 ### Fixing `py2neo`

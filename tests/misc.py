@@ -6,7 +6,7 @@ from operator import itemgetter
 
 from py2neo import Node, Relationship
 
-from dtcd_supergraph.settings import SCHEMA
+from complex_rest_dtcd_supergraph.settings import SCHEMA
 
 
 KEYS = SCHEMA["keys"]

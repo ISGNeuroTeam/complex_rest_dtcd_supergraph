@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.1.3] - 2022-07-01
+### Changed
+- Name of the source folder with code is now `complex_rest_dtcd_supergraph`, again.
+- Now we remove suffix `complex_rest_dtcd_` from plugin folder when making final archive.
+    > We do this to simplify URL management - see how `complex_rest` uses plugin folder names. 
+
 ## [0.1.2] - 2022-06-30
 ### Changed
 - Name of the source folder with code is now `dtcd_supergraph`.

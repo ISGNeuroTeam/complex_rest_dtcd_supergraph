@@ -5,13 +5,13 @@ from pathlib import Path
 from django.test import SimpleTestCase, tag
 from py2neo import Graph
 
-from dtcd_supergraph import settings
-from dtcd_supergraph.models import Fragment
-from dtcd_supergraph.exceptions import (
+from complex_rest_dtcd_supergraph import settings
+from complex_rest_dtcd_supergraph.models import Fragment
+from complex_rest_dtcd_supergraph.exceptions import (
     FragmentDoesNotExist,
     FragmentIsNotBound,
 )
-from dtcd_supergraph.managers import (
+from complex_rest_dtcd_supergraph.managers import (
     FragmentManager,
     ContentManager,
 )
