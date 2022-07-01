@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Changed
+- Logger name changed to `supergraph`.
 
 ## [0.1.3] - 2022-07-01
 ### Changed
