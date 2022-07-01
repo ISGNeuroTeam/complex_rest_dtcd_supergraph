@@ -17,7 +17,7 @@ DATA_DIR = TEST_DIR / "data"
 config = configparser.ConfigParser()
 config.read(TEST_DIR / "config.ini")
 USE_DB = config["general"].getboolean("use_db")
-URL_RESET = reverse("complex_rest_dtcd_supergraph:reset")  # post here resets the db
+URL_RESET = reverse("supergraph:reset")  # post here resets the db
 
 
 @unittest.skipUnless(USE_DB, "use_db=False")
@@ -26,7 +26,7 @@ class TestFragmentListView(APISimpleTestCase):
     def setUp(self) -> None:
         # reset db
         self.client.post(URL_RESET)
-        self.url = reverse("complex_rest_dtcd_supergraph:fragments")
+        self.url = reverse("supergraph:fragments")
 
     def tearDown(self) -> None:
         # reset the db
@@ -57,14 +57,14 @@ class TestFragmentDetailView(APISimpleTestCase):
         self.client.post(URL_RESET)
         # default fragment
         response = self.client.post(
-            reverse("complex_rest_dtcd_supergraph:fragments"),
+            reverse("supergraph:fragments"),
             data={"name": "sales"},
             format="json",
         )
         self.fragment = response.data["fragment"]
         self.pk = self.fragment["id"]
         self.url = reverse(
-            "complex_rest_dtcd_supergraph:fragment-detail", args=(self.pk,)
+            "supergraph:fragment-detail", args=(self.pk,)
         )
 
     def tearDown(self) -> None:
@@ -100,8 +100,8 @@ class TestFragmentDetailView(APISimpleTestCase):
 class TestNeo4jGraphView(APISimpleTestCase):
     @classmethod
     def setUpClass(cls):
-        cls.url_fragments = reverse("complex_rest_dtcd_supergraph:fragments")
-        cls.url_reset = reverse("complex_rest_dtcd_supergraph:reset")
+        cls.url_fragments = reverse("supergraph:fragments")
+        cls.url_reset = reverse("supergraph:reset")
         cls.data = generate_data()["data"]
         sort_payload(cls.data)
 
@@ -116,7 +116,7 @@ class TestNeo4jGraphView(APISimpleTestCase):
         )
         self.fragment_id = int(response.data["fragment"]["id"])
         self.url_graph = reverse(
-            "complex_rest_dtcd_supergraph:fragment-graph", args=(self.fragment_id,)
+            "supergraph:fragment-graph", args=(self.fragment_id,)
         )
 
     def tearDown(self):
