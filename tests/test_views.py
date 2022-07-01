@@ -1,4 +1,3 @@
-import configparser
 import json
 import unittest
 from pathlib import Path
@@ -13,10 +12,6 @@ from .misc import generate_data, sort_payload
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
-# testing config
-config = configparser.ConfigParser()
-config.read(TEST_DIR / "config.ini")
-USE_DB = config["general"].getboolean("use_db")
 URL_RESET = reverse("supergraph:reset")  # post here resets the db
 CLIENT = Client()
 
@@ -45,7 +40,6 @@ class Neo4jTestCaseMixin:
         reset_db()
 
 
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
     url = reverse("supergraph:fragments")
@@ -67,7 +61,6 @@ class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
         self.assertEqual({f["name"] for f in fragments}, names)
 
 
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
     def setUp(self) -> None:
@@ -106,7 +99,6 @@ class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
 
 
 @unittest.skip("deprecated")
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestNeo4jGraphView(APISimpleTestCase):
     @classmethod

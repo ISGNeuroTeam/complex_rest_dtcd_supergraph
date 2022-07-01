@@ -1,4 +1,3 @@
-import configparser
 import unittest
 from pathlib import Path
 
@@ -18,24 +17,18 @@ from complex_rest_dtcd_supergraph.managers import (
 
 
 TEST_DIR = Path(__file__).resolve().parent
-# testing config
-config = configparser.ConfigParser()
-config.read(TEST_DIR / "config.ini")
-USE_DB = config["general"].getboolean("use_db")
 # service settings for Neo4j operations
 KEYS = settings.SCHEMA["keys"]
 LABELS = settings.SCHEMA["labels"]
 TYPES = settings.SCHEMA["types"]
 # connection to Neo4j db
-if USE_DB:
-    GRAPH = Graph(
-        settings.NEO4J["uri"],
-        settings.NEO4J["name"],
-        auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
-    )
+GRAPH = Graph(
+    settings.NEO4J["uri"],
+    settings.NEO4J["name"],
+    auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
+)
 
 
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestFragmentManager(SimpleTestCase):
     @classmethod
@@ -100,7 +93,6 @@ class TestFragmentManager(SimpleTestCase):
         self.assertIsNone(fromdb)
 
 
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestContentManager(SimpleTestCase):
     @classmethod

@@ -1,4 +1,3 @@
-import configparser
 import json
 import unittest
 from pathlib import Path
@@ -12,10 +11,7 @@ from .misc import KEYS, LABELS, TYPES
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
-# testing config
-config = configparser.ConfigParser()
-config.read(TEST_DIR / "config.ini")
-N = config["general"].getint("num_iter")
+N = 30  # deprecated
 
 
 class TestConverter(SimpleTestCase):
