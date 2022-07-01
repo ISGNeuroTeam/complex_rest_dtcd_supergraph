@@ -7,7 +7,7 @@ from operator import itemgetter
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .fields import EdgeField, GraphField, VertexField
+from .fields import EdgeField, VertexField
 from .models import Fragment
 from .settings import SCHEMA
 
@@ -30,17 +30,13 @@ class FragmentSerializer(serializers.Serializer):
         return super().save(**kwargs)
 
 
-class GraphSerializer(serializers.Serializer):
-    graph = GraphField(allow_empty=False)
-
-
 class ContentSerializer(serializers.Serializer):
     default_error_messages = {
         "not_unique": _("Data contains non-unique, duplicated IDs."),
     }
 
-    nodes = serializers.ListField(child=VertexField, allow_empty=False)
-    edges = serializers.ListField(child=EdgeField)
+    nodes = serializers.ListField(child=VertexField(), allow_empty=False)
+    edges = serializers.ListField(child=EdgeField())
 
     def validate(self, data: dict):
         self._validate_unique_nodes(data)
@@ -72,3 +68,7 @@ class ContentSerializer(serializers.Serializer):
 
         if len(ids) != len(edges):
             self.fail("not_unique")
+
+
+class GraphSerializer(serializers.Serializer):
+    graph = ContentSerializer()
