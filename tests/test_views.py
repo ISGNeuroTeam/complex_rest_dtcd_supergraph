@@ -4,7 +4,7 @@ import unittest
 from pathlib import Path
 
 from django.urls import reverse
-from django.test import tag
+from django.test import Client, tag
 from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 
@@ -18,19 +18,37 @@ config = configparser.ConfigParser()
 config.read(TEST_DIR / "config.ini")
 USE_DB = config["general"].getboolean("use_db")
 URL_RESET = reverse("supergraph:reset")  # post here resets the db
+CLIENT = Client()
+
+
+def reset_db():
+    CLIENT.post(URL_RESET)
+
+
+class Neo4jTestCaseMixin:
+    """A mixin for API tests of a Neo4j-based endpoint.
+
+    Adds calls to reset the database on class setup and on teardowns of each test.
+    """
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        # clean db on start
+        reset_db()
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        pass
+
+    def tearDown(self) -> None:
+        # clean after each test
+        reset_db()
 
 
 @unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
-class TestFragmentListView(APISimpleTestCase):
-    def setUp(self) -> None:
-        # reset db
-        self.client.post(URL_RESET)
-        self.url = reverse("supergraph:fragments")
-
-    def tearDown(self) -> None:
-        # reset the db
-        self.client.post(URL_RESET)
+class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
+    url = reverse("supergraph:fragments")
 
     def test_post(self):
         response = self.client.post(self.url, data={"name": "sales"}, format="json")
@@ -51,10 +69,8 @@ class TestFragmentListView(APISimpleTestCase):
 
 @unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
-class TestFragmentDetailView(APISimpleTestCase):
+class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
     def setUp(self) -> None:
-        # reset db
-        self.client.post(URL_RESET)
         # default fragment
         response = self.client.post(
             reverse("supergraph:fragments"),
@@ -63,12 +79,7 @@ class TestFragmentDetailView(APISimpleTestCase):
         )
         self.fragment = response.data["fragment"]
         self.pk = self.fragment["id"]
-        self.url = reverse(
-            "supergraph:fragment-detail", args=(self.pk,)
-        )
-
-    def tearDown(self) -> None:
-        self.client.post(URL_RESET)
+        self.url = reverse("supergraph:fragment-detail", args=(self.pk,))
 
     def test_get(self):
         response = self.client.get(self.url)
@@ -115,9 +126,7 @@ class TestNeo4jGraphView(APISimpleTestCase):
             self.url_fragments, data={"name": "sales"}, format="json"
         )
         self.fragment_id = int(response.data["fragment"]["id"])
-        self.url_graph = reverse(
-            "supergraph:fragment-graph", args=(self.fragment_id,)
-        )
+        self.url_graph = reverse("supergraph:fragment-graph", args=(self.fragment_id,))
 
     def tearDown(self):
         # clear Neo4j
