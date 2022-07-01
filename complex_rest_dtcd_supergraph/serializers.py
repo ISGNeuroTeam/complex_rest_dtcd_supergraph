@@ -2,6 +2,7 @@
 Custom DRF serializers.
 """
 
+from itertools import chain
 from operator import itemgetter
 
 from django.utils.translation import gettext_lazy as _
@@ -32,6 +33,7 @@ class FragmentSerializer(serializers.Serializer):
 
 class ContentSerializer(serializers.Serializer):
     default_error_messages = {
+        "does_not_exist": _("An entity with id [{value}] does not exist."),
         "not_unique": _("Data contains non-unique, duplicated IDs."),
     }
 
@@ -41,18 +43,17 @@ class ContentSerializer(serializers.Serializer):
     def validate(self, data: dict):
         self._validate_unique_nodes(data)
         self._validate_unique_edges(data)
+        self._validate_references(data)
         return data
 
-    def _validate_unique_nodes(self, data: dict):
-        nodes = data[SCHEMA["keys"]["nodes"]]
-
+    @staticmethod
+    def _node_ids(data: dict):
+        nodes = data.get(SCHEMA["keys"]["nodes"], [])
         id_key = SCHEMA["keys"]["yfiles_id"]
-        ids = set(map(itemgetter(id_key), nodes))
+        return set(map(itemgetter(id_key), nodes))
 
-        if len(ids) != len(nodes):
-            self.fail("not_unique")
-
-    def _validate_unique_edges(self, data: dict):
+    @staticmethod
+    def _edge_ids(data: dict):
         edges = data[SCHEMA["keys"]["edges"]]
         src_node_key = SCHEMA["keys"]["source_node"]
         tgt_node_key = SCHEMA["keys"]["target_node"]
@@ -64,10 +65,35 @@ class ContentSerializer(serializers.Serializer):
             src_port_key,
             tgt_port_key,
         )
-        ids = set(map(itemgetter(*keys), edges))
+
+        return set(map(itemgetter(*keys), edges))
+
+    def _validate_unique_nodes(self, data: dict):
+        nodes = data[SCHEMA["keys"]["nodes"]]
+        ids = self._node_ids(data)
+
+        if len(ids) != len(nodes):
+            self.fail("not_unique")
+
+    def _validate_unique_edges(self, data: dict):
+        edges = data[SCHEMA["keys"]["edges"]]
+        ids = self._edge_ids(data)
 
         if len(ids) != len(edges):
             self.fail("not_unique")
+
+    def _validate_references(self, data: dict):
+        # for each edge, make sure referred nodes really exist
+        node_ids = self._node_ids(data)
+        edges = data.get(SCHEMA["keys"]["edges"], [])
+        src_node_key = SCHEMA["keys"]["source_node"]
+        tgt_node_key = SCHEMA["keys"]["target_node"]
+
+        for id_ in chain.from_iterable(
+            map(itemgetter(src_node_key, tgt_node_key), edges)
+        ):
+            if id_ not in node_ids:
+                self.fail("does_not_exist", value=id_)
 
 
 class GraphSerializer(serializers.Serializer):

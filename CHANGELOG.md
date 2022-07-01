@@ -6,6 +6,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+### Added
+- Serializer with validation for incoming payloads with graph content (IDs & integrity checks).
+
 ### Changed
 - Logger name changed to `supergraph`.
 
