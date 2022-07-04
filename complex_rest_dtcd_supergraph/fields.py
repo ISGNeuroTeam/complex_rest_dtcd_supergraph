@@ -29,6 +29,10 @@ class VertexField(DictField):
         return data
 
 
+class GroupField(VertexField):
+    pass
+
+
 class EdgeField(DictField):
     """An edge dictionary representation.
 
