@@ -252,15 +252,28 @@ class ContentManager:
 
         return set(subgraph.nodes)
 
+    @staticmethod
+    def _merge_groups(tx: Transaction, subgraph: Subgraph) -> Set[Node]:
+        """Merge Group nodes from subgraph, return a set of merged nodes."""
+
+        label = LABELS["group"]
+        groups = set(filter_nodes(subgraph, label))  # O(n)
+        key = KEYS["yfiles_id"]
+        subgraph = Subgraph(groups)
+        tx.merge(subgraph, label, key)
+
+        return set(subgraph.nodes)
+
     def _merge(self, tx: Transaction, subgraph: Subgraph, fragment: Fragment = None):
         """Merge given subgraph into the fragment.
 
         We want to preserve connections (edges and frontier vertices)
         between fragments. The merge is made as follows:
 
-        1. Merge entity roots:
-            1. Merge root nodes of *vertex* trees.
-            2. Merge root nodes of *edge* trees.
+        1. Merge roots of the following entity trees:
+            1. vertices
+            2. edges
+            3. groups
         2. Remove old content (entity roots and their trees).
         3. Re-link fragment with new entities to be created.
         4. Merge newly created entities and links.
@@ -268,6 +281,7 @@ class ContentManager:
 
         vertices = self._merge_vertices(tx, subgraph)
         edges = self._merge_edges(tx, subgraph)
+        groups = self._merge_groups(tx, subgraph)
 
         # delete difference
         # TODO think about this more
@@ -277,16 +291,17 @@ class ContentManager:
             current = self._nodes(tx, fragment.__primaryvalue__)
         else:
             current = self._nodes(tx)
-        old = current - vertices - edges
+        old = current - vertices - edges - groups
         tx.delete(Subgraph(old))
 
-        # re-link fragment to subgraph entities (roots of vertex and edge trees)
+        # re-link fragment to subgraph entities (roots of their trees)
         # entities with existing relationship are skipped
         if fragment is not None:
             root = fragment.__node__
             type_ = TYPES["contains_entity"]
             links = set(
-                Relationship(root, type_, entity) for entity in chain(vertices, edges)
+                Relationship(root, type_, entity)
+                for entity in chain(vertices, edges, groups)
             )
         else:
             links = []
