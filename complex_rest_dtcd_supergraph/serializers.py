@@ -116,7 +116,7 @@ class ContentSerializer(serializers.Serializer):
         nodes = data["nodes"]
 
         for obj in chain(groups, nodes):
-            parent_id = obj.data.get(self.keys.parent_id)
+            parent_id = obj.get(self.keys.parent_id)
 
             if parent_id is not None and parent_id not in group_ids:
                 self.fail("does_not_exist", value=parent_id)
