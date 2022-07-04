@@ -4,6 +4,8 @@ Custom DRF serializers.
 
 from itertools import chain
 from operator import itemgetter
+from types import SimpleNamespace
+from typing import List
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -37,60 +39,51 @@ class ContentSerializer(serializers.Serializer):
         "not_unique": _("Data contains non-unique, duplicated IDs."),
     }
 
+    keys = SimpleNamespace(
+        id=SCHEMA["keys"]["yfiles_id"],
+        src_node=SCHEMA["keys"]["source_node"],
+        tgt_node=SCHEMA["keys"]["target_node"],
+        src_port=SCHEMA["keys"]["source_port"],
+        tgt_port=SCHEMA["keys"]["target_port"],
+    )
+
     nodes = serializers.ListField(child=VertexField(), allow_empty=False)
     edges = serializers.ListField(child=EdgeField())
 
+    def validate_nodes(self, value):
+        ids = set(map(itemgetter(self.keys.id), value))
+
+        if len(ids) != len(value):
+            self.fail("not_unique")
+
+        return value
+
+    def validate_edges(self, value):
+        keys = (
+            self.keys.src_node,
+            self.keys.tgt_node,
+            self.keys.src_port,
+            self.keys.tgt_port,
+        )
+        ids = set(map(itemgetter(*keys), value))
+
+        if len(ids) != len(value):
+            self.fail("not_unique")
+
+        return value
+
     def validate(self, data: dict):
-        self._validate_unique_nodes(data)
-        self._validate_unique_edges(data)
         self._validate_references(data)
         return data
 
-    @staticmethod
-    def _node_ids(data: dict):
-        nodes = data.get(SCHEMA["keys"]["nodes"], [])
-        id_key = SCHEMA["keys"]["yfiles_id"]
-        return set(map(itemgetter(id_key), nodes))
-
-    @staticmethod
-    def _edge_ids(data: dict):
-        edges = data[SCHEMA["keys"]["edges"]]
-        src_node_key = SCHEMA["keys"]["source_node"]
-        tgt_node_key = SCHEMA["keys"]["target_node"]
-        src_port_key = SCHEMA["keys"]["source_port"]
-        tgt_port_key = SCHEMA["keys"]["target_port"]
-        keys = (
-            src_node_key,
-            tgt_node_key,
-            src_port_key,
-            tgt_port_key,
-        )
-
-        return set(map(itemgetter(*keys), edges))
-
-    def _validate_unique_nodes(self, data: dict):
-        nodes = data[SCHEMA["keys"]["nodes"]]
-        ids = self._node_ids(data)
-
-        if len(ids) != len(nodes):
-            self.fail("not_unique")
-
-    def _validate_unique_edges(self, data: dict):
-        edges = data[SCHEMA["keys"]["edges"]]
-        ids = self._edge_ids(data)
-
-        if len(ids) != len(edges):
-            self.fail("not_unique")
-
     def _validate_references(self, data: dict):
         # for each edge, make sure referred nodes really exist
-        node_ids = self._node_ids(data)
-        edges = data.get(SCHEMA["keys"]["edges"], [])
-        src_node_key = SCHEMA["keys"]["source_node"]
-        tgt_node_key = SCHEMA["keys"]["target_node"]
+        nodes = data["nodes"]
+        node_ids = set(map(itemgetter(self.keys.id), nodes))
+        edges = data["edges"]
 
         for id_ in chain.from_iterable(
-            map(itemgetter(src_node_key, tgt_node_key), edges)
+            map(itemgetter(self.keys.src_node, self.keys.tgt_node), edges)
         ):
             if id_ not in node_ids:
                 self.fail("does_not_exist", value=id_)
