@@ -69,6 +69,15 @@ class Converter:
 
         return tree
 
+    def _load_group(self, group_dict: dict) -> Tree:
+        tree = self._load_entity(group_dict)
+        # remember group id on root Entity node
+        id_key = self._c["keys"]["yfiles_id"]
+        tree.root[id_key] = group_dict[id_key]
+        tree.root.add_label(self._c["labels"]["group"])
+
+        return tree
+
     def load(self, data: dict) -> Subgraph:
         """Create a subgraph from data.
 
@@ -105,6 +114,13 @@ class Converter:
             r1 = Relationship(src, self._c["types"]["out"], e)
             r2 = Relationship(e, self._c["types"]["in"], tgt)
             rels.extend((r1, r2))
+
+        # optionally add groups
+        for group_dict in data.get(self._c["keys"]["groups"], []):  # TODO hardcoded, cheeky
+            group_tree = self._load_group(group_dict)
+            nodes.extend(group_tree.subgraph.nodes)
+            rels.extend(group_tree.subgraph.relationships)
+            # TODO relationships between groups and entities
 
         return Subgraph(nodes, rels)
 

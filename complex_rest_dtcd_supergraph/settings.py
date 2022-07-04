@@ -56,6 +56,7 @@ SERIALIZATION_SCHEMA = {
 EXCHANGE_SCHEMA = {
     "keys": {
         "edges": "edges",
+        "groups": "groups",
         "nodes": "nodes",
         "source_node": "sourceNode",
         "source_port": "sourcePort",
@@ -65,6 +66,7 @@ EXCHANGE_SCHEMA = {
     },
     "labels": {
         "edge": "Edge",
+        "group": "Group",
         "node": "Node",
     },
     "types": {
