@@ -71,8 +71,8 @@ EXCHANGE_SCHEMA = {
         "node": "Node",
     },
     "types": {
-        "out": "OUT",
         "in": "IN",
+        "out": "OUT",
     },
 }
 

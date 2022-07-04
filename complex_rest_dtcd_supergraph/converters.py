@@ -1,3 +1,4 @@
+from itertools import chain
 from typing import Mapping
 
 from neotools.serializers import RecursiveSerializer
@@ -87,11 +88,13 @@ class Converter:
         See https://py2neo.org/2021.1/data/index.html#py2neo.data.Node.
         """
 
+        # TODO prereqs in comment?
         nodes, rels = [], []
         id2root = {}
 
         # yfiles nodes
-        for vertex_dict in data[self._c["keys"]["nodes"]]:
+        vertices = data[self._c["keys"]["nodes"]]
+        for vertex_dict in vertices:
             # (recursively) construct root node and its (nested) properties
             vertex_tree = self._load_vertex(vertex_dict)
             # save nodes & rels created
@@ -102,7 +105,8 @@ class Converter:
             id2root[id_] = vertex_tree.root
 
         # yfiles edges
-        for edge_dict in data[self._c["keys"]["edges"]]:
+        edges = data[self._c["keys"]["edges"]]
+        for edge_dict in edges:
             edge_tree = self._load_edge(edge_dict)
             nodes.extend(edge_tree.subgraph.nodes)
             rels.extend(edge_tree.subgraph.relationships)
@@ -116,13 +120,26 @@ class Converter:
             rels.extend((r1, r2))
 
         # optionally add groups
-        for group_dict in data.get(
-            self._c["keys"]["groups"], []
-        ):  # TODO hardcoded, cheeky
+        groups = data.get(self._c["keys"]["groups"], [])  # TODO hardcoded, cheeky
+        for group_dict in groups:
             group_tree = self._load_group(group_dict)
             nodes.extend(group_tree.subgraph.nodes)
             rels.extend(group_tree.subgraph.relationships)
-            # TODO relationships between groups and entities
+            # remember root node for linking with children
+            id_ = group_dict[self._c["keys"]["yfiles_id"]]
+            id2root[id_] = group_tree.root
+
+        # link groups and its content entities, if necessary
+        for obj in chain(vertices, groups):
+            id_ = obj[self._c["keys"]["yfiles_id"]]
+            parent_id = obj.get(self._c["keys"]["parent_id"])
+
+            if parent_id is not None:
+                this = id2root[id_]
+                parent = id2root[parent_id]
+                rels.append(
+                    Relationship(parent, self._c["types"]["contains_entity"], this)
+                )
 
         return Subgraph(nodes, rels)
 
