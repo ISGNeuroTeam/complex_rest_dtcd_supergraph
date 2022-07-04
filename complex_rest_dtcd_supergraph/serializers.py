@@ -5,7 +5,6 @@ Custom DRF serializers.
 from itertools import chain
 from operator import itemgetter
 from types import SimpleNamespace
-from typing import List
 
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
@@ -37,6 +36,7 @@ class ContentSerializer(serializers.Serializer):
     default_error_messages = {
         "does_not_exist": _("An entity with id [{value}] does not exist."),
         "not_unique": _("Data contains non-unique, duplicated IDs."),
+        "self_reference": _("A group with id [{value}] has a self-reference."),
     }
 
     keys = SimpleNamespace(
@@ -75,7 +75,20 @@ class ContentSerializer(serializers.Serializer):
         return value
 
     def validate_groups(self, value):
-        self.validate_nodes(value)
+        groups = value
+
+        # unique IDs
+        self.validate_nodes(groups)
+
+        # no self-reference
+        for obj in groups:
+            id_ = obj[self.keys.id]
+            parent_id = obj.get(self.keys.parent_id)
+
+            if parent_id == id_:
+                self.fail("self_reference", value=id_)
+
+        return value
 
     def validate(self, data: dict):
         self._validate_references(data)
