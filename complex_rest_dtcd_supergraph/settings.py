@@ -58,6 +58,7 @@ EXCHANGE_SCHEMA = {
         "edges": "edges",
         "groups": "groups",
         "nodes": "nodes",
+        "parent_id": "parentID",
         "source_node": "sourceNode",
         "source_port": "sourcePort",
         "target_node": "targetNode",
