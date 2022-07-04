@@ -116,7 +116,9 @@ class Converter:
             rels.extend((r1, r2))
 
         # optionally add groups
-        for group_dict in data.get(self._c["keys"]["groups"], []):  # TODO hardcoded, cheeky
+        for group_dict in data.get(
+            self._c["keys"]["groups"], []
+        ):  # TODO hardcoded, cheeky
             group_tree = self._load_group(group_dict)
             nodes.extend(group_tree.subgraph.nodes)
             rels.extend(group_tree.subgraph.relationships)
@@ -131,7 +133,7 @@ class Converter:
         """
 
         # TODO subgraphs of incorrect format (missing VERTEX nodes / EDGE rels)
-        vertices, edges = [], []
+        vertices, edges, groups = [], [], []
 
         # TODO better way to recursively re-construct initial dict from data?
 
@@ -153,6 +155,8 @@ class Converter:
                 vertices.append(end)
             elif start.has_label(self._c["labels"]["edge"]):
                 edges.append(end)
+            elif start.has_label(self._c["labels"]["group"]):
+                groups.append(end)
 
         # O(n) + O(r), where n is node count and r is rel count
         serializer = RecursiveSerializer(subgraph=subgraph, config=self._c)
@@ -162,5 +166,9 @@ class Converter:
             self._c["keys"]["nodes"]: [serializer.dump(v) for v in vertices],
             self._c["keys"]["edges"]: [serializer.dump(e) for e in edges],
         }
+
+        # optionally add groups to the dict  TODO this is bad, but does not break tests
+        if groups:
+            result[self._c["keys"]["groups"]] = [serializer.dump(g) for g in groups]
 
         return result
