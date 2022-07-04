@@ -45,6 +45,7 @@ class ContentSerializer(serializers.Serializer):
         tgt_node=SCHEMA["keys"]["target_node"],
         src_port=SCHEMA["keys"]["source_port"],
         tgt_port=SCHEMA["keys"]["target_port"],
+        parent_id=SCHEMA["keys"]["parent_id"],
     )
 
     nodes = serializers.ListField(child=VertexField(), allow_empty=False)
@@ -78,6 +79,7 @@ class ContentSerializer(serializers.Serializer):
 
     def validate(self, data: dict):
         self._validate_references(data)
+        self._validate_parent_groups_exist(data)
         return data
 
     def _validate_references(self, data: dict):
@@ -91,6 +93,18 @@ class ContentSerializer(serializers.Serializer):
         ):
             if id_ not in node_ids:
                 self.fail("does_not_exist", value=id_)
+
+    def _validate_parent_groups_exist(self, data: dict):
+        # make sure parent groups exist for vertices and groups
+        groups = data.get("groups", [])
+        group_ids = set(map(itemgetter(self.keys.id), groups))
+        nodes = data["nodes"]
+
+        for obj in chain(groups, nodes):
+            parent_id = obj.data.get(self.keys.parent_id)
+
+            if parent_id is not None and parent_id not in group_ids:
+                self.fail("does_not_exist", value=parent_id)
 
 
 class GraphSerializer(serializers.Serializer):
