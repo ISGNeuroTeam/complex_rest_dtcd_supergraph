@@ -10,7 +10,7 @@ from typing import List
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .fields import EdgeField, VertexField
+from .fields import EdgeField, GroupField, VertexField
 from .models import Fragment
 from .settings import SCHEMA
 
@@ -49,6 +49,7 @@ class ContentSerializer(serializers.Serializer):
 
     nodes = serializers.ListField(child=VertexField(), allow_empty=False)
     edges = serializers.ListField(child=EdgeField())
+    groups = serializers.ListField(required=False, child=GroupField())
 
     def validate_nodes(self, value):
         ids = set(map(itemgetter(self.keys.id), value))
@@ -71,6 +72,9 @@ class ContentSerializer(serializers.Serializer):
             self.fail("not_unique")
 
         return value
+
+    def validate_groups(self, value):
+        self.validate_nodes(value)
 
     def validate(self, data: dict):
         self._validate_references(data)
