@@ -143,8 +143,8 @@ class FragmentGraphView(APIView):
         # convert to representation format
         converter = self.converter_class()
         payload = converter.dump(subgraph)
-        n, m = describe(payload)
-        logger.info(f"Converted to payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Converted to payload with {v} vertices, {e} edges, {g} groups.")
 
         # TODO validation checks?
         # TODO move hard-coded key to config
@@ -157,8 +157,8 @@ class FragmentGraphView(APIView):
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data["graph"]
-        n, m = describe(payload)
-        logger.info(f"Got payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Got payload with {v} vertices, {e} edges, {g} groups.")
 
         # convert dict to subgraph
         converter = self.converter_class()
@@ -203,8 +203,8 @@ class RootGraphView(APIView):
 
         converter = self.converter_class()
         payload = converter.dump(subgraph)
-        n, m = describe(payload)
-        logger.info(f"Converted to payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Converted to payload with {v} vertices, {e} edges, {g} groups.")
 
         return SuccessResponse({"graph": payload})
 
@@ -214,8 +214,8 @@ class RootGraphView(APIView):
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data["graph"]
-        n, m = describe(payload)
-        logger.info(f"Got payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Got payload with {v} vertices, {e} edges, {g} groups.")
 
         converter = self.converter_class()
         subgraph = load_or_400(converter, payload)
@@ -248,5 +248,6 @@ class ResetNeo4j(APIView):
 
 
 def describe(data):
-    """Return (num_nodes, num_edges) tuple from data."""
-    return len(data["nodes"]), len(data["edges"])
+    """Return (num_nodes, num_edges, num_groups) tuple from data."""
+    # TODO get from settings
+    return len(data["nodes"]), len(data["edges"]), len(data.get("groups", []))
