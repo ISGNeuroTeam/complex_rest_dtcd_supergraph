@@ -53,32 +53,34 @@ class ContentSerializer(serializers.Serializer):
     groups = serializers.ListField(required=False, child=GroupField())
 
     def validate_nodes(self, value):
-        ids = set(map(itemgetter(self.keys.id), value))
+        groups = value
+        ids = set(map(itemgetter(self.keys.id), groups))
 
-        if len(ids) != len(value):
+        if len(ids) != len(groups):
             self.fail("not_unique")
 
-        return value
+        return groups
 
     def validate_edges(self, value):
+        edges = value
         keys = (
             self.keys.src_node,
             self.keys.tgt_node,
             self.keys.src_port,
             self.keys.tgt_port,
         )
-        ids = set(map(itemgetter(*keys), value))
+        ids = set(map(itemgetter(*keys), edges))
 
-        if len(ids) != len(value):
+        if len(ids) != len(edges):
             self.fail("not_unique")
 
-        return value
+        return edges
 
     def validate_groups(self, value):
         groups = value
 
         # unique IDs
-        self.validate_nodes(groups)
+        groups = self.validate_nodes(groups)
 
         # no self-reference
         for obj in groups:
@@ -88,7 +90,7 @@ class ContentSerializer(serializers.Serializer):
             if parent_id == id_:
                 self.fail("self_reference", value=id_)
 
-        return value
+        return groups
 
     def validate(self, data: dict):
         self._validate_references(data)
