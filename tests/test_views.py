@@ -7,7 +7,7 @@ from django.test import Client, tag
 from rest_framework import status
 from rest_framework.test import APISimpleTestCase
 
-from .misc import generate_data, sort_payload
+from .misc import load_data, sort_payload
 
 
 TEST_DIR = Path(__file__).resolve().parent
@@ -98,125 +98,164 @@ class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
 
-@unittest.skip("deprecated")
+class GraphEndpointTestCaseMixin:
+    def merge(self, graph: dict):
+        data = {"graph": graph}
+        return self.client.put(self.url, data=data, format="json")
+
+    def retrieve(self) -> dict:
+        r = self.client.get(self.url)
+        return r.data["graph"]
+
+    def assert_merge_retrieve_eq(self, graph: dict):
+        self.merge(graph)
+        fromdb = self.retrieve()
+        sort_payload(fromdb)
+        self.assertEqual(fromdb, graph)
+
+    def assert_merge_retrieve_eq_from_json(self, path):
+        data = load_data(path)
+        self.assert_merge_retrieve_eq(data)
+
+
 @tag("neo4j")
-class TestNeo4jGraphView(APISimpleTestCase):
-    @classmethod
-    def setUpClass(cls):
-        cls.url_fragments = reverse("supergraph:fragments")
-        cls.url_reset = reverse("supergraph:reset")
-        cls.data = generate_data()["data"]
-        sort_payload(cls.data)
+class TestRootGraphView(
+    GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
+):
+    url = reverse("supergraph:root-graph")
 
-    @classmethod
-    def tearDownClass(cls):
-        pass
+    def test_get_empty(self):
+        r = self.client.get(self.url)
+        self.assertEqual(r.status_code, status.HTTP_200_OK)
+        graph = r.data["graph"]
+        self.assertEqual(graph, {"nodes": [], "edges": []})
 
+    def test_basic(self):
+        path = DATA_DIR / "basic.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_attributes(self):
+        path = DATA_DIR / "basic-attributes.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_nested_attributes(self):
+        path = DATA_DIR / "basic-nested-attributes.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_edges(self):
+        path = DATA_DIR / "basic-edges.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_nested_edges(self):
+        path = DATA_DIR / "basic-nested-edges.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_ports(self):
+        path = DATA_DIR / "basic-ports.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_nested_ports(self):
+        path = DATA_DIR / "basic-nested-ports.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic_groups(self):
+        path = DATA_DIR / "basic-groups.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_sample(self):
+        path = DATA_DIR / "sample.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    @tag("slow")
+    def test_n25_e25(self):
+        path = DATA_DIR / "n25_e25.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    @tag("slow")
+    def test_n50_e25(self):
+        path = DATA_DIR / "n50_e25.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    @tag("slow")
+    def test_n25_then_n50(self):
+        # first merge
+        old = load_data(DATA_DIR / "n25_e25.json")
+        self.merge(old)
+
+        # over-write
+        new_path = DATA_DIR / "n50_e25.json"
+        self.assert_merge_retrieve_eq_from_json(new_path)
+
+
+class TestFragmentGraphView(
+    GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
+):
     def setUp(self):
+        super().setUp()
+
         # create a fragment
-        response = self.client.post(
-            self.url_fragments, data={"name": "sales"}, format="json"
+        r = self.client.post(
+            TestFragmentListView.url, data={"name": "marketing"}, format="json"
         )
-        self.fragment_id = int(response.data["fragment"]["id"])
-        self.url_graph = reverse("supergraph:fragment-graph", args=(self.fragment_id,))
-
-    def tearDown(self):
-        # clear Neo4j
-        self.client.post(self.url_reset)
-
-    def _put(self, data):
-        """Shortcut to upload graph data to pre-created fragment."""
-
-        sort_payload(data)
-        response = self.client.put(self.url_graph, data={"graph": data}, format="json")
-        return response
-
-    def _check_put(self, data):
-        response = self._put(data)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        return response
-
-    def _get(self):
-        """Shortcut to read graph data from pre-created fragment."""
-
-        response = self.client.get(self.url_graph, format="json")
-        return response
-
-    def _check_get(self):
-        response = self._get()
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIn("graph", response.data)
-        return response
-
-    def _check_put_get(self, data):
-        self._check_put(data)
-        freshdata = self._check_get().data["graph"]
-        sort_payload(freshdata)
-        self.assertEqual(freshdata, data)
-
-    def _check_put_get_from_json(self, path):
-        with open(path) as f:
-            data = json.load(f)
-        self._check_put_get(data)
-
-    def test_put_get(self):
-        self._check_put_get(self.data)
-
-    def test_put_get_duplicated_edges(self):
-        data = {
-            "nodes": [{"primitiveID": "france"}, {"primitiveID": "spain"}],
-            "edges": [
-                {
-                    "sourceNode": "france",
-                    "targetNode": "spain",
-                    "sourcePort": "lyon",
-                    "targetPort": "barcelona",
-                },
-                {
-                    "sourceNode": "france",
-                    "targetNode": "spain",
-                    "sourcePort": "paris",
-                    "targetPort": "madrid",
-                },
-            ],
-        }
-        self._check_put_get(data)
-
-    def test_put_get_basic(self):
-        self._check_put_get_from_json(DATA_DIR / "basic.json")
-
-    def test_put_get_basic_attributes(self):
-        self._check_put_get_from_json(DATA_DIR / "basic-attributes.json")
-
-    def test_put_get_basic_edges(self):
-        self._check_put_get_from_json(DATA_DIR / "basic-edges.json")
-
-    def test_put_get_basic_ports(self):
-        self._check_put_get_from_json(DATA_DIR / "basic-ports.json")
-
-    def test_put_get_basic_nested_attributes(self):
-        self._check_put_get_from_json(DATA_DIR / "basic-nested-attributes.json")
-
-    def test_put_get_basic_nested_edges(self):
-        self._check_put_get_from_json(DATA_DIR / "basic-nested-edges.json")
-
-    def test_put_get_basic_nested_ports(self):
-        self._check_put_get_from_json(DATA_DIR / "basic-nested-ports.json")
+        id_ = r.data["fragment"]["id"]
+        self.url = reverse("supergraph:fragment-graph", args=(id_,))
 
     @tag("slow")
-    def test_put_get_large(self):
-        self._check_put_get_from_json(DATA_DIR / "graph-sample-large.json")
-
-    def test_put_get_empty(self):
-        self._check_put_get_from_json(DATA_DIR / "empty.json")
+    def test_n25_e25(self):
+        path = DATA_DIR / "n25_e25.json"
+        self.assert_merge_retrieve_eq_from_json(path)
 
     @tag("slow")
-    def test_put_get_n25_e25(self):
-        self._check_put_get_from_json(DATA_DIR / "n25_e25.json")
+    def test_n50_e25(self):
+        path = DATA_DIR / "n50_e25.json"
+        self.assert_merge_retrieve_eq_from_json(path)
 
     @tag("slow")
-    def test_put_get_n50_e25(self):
-        self._check_put_get_from_json(DATA_DIR / "n50_e25.json")
+    def test_n25_then_n50(self):
+        old = load_data(DATA_DIR / "n25_e25.json")
+        self.merge(old)
+        new_path = DATA_DIR / "n50_e25.json"
+        self.assert_merge_retrieve_eq_from_json(new_path)
+
+    def test_basic_groups(self):
+        path = DATA_DIR / "basic-groups.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+
+# TODO combined tests
+class TestFragmentGroupInteraction(
+    GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
+):
+    def setUp(self):
+        super().setUp()
+
+        # create a fragment
+        r = self.client.post(
+            TestFragmentListView.url, data={"name": "marketing"}, format="json"
+        )
+        id_ = r.data["fragment"]["id"]
+        self.url = reverse("supergraph:fragment-graph", args=(id_,))
+
+    def test_root_merge_overwrite(self):
+        # merge fragment with some data
+        old = load_data(DATA_DIR / "basic.json")
+        self.merge(old)
+
+        # merge root with other data
+        new = {"nodes": [{"primitiveID": "cloe"}], "edges": []}
+        self.merge(new)
+
+        # make sure fragment is empty
+        fragment = self.retrieve()
+        self.assertEqual(fragment, {"nodes": [], "edges": []})
+
+    # TODO interaction tests
+    # merge
+    # fragment, then root
+    # root management over-writes fragments data
+    # merge f1, f2, get root = combination
+    # merge of existing nodes preserves frontier connections
+    # merge fragment, then root with same vertices / edges
 
 
 if __name__ == "__main__":
