@@ -115,7 +115,7 @@ class TestConverter(SimpleTestCase):
         exported = converter.dump(subgraph)
         sort_payload(exported)
         # TODO log difference like in api test suite
-        self.assertEqual(data, exported)
+        self.assertEqual(exported, data)
 
     def _check_load_dump_from_json(self, path):
         with open(path) as f:

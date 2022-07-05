@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Mapping
+from typing import List, Tuple
 
 from neotools.serializers import RecursiveSerializer
 from neotools.structures import Tree
@@ -137,8 +137,9 @@ class Dumper:
     def __init__(self, config):
         self._c = config
 
-    def dump(self, subgraph: Subgraph) -> dict:
-        # TODO subgraphs of incorrect format (missing VERTEX nodes / EDGE rels)
+    def _extract_roots(
+        self, subgraph: Subgraph
+    ) -> Tuple[List[Node], List[Node], List[Node]]:
         vertices, edges, groups = [], [], []
 
         # TODO better way to recursively re-construct initial dict from data?
@@ -156,13 +157,19 @@ class Dumper:
             ):
                 continue
 
-            # put data tree root into corresp. (vertex / edge) list
+            # put data tree root into corresp. list
             if start.has_label(self._c["labels"]["node"]):
                 vertices.append(end)
             elif start.has_label(self._c["labels"]["edge"]):
                 edges.append(end)
             elif start.has_label(self._c["labels"]["group"]):
                 groups.append(end)
+
+        return vertices, edges, groups
+
+    def dump(self, subgraph: Subgraph) -> dict:
+        # TODO subgraphs of incorrect format (missing VERTEX nodes / EDGE rels)
+        vertices, edges, groups = self._extract_roots(subgraph)
 
         # O(n) + O(r), where n is node count and r is rel count
         serializer = RecursiveSerializer(subgraph=subgraph, config=self._c)
@@ -184,7 +191,6 @@ class Converter:
     """ADT for data serialization to/from specified exchange formats."""
 
     def __init__(self, config=SCHEMA) -> None:
-        self._c = config
         self._loader = Loader(config)
         self._dumper = Dumper(config)
 
