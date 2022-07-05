@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import List, Tuple
+from typing import Any, Dict, List, Tuple
 
 from neotools.serializers import RecursiveSerializer
 from neotools.structures import Tree
@@ -13,6 +13,22 @@ class Loader:
         # TODO better config management: split into keys / labels / types?
         self._c = config
         self._serializer = RecursiveSerializer(config=config)
+        self._nodes = []
+        self._relationships = []
+        self._id2root = {}
+
+    def _clear(self):
+        self._nodes.clear()
+        self._relationships.clear()
+        self._id2root.clear()
+
+    def _save_tree(self, tree: Tree):
+        self._nodes.extend(tree.subgraph.nodes)
+        self._relationships.extend(tree.subgraph.relationships)
+
+    def _map(self, root: Node):
+        id_ = root[self._c["keys"]["yfiles_id"]]
+        self._id2root[id_] = root
 
     def _load_data(self, data: dict) -> Tree:
         """Recursively construct a tree from data."""
@@ -22,7 +38,7 @@ class Loader:
 
         return tree
 
-    def _load_entity(self, data: dict) -> Tree:
+    def _entity(self, data: dict) -> Tree:
         """Recursively construct entity tree."""
 
         # create root Entity node
@@ -35,102 +51,101 @@ class Loader:
 
         return Tree(root, data_tree.subgraph | r)
 
-    def _load_vertex(self, vertex_dict: dict) -> Tree:
+    def _vertex(self, data: dict) -> Tree:
         """Recursively construct vertex tree."""
 
-        tree = self._load_entity(vertex_dict)
+        tree = self._entity(data)
         # remember vertex id on root Entity node
         id_key = self._c["keys"]["yfiles_id"]
-        tree.root[id_key] = vertex_dict[id_key]
+        tree.root[id_key] = data[id_key]
         tree.root.add_label(self._c["labels"]["node"])
 
         return tree
 
-    def _load_edge(self, edge_dict: dict) -> Tree:
+    def _edge(self, data: dict) -> Tree:
         """Recursively construct edge tree."""
 
-        tree = self._load_entity(edge_dict)
+        tree = self._entity(data)
         root = tree.root
         root.add_label(self._c["labels"]["edge"])
 
         src_node = self._c["keys"]["source_node"]
-        root[src_node] = edge_dict[src_node]
+        root[src_node] = data[src_node]
 
         src_port = self._c["keys"]["source_port"]
-        root[src_port] = edge_dict[src_port]
+        root[src_port] = data[src_port]
 
         tgt_node = self._c["keys"]["target_node"]
-        root[tgt_node] = edge_dict[tgt_node]
+        root[tgt_node] = data[tgt_node]
 
         tgt_port = self._c["keys"]["target_port"]
-        root[tgt_port] = edge_dict[tgt_port]
+        root[tgt_port] = data[tgt_port]
 
         return tree
 
-    def _load_group(self, group_dict: dict) -> Tree:
-        tree = self._load_entity(group_dict)
-        # remember group id on root Entity node
-        id_key = self._c["keys"]["yfiles_id"]
-        tree.root[id_key] = group_dict[id_key]
+    def _link_edge_root(self, root: Node):
+        # links src --> edge root --> tgt
+        src_id = root[self._c["keys"]["source_node"]]
+        src = self._id2root[src_id]
+        r1 = Relationship(src, self._c["types"]["out"], root)
+
+        tgt_id = root[self._c["keys"]["target_node"]]
+        tgt = self._id2root[tgt_id]
+        r2 = Relationship(root, self._c["types"]["in"], tgt)
+
+        self._relationships.extend((r1, r2))
+
+    def _group(self, data: dict) -> Tree:
+        # group is a vertex, for now; the only difference = root label
+        tree = self._vertex(data)
+        tree.root.remove_label(self._c["labels"]["node"])
         tree.root.add_label(self._c["labels"]["group"])
 
         return tree
 
-    def load(self, data: dict) -> Subgraph:
-        # TODO prereqs in comment?
-        nodes, rels = [], []
-        id2root = {}
+    def _link_parent(self, obj: dict):
+        id_ = obj[self._c["keys"]["yfiles_id"]]
+        parent_id = obj.get(self._c["keys"]["parent_id"])
 
-        # yfiles nodes
+        if parent_id is not None:
+            this = self._id2root[id_]
+            parent = self._id2root[parent_id]
+            self._relationships.append(
+                Relationship(parent, self._c["types"]["contains_entity"], this)
+            )
+
+    def load(self, data: dict) -> Subgraph:
+        # assume data is valid
+        # order matters here!
+
+        self._clear()
+
         vertices = data[self._c["keys"]["nodes"]]
         for vertex_dict in vertices:
             # (recursively) construct root node and its (nested) properties
-            vertex_tree = self._load_vertex(vertex_dict)
-            # save nodes & rels created
-            nodes.extend(vertex_tree.subgraph.nodes)
-            rels.extend(vertex_tree.subgraph.relationships)
-            # remember the root to link with edges later
-            id_ = vertex_dict[self._c["keys"]["yfiles_id"]]
-            id2root[id_] = vertex_tree.root
+            tree = self._vertex(vertex_dict)
+            # save nodes & rels created, remember the root to link with edges later
+            self._save_tree(tree)
+            self._map(tree.root)
 
-        # yfiles edges
         edges = data[self._c["keys"]["edges"]]
         for edge_dict in edges:
-            edge_tree = self._load_edge(edge_dict)
-            nodes.extend(edge_tree.subgraph.nodes)
-            rels.extend(edge_tree.subgraph.relationships)
-            # link the edge with src and tgt nodes
-            # TODO what happens if src / tgt node ids are not in nodes?
-            e = edge_tree.root
-            src = id2root[e[self._c["keys"]["source_node"]]]
-            tgt = id2root[e[self._c["keys"]["target_node"]]]
-            r1 = Relationship(src, self._c["types"]["out"], e)
-            r2 = Relationship(e, self._c["types"]["in"], tgt)
-            rels.extend((r1, r2))
+            tree = self._edge(edge_dict)
+            self._save_tree(tree)
+            self._link_edge_root(tree.root)
 
         # optionally add groups
         groups = data.get(self._c["keys"]["groups"], [])  # TODO hardcoded, cheeky
         for group_dict in groups:
-            group_tree = self._load_group(group_dict)
-            nodes.extend(group_tree.subgraph.nodes)
-            rels.extend(group_tree.subgraph.relationships)
-            # remember root node for linking with children
-            id_ = group_dict[self._c["keys"]["yfiles_id"]]
-            id2root[id_] = group_tree.root
+            tree = self._group(group_dict)
+            self._save_tree(tree)
+            self._map(tree.root)
 
         # link groups and its content entities, if necessary
         for obj in chain(vertices, groups):
-            id_ = obj[self._c["keys"]["yfiles_id"]]
-            parent_id = obj.get(self._c["keys"]["parent_id"])
+            self._link_parent(obj)
 
-            if parent_id is not None:
-                this = id2root[id_]
-                parent = id2root[parent_id]
-                rels.append(
-                    Relationship(parent, self._c["types"]["contains_entity"], this)
-                )
-
-        return Subgraph(nodes, rels)
+        return Subgraph(self._nodes, self._relationships)
 
 
 class Dumper:

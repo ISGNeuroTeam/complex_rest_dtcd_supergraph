@@ -30,20 +30,20 @@ class TestLoader(SimpleTestCase):
         self.assertEqual(len(tree.subgraph.relationships), 1)
         self.assertTrue(tree.root.has_label(LABELS["data"]))
 
-    def test_load_entity(self):
+    def test_entity(self):
         data = {
             "name": "amy",
             "online": True,
             "address": ["bob", "dan"],
             "layout": {"x": 0, "y": 0},
         }
-        tree = self.loader._load_entity(data)
+        tree = self.loader._entity(data)
         self.assertEqual(len(tree.subgraph.nodes), 3)
         self.assertEqual(len(tree.subgraph.relationships), 2)
         self.assertTrue(tree.root.has_label(LABELS["entity"]))
         self.assertIn(TYPES["has_data"], tree.subgraph.types())
 
-    def test_load_vertex(self):
+    def test_vertex(self):
         data = {
             "name": "amy",
             "primitiveID": "abc",
@@ -51,7 +51,7 @@ class TestLoader(SimpleTestCase):
             "address": ["bob", "dan"],
             "layout": {"x": 0, "y": 0},
         }
-        tree = self.loader._load_vertex(data)
+        tree = self.loader._vertex(data)
         self.assertEqual(len(tree.subgraph.nodes), 3)
         self.assertEqual(len(tree.subgraph.relationships), 2)
         self.assertTrue(tree.root.has_label(LABELS["node"]))
@@ -59,14 +59,14 @@ class TestLoader(SimpleTestCase):
         self.assertIn(key, tree.root)
         self.assertEqual(tree.root[key], "abc")
 
-    def test_load_edge(self):
+    def test_edge(self):
         data = {
             "sourceNode": "amy",
             "sourcePort": "o1",
             "targetNode": "bob",
             "targetPort": "i1",
         }
-        tree = self.loader._load_edge(data)
+        tree = self.loader._edge(data)
         self.assertEqual(len(tree.subgraph.nodes), 2)
         self.assertEqual(len(tree.subgraph.relationships), 1)
         self.assertTrue(tree.root.has_label(LABELS["edge"]))
@@ -86,7 +86,7 @@ class TestLoader(SimpleTestCase):
         self.assertEqual(len(subgraph.nodes), 17)
         self.assertEqual(len(subgraph.relationships), 16)
 
-    def test_load_from_json(self):
+    def test_from_json(self):
         with open(DATA_DIR / "graph-sample-small.json") as f:
             data = json.load(f)
 
