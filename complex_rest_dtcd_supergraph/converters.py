@@ -8,17 +8,16 @@ from py2neo import Node, Relationship, Subgraph
 from .settings import SCHEMA
 
 
-class Converter:
-    """ADT for data serialization to/from specified exchange formats."""
-
-    def __init__(self, config: Mapping[str, Mapping[str, str]] = SCHEMA) -> None:
+class Loader:
+    def __init__(self, config):
+        # TODO better config management: split into keys / labels / types?
         self._c = config
-        self._loader = RecursiveSerializer(config=config)
+        self._serializer = RecursiveSerializer(config=config)
 
     def _load_data(self, data: dict) -> Tree:
         """Recursively construct a tree from data."""
 
-        tree = self._loader.load(data)
+        tree = self._serializer.load(data)
         tree.root.add_label(self._c["labels"]["data"])
 
         return tree
@@ -28,10 +27,8 @@ class Converter:
 
         # create root Entity node
         root = Node(self._c["labels"]["entity"])
-
         # load data for this entity
         data_tree = self._load_data(data)
-
         # link data to root node
         type_ = self._c["types"]["has_data"]
         r = Relationship(root, type_, data_tree.root)
@@ -80,14 +77,6 @@ class Converter:
         return tree
 
     def load(self, data: dict) -> Subgraph:
-        """Create a subgraph from data.
-
-        See `docs/Format.md` for exchange format specification.
-
-        The nodes in the created subgraph are unbound.
-        See https://py2neo.org/2021.1/data/index.html#py2neo.data.Node.
-        """
-
         # TODO prereqs in comment?
         nodes, rels = [], []
         id2root = {}
@@ -143,12 +132,12 @@ class Converter:
 
         return Subgraph(nodes, rels)
 
+
+class Dumper:
+    def __init__(self, config):
+        self._c = config
+
     def dump(self, subgraph: Subgraph) -> dict:
-        """Dump the subgraph to a dictionary.
-
-        See See `docs/Format.md` for exchange format specification.
-        """
-
         # TODO subgraphs of incorrect format (missing VERTEX nodes / EDGE rels)
         vertices, edges, groups = [], [], []
 
@@ -189,3 +178,31 @@ class Converter:
             result[self._c["keys"]["groups"]] = [serializer.dump(g) for g in groups]
 
         return result
+
+
+class Converter:
+    """ADT for data serialization to/from specified exchange formats."""
+
+    def __init__(self, config=SCHEMA) -> None:
+        self._c = config
+        self._loader = Loader(config)
+        self._dumper = Dumper(config)
+
+    def load(self, data: dict):
+        """Create a subgraph from data.
+
+        See `docs/Format.md` for exchange format specification.
+
+        The nodes in the created subgraph are unbound.
+        See https://py2neo.org/2021.1/data/index.html#py2neo.data.Node.
+        """
+
+        return self._loader.load(data)
+
+    def dump(self, subgraph: Subgraph):
+        """Dump the subgraph to a dictionary.
+
+        See See `docs/Format.md` for exchange format specification.
+        """
+
+        return self._dumper.dump(subgraph)
