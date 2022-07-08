@@ -2,7 +2,8 @@
 level = INFO
 
 [neo4j]
-uri = neo4j://localhost:7687
+uri = bolt://localhost:7687
 user = neo4j
 password = password
-name = neo4j
+# set name to empty to preserve compatibility with Neo4j 3.x
+name = 

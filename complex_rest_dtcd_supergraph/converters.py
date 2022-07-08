@@ -1,5 +1,5 @@
 from itertools import chain
-from typing import Any, Dict, List, Tuple
+from typing import List, Tuple
 
 from neotools.serializers import RecursiveSerializer
 from neotools.structures import Tree

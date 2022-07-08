@@ -1,6 +1,6 @@
 import unittest
 
-from django.test import SimpleTestCase, tag
+from django.test import SimpleTestCase
 from rest_framework.validators import ValidationError
 
 from complex_rest_dtcd_supergraph.fields import EdgeField, VertexField
