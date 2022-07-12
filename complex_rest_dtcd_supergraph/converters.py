@@ -1,3 +1,10 @@
+"""
+This module contains converter classes.
+
+They help to translate parts of our domain model between Python objects
+and neo4j-comptabile structures.
+"""
+
 from itertools import chain
 from typing import List, Tuple
 
