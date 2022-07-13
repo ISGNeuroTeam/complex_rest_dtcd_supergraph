@@ -11,7 +11,7 @@ from rest.response import SuccessResponse
 from . import settings
 from .models import Fragment
 from .serializers import GraphSerializer, FragmentSerializer
-from .exceptions import FragmentDoesNotExist, LoadingError
+from .exceptions import LoadingError
 from .managers import Neo4jGraphManager
 from .converters import Converter
 
@@ -26,16 +26,17 @@ GRAPH_MANAGER = Neo4jGraphManager(
 
 
 def get_fragment_or_404(manager: Neo4jGraphManager, id_: int) -> Fragment:
-    """Return a fragment with a given id from the provided manager.
+    """Return a fragment with the given id from the provided manager.
 
-    Calls `.fragments.get()` on a given manager, but raises `NotFound`
-    instead of `FragmentDoesNotExist`.
+    Raises `NotFound` if the fragment does not exist.
     """
 
-    try:
-        return manager.fragments.get_or_exception(id_)
-    except FragmentDoesNotExist as e:
-        raise NotFound(detail=str(e))
+    fragment = manager.fragments.get(id_)
+
+    if fragment is not None:
+        return fragment
+    else:
+        raise NotFound
 
 
 def load_or_400(loader: Converter, data: dict):
@@ -134,7 +135,7 @@ class FragmentGraphView(APIView):
 
         # read fragment's graph
         fragment = get_fragment_or_404(self.graph_manager, pk)
-        subgraph = self.graph_manager.fragments.content.get(fragment)
+        subgraph = self.graph_manager.fragments.content.read(fragment)
         logger.info(
             f"Read {len(subgraph.nodes)} nodes, "
             f"{len(subgraph.relationships)} relationships."
@@ -195,7 +196,7 @@ class RootGraphView(APIView):
         """Read all content."""
 
         # TODO copy-paste from FragmentGraphView
-        subgraph = self.graph_manager.fragments.content.get()
+        subgraph = self.graph_manager.fragments.content.read()
         logger.info(
             f"Read {len(subgraph.nodes)} nodes, "
             f"{len(subgraph.relationships)} relationships."

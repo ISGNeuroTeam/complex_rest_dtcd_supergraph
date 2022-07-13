@@ -6,20 +6,21 @@ and isolate details and complexity.
 """
 
 from itertools import chain
-from typing import Generator, List, Set, Tuple, Union
+from typing import List, Set, Tuple, Union
 
 from py2neo import Graph, Node, Relationship, Subgraph, Transaction
 from py2neo import ogm
-from py2neo.cypher import Cursor, cypher_join
+from py2neo.cypher import cypher_join
 
 from . import clauses
 from .exceptions import (
     FragmentDoesNotBelongToGraph,
-    FragmentDoesNotExist,
     FragmentIsNotBound,
 )
 from .models import Fragment
 from .settings import SCHEMA
+from .utils import filter_nodes, match_nodes, subgraph_from_match_clause
+
 
 # TODO custom type aliases
 FragmentID = int
@@ -27,11 +28,6 @@ FragmentID = int
 KEYS = SCHEMA["keys"]
 LABELS = SCHEMA["labels"]
 TYPES = SCHEMA["types"]
-
-
-def filter_nodes(subgraph: Subgraph, label: str) -> Generator[Node, None, None]:
-    """Construct an iterator over subgraph nodes with the given label."""
-    return (x for x in subgraph.nodes if x.has_label(label))
 
 
 class Neo4jGraphManager:
@@ -69,19 +65,6 @@ class FragmentManager:
         """Return a fragment with given id if it exists, None otherwise."""
         return self._repo.get(Fragment, fragment_id)
 
-    def get_or_exception(self, fragment_id: int) -> Fragment:
-        """Return a fragment with given id.
-
-        Raises `FragmentDoesNotExist` if the fragment is missing.
-        """
-
-        fragment = self.get(fragment_id)
-
-        if fragment is not None:
-            return fragment
-        else:
-            raise FragmentDoesNotExist(f"fragment [{fragment_id}] does not exist")
-
     def save(self, *fragments: Fragment):
         """Save local fragments into the repository.
 
@@ -112,10 +95,10 @@ class ContentManager:
         self._graph = graph
 
     def _validate(self, fragment: Fragment):
-        """Validate given fragment.
+        """Validate the given fragment.
 
-        - Raises `FragmentIsNotBound` exception if a fragment is not bound.
-        - Raises `FragmentDoesNotBelongToGraph` if fragment's graph is
+        - Raise `FragmentIsNotBound` exception if a fragment is not bound.
+        - Raise `FragmentDoesNotBelongToGraph` if fragment's graph is
             different from this one.
         """
 
@@ -125,7 +108,7 @@ class ContentManager:
             raise FragmentDoesNotBelongToGraph
 
     @staticmethod
-    def _match_query(fragment_id: int = None) -> Tuple[str, dict]:
+    def _match_entity_trees_clause(fragment_id: int = None) -> Tuple[str, dict]:
         """Prepare Cypher clause and params to match graph's content.
 
         If `fragment_id` is provided, then match entities, their trees
@@ -150,17 +133,6 @@ class ContentManager:
                 id=fragment_id,
             )
 
-    def _cursor(
-        self, tx: Transaction, return_clause: str, fragment_id: int = None
-    ) -> Cursor:
-        match_clause, kwargs = self._match_query(fragment_id)
-        q, params = cypher_join(match_clause, return_clause, **kwargs)
-        cursor = tx.run(q, params)
-        return cursor
-
-    def _match_nodes(self, tx: Transaction, fragment_id: int = None) -> Cursor:
-        return self._cursor(tx, clauses.RETURN_NODES, fragment_id)
-
     def _nodes(self, tx: Transaction, fragment_id: int = None) -> Set[Node]:
         """
         Return a set of content nodes.
@@ -169,61 +141,39 @@ class ContentManager:
         fragment. Otherwise, match all content nodes.
         """
 
-        cursor = self._match_nodes(tx, fragment_id)
+        match_clause, params = self._match_entity_trees_clause(fragment_id)
+        cursor = match_nodes(tx, match_clause, **params)
         return set(record[0] for record in cursor)
 
-    def _match_relationships(self, tx: Transaction, fragment_id: int = None) -> Cursor:
+    def _all(self, tx: Transaction) -> Subgraph:
+        """Return bound subgraph with content."""
+
+        match_clause, params = self._match_entity_trees_clause()
+        return subgraph_from_match_clause(tx, match_clause, **params)
+
+    def _get(self, tx: Transaction, fragment: Fragment) -> Subgraph:
+        """Return bound subgraph with content of a given fragment."""
+
+        self._validate(fragment)
+        fragment_id = fragment.__primaryvalue__
+        match_clause, params = self._match_entity_trees_clause(fragment_id)
+
+        return subgraph_from_match_clause(tx, match_clause, **params)
+
+    def read(self, fragment: Fragment = None) -> Subgraph:
+        """Return a bound subgraph with content.
+
+        If a fragment is given, then content belongs to the given fragment.
+        Otherwise, returns full content.
         """
-        Match content relationships.
-
-        If `fragment_id` is provided, then match relationships from a given
-        fragment. Otherwise, match all content relationships.
-        """
-
-        return self._cursor(tx, clauses.RETURN_RELATIONSHIPS, fragment_id)
-
-    def _content(self, tx: Transaction, fragment_id: int = None) -> Subgraph:
-        """Return bound subgraph with content.
-
-        If `fragment_id` is provided, then return content subgraph from
-        a given fragment. Otherwise, return the whole content.
-        """
-
-        # nodes
-        nodes = self._nodes(tx, fragment_id)
-        id2node = {node.identity: node for node in nodes}
-
-        # relationships
-        rels_cursor = self._match_relationships(tx, fragment_id)
-
-        # workaround: py2neo sucks at efficient conversion of rels to Subgraph
-        # manually construct Relationships
-        relationships = []
-        for record in rels_cursor:
-            start_node = id2node[record["start_id"]]
-            end_node = id2node[record["end_id"]]
-            t = record["type"]
-            properties = record.get("properties", {})
-            relationships.append(Relationship(start_node, t, end_node, **properties))
-
-        return Subgraph(id2node.values(), relationships)
-
-    def get(self, fragment: Fragment = None) -> Subgraph:
-        """Return bound subgraph with content.
-
-        If `fragment` is provided, then return content subgraph from
-        a given fragment. Otherwise, return the whole content.
-        """
-
-        # TODO error handling + docs
-        if fragment is not None:
-            self._validate(fragment)
-            fragment_id = fragment.__primaryvalue__
-        else:
-            fragment_id = None
 
         tx = self._graph.begin(readonly=True)
-        subgraph = self._content(tx, fragment_id)
+
+        if fragment is None:
+            subgraph = self._all(tx)
+        else:
+            subgraph = self._get(tx, fragment)
+
         self._graph.commit(tx)
 
         return subgraph
@@ -234,7 +184,7 @@ class ContentManager:
 
         # merge vertex roots on (label, yfiles_id)
         label = LABELS["node"]
-        vertices = set(filter_nodes(subgraph, label))  # O(n)
+        vertices = filter_nodes(subgraph, label)  # O(n)
         key = KEYS["yfiles_id"]
         subgraph = Subgraph(vertices)  # TODO better way to return merged nodes?
         tx.merge(subgraph, label, key)
@@ -245,7 +195,7 @@ class ContentManager:
     def _merge_edges(tx: Transaction, subgraph: Subgraph) -> Set[Node]:
         """Merge Edge nodes from subgraph, return a set of merged nodes."""
         label = LABELS["edge"]
-        edges = set(filter_nodes(subgraph, label))  # O(n)
+        edges = filter_nodes(subgraph, label)  # O(n)
         keys = tuple(
             KEYS[key]
             for key in ("source_node", "source_port", "target_node", "target_port")
@@ -260,7 +210,7 @@ class ContentManager:
         """Merge Group nodes from subgraph, return a set of merged nodes."""
 
         label = LABELS["group"]
-        groups = set(filter_nodes(subgraph, label))  # O(n)
+        groups = filter_nodes(subgraph, label)  # O(n)
         key = KEYS["yfiles_id"]
         subgraph = Subgraph(groups)
         tx.merge(subgraph, label, key)
@@ -277,20 +227,20 @@ class ContentManager:
             1. vertices
             2. edges
             3. groups
-        2. Remove old content (entity roots and their trees).
+        2. Remove old nodes & relationships.
         3. Re-link fragment with new entities to be created.
-        4. Merge newly created entities and links.
+        4. Merge the rest and fragment-entity links.
         """
 
+        # FIXME this procedure fails when adding existing entities
+        # outside current fragment
+        # merge tree roots = preserve relationships
         vertices = self._merge_vertices(tx, subgraph)
         edges = self._merge_edges(tx, subgraph)
         groups = self._merge_groups(tx, subgraph)
 
-        # delete difference
-        # TODO think about this more
+        # delete outdated nodes
         if fragment is not None:
-            # TODO validation + docs
-            self._validate(fragment)
             current = self._nodes(tx, fragment.__primaryvalue__)
         else:
             current = self._nodes(tx)
@@ -298,7 +248,6 @@ class ContentManager:
         tx.delete(Subgraph(old))
 
         # re-link fragment to subgraph entities (roots of their trees)
-        # entities with existing relationship are skipped
         if fragment is not None:
             root = fragment.__node__
             type_ = TYPES["contains_entity"]
@@ -310,7 +259,7 @@ class ContentManager:
             links = []
 
         # create the rest of the subgraph & fragment-entity links
-        # skips already bound nodes & relationships
+        # skips existing nodes & relationships
         tx.create(subgraph | Subgraph(relationships=links))
 
     def replace(self, subgraph: Subgraph, fragment: Fragment = None):
@@ -338,6 +287,7 @@ class ContentManager:
 
         self._validate(fragment)
         fragment_id = fragment.__primaryvalue__
+        # FIXME this deletes nodes outside a fragment if they are on a directed path
         q, params = cypher_join(
             clauses.MATCH_FRAGMENT,
             clauses.DELETE_DESCENDANTS,
@@ -348,7 +298,7 @@ class ContentManager:
     def clear(self):
         """Remove all content from this graph."""
 
-        match_content = self._match_query()
+        match_content = self._match_entity_trees_clause()
         q, _ = cypher_join(
             match_content,
             clauses.DELETE_NODES,
@@ -362,4 +312,5 @@ class ContentManager:
         # empty if there are no links to entities
         n = fragment.__node__
         link = self._graph.match_one((n,), r_type=TYPES["contains_entity"])
+
         return link is None
