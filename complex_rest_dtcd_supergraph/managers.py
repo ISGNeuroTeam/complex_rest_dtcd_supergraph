@@ -287,18 +287,18 @@ class ContentManager:
 
         self._validate(fragment)
         fragment_id = fragment.__primaryvalue__
-        # FIXME this deletes nodes outside a fragment if they are on a directed path
+        match_clause, params = self._match_entity_trees_clause(fragment_id)
         q, params = cypher_join(
-            clauses.MATCH_FRAGMENT,
-            clauses.DELETE_DESCENDANTS,
-            id=fragment_id,
+            match_clause,
+            clauses.DELETE_NODES,
+            **params,
         )
         self._graph.update(q, params)
 
     def clear(self):
         """Remove all content from this graph."""
 
-        match_content = self._match_entity_trees_clause()
+        match_content, _ = self._match_entity_trees_clause()
         q, _ = cypher_join(
             match_content,
             clauses.DELETE_NODES,
