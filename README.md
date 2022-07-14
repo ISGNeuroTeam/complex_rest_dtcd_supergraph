@@ -2,7 +2,9 @@
 
 [Complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop) plugin for graph management.
 
-## Getting Started
+For an introduction check out the [User guide](docs/user-guide.md) 
+
+## Installation
 
 > **WARNING**: `py2neo` library has a *bug* [[Issue 942](https://github.com/py2neo-org/py2neo/issues/942)]. Depending on deployment option, you might have to run a fixing script on your local machine. Follow [*Fixing `py2neo`* section](#fixing-py2neo).
 
