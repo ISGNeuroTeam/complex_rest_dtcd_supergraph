@@ -2,7 +2,7 @@
 This module contains converter classes.
 
 They help to translate parts of our domain model between Python objects
-and neo4j-comptabile structures.
+and Neo4j-comptabile structures.
 """
 
 from itertools import chain
@@ -16,10 +16,16 @@ from .settings import SCHEMA
 
 
 class Loader:
+    """A class that supports loading of data structures as subgraphs.
+
+    Uses `RecursiveSerializer` to load nested Python containers.
+    """
+
     def __init__(self, config):
         # TODO better config management: split into keys / labels / types?
         self._c = config
         self._serializer = RecursiveSerializer(config=config)
+        # keep track of loaded nodes & rels
         self._nodes = []
         self._relationships = []
         self._id2root = {}
@@ -30,10 +36,14 @@ class Loader:
         self._id2root.clear()
 
     def _save_tree(self, tree: Tree):
+        """Save tree nodes & rels."""
+
         self._nodes.extend(tree.subgraph.nodes)
         self._relationships.extend(tree.subgraph.relationships)
 
     def _map(self, root: Node):
+        """Remember id:root pair."""
+
         id_ = root[self._c["keys"]["yfiles_id"]]
         self._id2root[id_] = root
 
@@ -42,7 +52,6 @@ class Loader:
 
         tree = self._serializer.load(data)
         tree.root.add_label(self._c["labels"]["data"])
-
         return tree
 
     def _entity(self, data: dict) -> Tree:
@@ -55,7 +64,6 @@ class Loader:
         # link data to root node
         type_ = self._c["types"]["has_data"]
         r = Relationship(root, type_, data_tree.root)
-
         return Tree(root, data_tree.subgraph | r)
 
     def _vertex(self, data: dict) -> Tree:
@@ -66,7 +74,6 @@ class Loader:
         id_key = self._c["keys"]["yfiles_id"]
         tree.root[id_key] = data[id_key]
         tree.root.add_label(self._c["labels"]["node"])
-
         return tree
 
     def _edge(self, data: dict) -> Tree:
@@ -107,7 +114,6 @@ class Loader:
         tree = self._vertex(data)
         tree.root.remove_label(self._c["labels"]["node"])
         tree.root.add_label(self._c["labels"]["group"])
-
         return tree
 
     def _link_parent(self, obj: dict):
@@ -156,6 +162,12 @@ class Loader:
 
 
 class Dumper:
+    """A class that supports conversion of subgraphs into data structures.
+
+    Uses `RecursiveSerializer` to translate subgraphs into nested Python
+    containers.
+    """
+
     def __init__(self, config):
         self._c = config
 
@@ -190,6 +202,8 @@ class Dumper:
         return vertices, edges, groups
 
     def dump(self, subgraph: Subgraph) -> dict:
+        """Convert subgraph in a specified format to Python data structure."""
+
         # TODO subgraphs of incorrect format (missing VERTEX nodes / EDGE rels)
         vertices, edges, groups = self._extract_roots(subgraph)
 
@@ -210,7 +224,7 @@ class Dumper:
 
 
 class Converter:
-    """ADT for data serialization to/from specified exchange formats."""
+    """Supports conversion between Python containers and Neo4j structures."""
 
     def __init__(self, config=SCHEMA) -> None:
         self._loader = Loader(config)

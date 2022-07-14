@@ -40,11 +40,13 @@ class Neo4jGraphManager:
 
     def clear(self):
         """Remove all nodes and relationships from managed graph."""
+
         self._graph.delete_all()
 
     @property
     def fragments(self):
         """Fragment manager for this graph."""
+
         return self._fragment_manager
 
 
@@ -157,7 +159,6 @@ class ContentManager:
         self._validate(fragment)
         fragment_id = fragment.__primaryvalue__
         match_clause, params = self._match_entity_trees_clause(fragment_id)
-
         return subgraph_from_match_clause(tx, match_clause, **params)
 
     def read(self, fragment: Fragment = None) -> Subgraph:

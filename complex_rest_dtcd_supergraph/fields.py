@@ -30,7 +30,10 @@ class VertexField(DictField):
 
 
 class GroupField(VertexField):
-    pass
+    """A group dictionary representation.
+
+    For now, groups are implemented as vertices.
+    """
 
 
 class EdgeField(DictField):
