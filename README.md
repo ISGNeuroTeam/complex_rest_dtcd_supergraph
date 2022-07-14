@@ -2,7 +2,7 @@
 
 [Complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop) plugin for graph management.
 
-For an introduction check out the [User guide](docs/user-guide.md) 
+For an introduction check out the [User guide](docs/user-guide.md).
 
 ## Installation
 

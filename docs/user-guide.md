@@ -2,6 +2,8 @@
 
 In this guide you'll find examples of core operations provided by this plugin.
 
+Check out check out the [Format](Format.md) and `neo-tools` library for details on why and how we represent nested structures in the database and [OpenAPI schema](./openapi.yaml) to get a general idea for the plugin.
+
 > You can follow examples using Django-provided shell of `complex_rest` project.
 
 ## Vertices and edges
@@ -121,18 +123,72 @@ Additional notes:
 
 ## Graph operations
 
-The main operation is a **replacement** of a graph. We can do this either for a given fragment, or for the whole graph using the *root* fragment.
+The main operation is a **merge with replacement**. We can do this either for a given fragment, or for the whole graph using the *root* fragment.
 
-Let's start and add some graph data.
+### Basic save and read
+
+Let's add some graph data to the `marketing` fragment:
 
 ```python
->>> data = {"nodes": [{"primitiveID": "amy"}], "edges": []}
+>>> data = {'edges': [], 'nodes': [{'primitiveID': 'amy'}, {'primitiveID': 'bob'}]}
 >>> subgraph = converter.load(data)
 >>> # .content is a ContentManger for this graph
->>> maanger.fragments.content.replace(subgraph, marketing)
+>>> manager.fragments.content.replace(subgraph, marketing)
 ```
 
-We just merged (with replacement) new content into the fragment `marketing`. Now it contains one *vertex tree* with a given ID.
+We just merged (with replacement) new content into the fragment `marketing`. Now the fragment node has a link to the roots of 2 *vertex trees*: a tree-like subgraph of nodes and relationships representing our initial data. Each tree stores the data for a corresponding node.
+
+> Remember that we *cannot* save nested data structures as Neo4j properties. We represent these as tree-like entities on the backend.
+
+We can get this data back just as easy:
+
+```python
+>>> subgraph = manager.fragments.content.read(marketing)
+>>> data = converter.dump(subgraph)
+>>> data
+{'edges': [], 'nodes': [{'primitiveID': 'amy'}, {'primitiveID': 'bob'}]}
+```
+
+### Merge with replacement
+
+Now for something interesting - let's try and save the following graph in the same fragment:
+
+```python
+>>> data = {'edges': [], 'nodes': [{'primitiveID': 'amy'}, {'primitiveID': 'dan'}]}
+>>> subgraph = converter.load(data)
+>>> manager.fragments.content.replace(subgraph, marketing)
+```
+
+The idea here is that we want to **replace** the content of the `marketing` fragment in a smart way:
+
+- create new nodes & relationships
+- update existing stuff with new data if needed
+- delete the old stuff
+
+We also want to *preserve existing relationships* between updated nodes and other entities in the graph. Here's how we do it:
+
+1. Merge the *root nodes* of the following entity trees:
+    1. Vertex trees.
+    2. Edge trees.
+    3. Group trees (if any).
+2. Remove old nodes & relationships.
+3. Re-link fragment with the root nodes of new entities to be created.
+4. Merge the rest and fragment-entity links.
+
+> See `managers.ContentManager._merge` for details.
+
+In the example above, we create `dan`, delete `bob` and update `amy` vertices. We preserve all connections from `amy` vertex to other intact members of the same graph.
+
+Now the fragment contains just two vertices:
+
+```python
+>>> subgraph = manager.fragments.content.read(marketing)
+>>> data = converter.dump(subgraph)
+>>> data
+{'edges': [], 'nodes': [{'primitiveID': 'amy'}, {'primitiveID': 'dan'}]}
+```
+
+### Multiple fragments and the root
 
 Let's add some more data to another fragment:
 
@@ -144,29 +200,16 @@ Let's add some more data to another fragment:
 ...          'targetPort': 'laptop'}],
 ...  'nodes': [{'primitiveID': 'bob'}, {'primitiveID': 'cloe'}]}
 >>> subgraph = converter.load(data)
->>> maanger.fragments.content.replace(subgraph, research)
+>>> manager.fragments.content.replace(subgraph, research)
 ```
 
-The `research` fragment now contains 2 vertex trees and 1 *edge tree*, with a *relationship* between roots of entity trees like so:
+The `research` fragment now contains 2 vertex trees and 1 *edge tree*, with a *relationship* between roots of entity trees:
 
 ```
 (bob_root) --> (edge_root) --> (cloe_root)
 ```
 
-We can get this data back just as easy:
-
-```python
->>> subgraph = manager.fragments.content.read(research)
->>> data = converter.dump(subgraph)
->>> data
-{'edges': [{'sourceNode': 'bob',
-            'sourcePort': 'mobile',
-            'targetNode': 'cloe',
-            'targetPort': 'laptop'}],
- 'nodes': [{'primitiveID': 'bob'}, {'primitiveID': 'cloe'}]}
-```
-
-We can also get the whole graph (notice a node object with `amy` ID):
+We can get the *whole* graph (same as the *root* fragment):
 
 ```python
 >>> # reads root fragment by default
@@ -179,39 +222,37 @@ We can also get the whole graph (notice a node object with `amy` ID):
             'targetPort': 'laptop'}],
  'nodes': [{'primitiveID': 'amy'},
            {'primitiveID': 'bob'},
-           {'primitiveID': 'cloe'}]}
+           {'primitiveID': 'cloe'},
+           {'primitiveID': 'dan'}]}
 ```
+
+Now for something interesting. Let's save the following graph on the `root` fragment:
+
+```python
+>>> data = {
+...  'edges': [{'sourceNode': 'bob',
+...             'sourcePort': 'IoT device',
+...             'targetNode': 'eve',
+...             'targetPort': 'server'}],
+...  'nodes': [{'primitiveID': 'amy'},
+...            {'primitiveID': 'bob'},
+...            {'primitiveID': 'eve'}]}
+>>> subgraph = converter.load(data)
+>>> # replaces root fragment by default
+>>> manager.fragments.content.replace(subgraph)
+```
+
+Here we:
+
+- create `eve` vertex and `bob-eve` edge
+- *update* `amy` and `bob` vertices while preserving relationships to parent fragment 
+- delete vertices `cloe`, `dan` and `bob-cloe` edge
+
+The state of fragments' content:
+- `marketing` fragment still contains `amy` vertex
+- `research` fragment still has `bob` vertex
+- `eve` vertex and `bob-eve` edge do not belong to *any* fragment
 
 Notes:
 
 - `ContentManger` is responsible for all the logic related to graph updates.
-
-
----
-
-
-## Graph operations workflow
-
-This is a quick recap of how the plugin works.
-
-### Saving graph objects
-
-```
-json --> [validation] --> dict
-dict --> [converter] --> subgraph
-subgraph --> [managers] --> neo4j
-```
-
-### Retrieving graph objects
-
-Same as saving, but backwards:
-
-```
-neo4j --> [managers] --> subgraph
-subgraph --> [converter] --> dict
-dict --> json
-```
-
-Converter helps to translate back and forth between original data and structures for Neo4j.
-
-Managers support main graph operations.
