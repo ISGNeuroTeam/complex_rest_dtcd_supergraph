@@ -15,20 +15,23 @@ from .settings import SCHEMA
 
 
 class FragmentSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True, source="__primaryvalue__")
+    id = serializers.UUIDField(read_only=True, source="uid", format="hex")
     name = serializers.CharField(max_length=255)  # TODO value in settings
 
-    def create(self, validated_data) -> Fragment:
-        """Construct local fragment instance."""
-        return Fragment(**validated_data)
+    def create(self, validated_data):
+        """Construct fragment instance and save it to the database."""
 
-    def update(self, instance, validated_data):
-        """Update local fragment instance."""
+        return Fragment(**validated_data).save()
+
+    def update(self, instance: Fragment, validated_data: dict):
+        """Update fragment instance in the database."""
+
         instance.name = validated_data["name"]
-        return instance
+        return instance.save()
 
     def save(self, **kwargs) -> Fragment:
-        """Create or update local fragment instance."""
+        """Create or update a fragment instance in the database."""
+
         return super().save(**kwargs)
 
 
