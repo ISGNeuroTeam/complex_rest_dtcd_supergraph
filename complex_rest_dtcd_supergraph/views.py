@@ -1,5 +1,7 @@
 import logging
+from uuid import UUID
 
+import neomodel
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
@@ -23,6 +25,18 @@ GRAPH_MANAGER = Neo4jGraphManager(
     settings.NEO4J["name"],
     auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
 )
+
+
+def get_node_or_404(model: neomodel.StructuredNode, lazy=False, **kwargs):
+    """Call `.nodes.get()` on a given node.
+
+    Raises `rest_framework.exceptions.NotFound` if a node is missing.
+    """
+
+    try:
+        return model.nodes.get(lazy=lazy, **kwargs)
+    except neomodel.DoesNotExist:
+        raise NotFound
 
 
 def get_fragment_or_404(manager: Neo4jGraphManager, id_: int) -> Fragment:
@@ -58,12 +72,11 @@ class FragmentListView(APIView):
     http_method_names = ["get", "post"]
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
-    graph_manager = GRAPH_MANAGER
 
     def get(self, request: Request):
         """Read a list of existing fragment names."""
 
-        fragments = self.graph_manager.fragments.all()
+        fragments = list(Fragment.nodes)
         serializer = self.serializer_class(fragments, many=True)
 
         return SuccessResponse({"fragments": serializer.data})
@@ -74,14 +87,11 @@ class FragmentListView(APIView):
         # validation
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-
         # create a fragment
-        fragment = serializer.save()
-        self.graph_manager.fragments.save(fragment)
+        serializer.save()
 
         return SuccessResponse(
-            # TODO how to get rid of additional serializer here?
-            data={"fragment": self.serializer_class(fragment).data},
+            data={"fragment": serializer.data},
             http_status=status.HTTP_201_CREATED,
         )
 
@@ -92,32 +102,30 @@ class FragmentDetailView(APIView):
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
-    graph_manager = GRAPH_MANAGER
 
-    def get(self, request: Request, pk: int):
+    def get(self, request: Request, pk: UUID):
         """Return a fragment."""
 
-        fragment = get_fragment_or_404(self.graph_manager, pk)
+        fragment = get_node_or_404(Fragment, uid=pk.hex)
         serializer = self.serializer_class(fragment)
 
         return SuccessResponse({"fragment": serializer.data})
 
-    def put(self, request: Request, pk: int):
+    def put(self, request: Request, pk: UUID):
         """Update a fragment."""
 
-        old = get_fragment_or_404(self.graph_manager, pk)
+        old = get_node_or_404(Fragment, uid=pk.hex)
         serializer = self.serializer_class(old, data=request.data)
         serializer.is_valid(raise_exception=True)
-        new = serializer.save()
-        self.graph_manager.fragments.save(new)
+        serializer.save()
 
         return SuccessResponse({"fragment": serializer.data})
 
-    def delete(self, request: Request, pk: int):
+    def delete(self, request: Request, pk: UUID):
         """Delete a fragment and its content."""
 
-        fragment = get_fragment_or_404(self.graph_manager, pk)
-        self.graph_manager.fragments.remove(fragment)
+        fragment = get_node_or_404(Fragment, uid=pk.hex)
+        fragment.delete()
 
         return SuccessResponse()
 
