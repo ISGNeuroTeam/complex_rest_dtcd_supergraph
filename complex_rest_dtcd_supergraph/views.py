@@ -248,11 +248,11 @@ class ResetNeo4j(APIView):
 
     http_method_names = ["post"]
     permission_classes = (AllowAny,)
-    graph_manager = GRAPH_MANAGER
 
     def post(self, request, *args, **kwargs):
         """Delete all nodes and relationships from Neo4j database."""
-        self.graph_manager.clear()
+
+        neomodel.clear_neo4j_database(neomodel.db)  # TODO constraints? indexes?
         return SuccessResponse()
 
 
