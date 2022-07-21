@@ -1,6 +1,8 @@
 import configparser
 from pathlib import Path
 
+import neomodel
+
 from core.settings.ini_config import merge_ini_config_with_defaults, merge_dicts
 
 
@@ -13,6 +15,9 @@ default_ini_config = {
     "graph": {},
     "workspace": {},
     "neo4j": {
+        "protocol": "bolt",
+        "address": "localhost",
+        "port": 7687,
         "uri": "bolt://localhost:7687",
         "user": "neo4j",
         "password": "password",
@@ -79,3 +84,12 @@ SCHEMA = merge_dicts(SERIALIZATION_SCHEMA, EXCHANGE_SCHEMA)
 
 # custom types / aliases
 DEFAULT_ID_TYPE = str  # type for id field on vertices, edges, etc.
+
+# neomodel
+# https://neomodel.readthedocs.io/en/latest/configuration.html
+protocol = ini_config["neo4j"]["protocol"]
+address = ini_config["neo4j"]["address"]
+port = ini_config["neo4j"]["port"]
+user = ini_config["neo4j"]["user"]
+password = ini_config["neo4j"]["password"]
+neomodel.config.DATABASE_URL = f"{protocol}://{user}:{password}@{address}:{port}"
