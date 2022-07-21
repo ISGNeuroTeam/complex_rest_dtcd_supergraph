@@ -1,5 +1,5 @@
 import logging
-from uuid import UUID
+import uuid
 
 import neomodel
 from rest_framework import status
@@ -103,7 +103,7 @@ class FragmentDetailView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
-    def get(self, request: Request, pk: UUID):
+    def get(self, request: Request, pk: uuid.UUID):
         """Return a fragment."""
 
         fragment = get_node_or_404(Fragment, uid=pk.hex)
@@ -111,7 +111,7 @@ class FragmentDetailView(APIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
-    def put(self, request: Request, pk: UUID):
+    def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
         old = get_node_or_404(Fragment, uid=pk.hex)
@@ -121,11 +121,11 @@ class FragmentDetailView(APIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
-    def delete(self, request: Request, pk: UUID):
+    def delete(self, request: Request, pk: uuid.UUID):
         """Delete a fragment and its content."""
 
         fragment = get_node_or_404(Fragment, uid=pk.hex)
-        fragment.delete()
+        fragment.delete()  # TODO recursively delete this fragment's content
 
         return SuccessResponse()
 
