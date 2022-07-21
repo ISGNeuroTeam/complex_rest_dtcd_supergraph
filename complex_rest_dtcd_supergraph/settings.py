@@ -76,3 +76,6 @@ EXCHANGE_SCHEMA = {
 }
 
 SCHEMA = merge_dicts(SERIALIZATION_SCHEMA, EXCHANGE_SCHEMA)
+
+# custom types / aliases
+DEFAULT_ID_TYPE = str  # type for id field on vertices, edges, etc.
