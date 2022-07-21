@@ -50,6 +50,7 @@ class PrimitiveField(PopOrFailMixin, DictField):
 class PortField(PrimitiveField):
     """A port representation."""
 
+    # TODO input/output port?
     internal_value_class = Port
 
 
