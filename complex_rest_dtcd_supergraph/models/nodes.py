@@ -1,25 +1,22 @@
-from types import SimpleNamespace
+"""
+Node classes for neomodel.
+"""
 
 from neomodel import (
     JSONProperty,
     Relationship,
     StringProperty,
     StructuredNode,
-    StructuredRel,
     UniqueIdProperty,
     ZeroOrOne,
 )
 from neomodel.contrib import SemiStructuredNode
 
+from .relations import EdgeRel, RELATION_TYPES
+
 
 # type aliases
 CustomUniqueIdProperty = StringProperty
-
-# settings
-REL_TYPES = SimpleNamespace()
-REL_TYPES.contains = "CONTAINS"
-REL_TYPES.default = "CONN"
-REL_TYPES.edge = "EDGE"
 
 
 class AbstractPrimitive(SemiStructuredNode):
@@ -35,13 +32,6 @@ class AbstractPrimitive(SemiStructuredNode):
     data_ = JSONProperty()
 
 
-class EdgeRel(StructuredRel):
-    """An edge between the ports of vertices."""
-
-    # TODO this is semi-structured too
-    data = JSONProperty()
-
-
 class Port(AbstractPrimitive):
     """Abstract node for a vertex port.
 
@@ -50,7 +40,7 @@ class Port(AbstractPrimitive):
 
     # TODO rel back to parent vertex?
     neighbor = Relationship(
-        "Port", REL_TYPES.edge, cardinality=ZeroOrOne, model=EdgeRel
+        "Port", RELATION_TYPES.edge, cardinality=ZeroOrOne, model=EdgeRel
     )
 
 
@@ -68,7 +58,7 @@ class Vertex(AbstractPrimitive):
     Vertices have ports, through which they connect to other vertices.
     """
 
-    ports = Relationship(Port, REL_TYPES.default)
+    ports = Relationship(Port, RELATION_TYPES.default)
 
 
 class Group(AbstractPrimitive):
@@ -89,5 +79,5 @@ class Fragment(StructuredNode):
     uid = UniqueIdProperty()
     name = StringProperty(max_length=255, required=True)
 
-    vertices = Relationship(Vertex, REL_TYPES.contains)
-    groups = Relationship(Group, REL_TYPES.contains)
+    vertices = Relationship(Vertex, RELATION_TYPES.contains)
+    groups = Relationship(Group, RELATION_TYPES.contains)
