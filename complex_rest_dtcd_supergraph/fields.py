@@ -2,66 +2,96 @@
 Custom fields.
 """
 
+from copy import deepcopy
+from types import SimpleNamespace
+
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import DictField
 
 from .settings import SCHEMA
+from .structures import Edge, Group, Port, Primitive, Vertex
 
 
-class VertexField(DictField):
-    """A vertex dictionary representation.
-
-    Validates the vertex to have an ID field.
-    """
-
+class PopOrFailMixin:
     default_error_messages = {
         "key_error": _("Key '{value}' is missing."),
     }
+
+    def _pop_or_fail(self, key, data: dict):
+        try:
+            return data.pop(key)
+        except KeyError:
+            self.fail("key_error", value=key)
+
+
+class PrimitiveField(PopOrFailMixin, DictField):
 
     id_key = SCHEMA["keys"]["yfiles_id"]
+    internal_value_class = Primitive
+
+    def to_representation(self, value: Primitive):
+        """Convert to primitive, serializable data types."""
+
+        result = deepcopy(value.data)
+        result[self.id_key] = value.uid
+
+        return result
 
     def to_internal_value(self, data: dict):
+        """Primitive <- dict of native values."""
+
         data = super().to_internal_value(data)
+        data = deepcopy(data)
+        uid = self._pop_or_fail(self.id_key, data)
 
-        if self.id_key not in data:
-            self.fail("key_error", value=self.id_key)
-
-        return data
-
-
-class GroupField(VertexField):
-    """A group dictionary representation.
-
-    For now, groups are implemented as vertices.
-    """
+        return self.internal_value_class(uid=uid, data=data)
 
 
-class EdgeField(DictField):
-    """An edge dictionary representation.
+class PortField(PrimitiveField):
+    """A port representation."""
 
-    Validates the edge to have start and end vertices and ports.
-    """
+    internal_value_class = Port
 
-    default_error_messages = {
-        "key_error": _("Key '{value}' is missing."),
-    }
 
-    src_node_key = SCHEMA["keys"]["source_node"]
-    tgt_node_key = SCHEMA["keys"]["target_node"]
-    src_port_key = SCHEMA["keys"]["source_port"]
-    tgt_port_key = SCHEMA["keys"]["target_port"]
-    keys = (
-        src_node_key,
-        tgt_node_key,
-        src_port_key,
-        tgt_port_key,
+class VertexField(PrimitiveField):
+    """A vertex representation."""
+
+    internal_value_class = Vertex
+
+
+class GroupField(PrimitiveField):
+    """A group representation."""
+
+    internal_value_class = Group
+
+
+class EdgeField(PopOrFailMixin, DictField):
+    """An edge representation."""
+
+    keys = SimpleNamespace(
+        source=SCHEMA["keys"]["source_port"],
+        target=SCHEMA["keys"]["target_port"],
     )
 
-    def to_internal_value(self, data: dict):
+    def to_representation(self, value: Edge):
+        """Convert to primitive, serializable data types."""
+
+        result = deepcopy(value.data)
+        result[self.keys.source] = value.start
+        result[self.keys.target] = value.end
+
+        return result
+
+    def to_internal_value(self, data):
+        """Edge <- dict of native values."""
+
         data = super().to_internal_value(data)
+        data = deepcopy(data)
+        start_port = self._pop_or_fail(self.keys.source, data)
+        end_port = self._pop_or_fail(self.keys.target, data)
 
-        for key in self.keys:
-            if key not in data:
-                self.fail("key_error", value=key)
-
-        return data
+        return Edge(
+            start=start_port,
+            end=end_port,
+            data=data,
+        )
