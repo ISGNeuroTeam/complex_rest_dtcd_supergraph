@@ -60,6 +60,18 @@ class Vertex(AbstractPrimitive):
 
     ports = Relationship(Port, RELATION_TYPES.default)
 
+    def delete(self, cascade=True):
+        """Delete this vertex.
+        
+        If cascade is enabled, also delete all connected ports.
+        """
+
+        if cascade:
+            for port in self.ports.all():
+                port.delete()
+
+        return super().delete()
+
 
 class Group(AbstractPrimitive):
     """A group is a container for vertices or other groups.
@@ -81,3 +93,24 @@ class Fragment(StructuredNode):
 
     vertices = Relationship(Vertex, RELATION_TYPES.contains)
     groups = Relationship(Group, RELATION_TYPES.contains)
+
+    def delete(self, cascade=True):
+        """Delete this fragment.
+        
+        If cascade is enabled, delete all related vertices and groups in
+        a cascading fashion.
+        """
+
+        if cascade:
+            self.clear()
+
+        return super().delete()
+
+    def clear(self):
+        """Delete all related vertices and groups in a cascading fashion."""
+
+        for vertex in self.vertices.all():
+            vertex.delete(cascade=True)
+        
+        for group in self.groups.all():
+            group.delete()
