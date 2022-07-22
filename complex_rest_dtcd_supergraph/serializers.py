@@ -15,7 +15,7 @@ from .settings import SCHEMA
 
 
 class FragmentSerializer(serializers.Serializer):
-    id = serializers.UUIDField(read_only=True, source="uid", format="hex")
+    id = serializers.UUIDField(read_only=True, source="uid")
     name = serializers.CharField(max_length=255)  # TODO value in settings
 
     def create(self, validated_data):

@@ -106,6 +106,7 @@ class FragmentDetailView(APIView):
     def get(self, request: Request, pk: uuid.UUID):
         """Return a fragment."""
 
+        # Neo4j generates and stored uuid in hex format
         fragment = get_node_or_404(Fragment, uid=pk.hex)
         serializer = self.serializer_class(fragment)
 
@@ -125,7 +126,7 @@ class FragmentDetailView(APIView):
         """Delete a fragment and its content."""
 
         fragment = get_node_or_404(Fragment, uid=pk.hex)
-        fragment.delete()  # TODO recursively delete this fragment's content
+        fragment.delete(cascade=True)
 
         return SuccessResponse()
 
