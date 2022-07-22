@@ -3,7 +3,7 @@ from pathlib import Path
 
 import neomodel
 
-from core.settings.ini_config import merge_ini_config_with_defaults, merge_dicts
+from core.settings.ini_config import merge_ini_config_with_defaults
 
 
 PROJECT_DIR = Path(__file__).parent
@@ -12,16 +12,12 @@ default_ini_config = {
     "logging": {
         "level": "INFO",
     },
-    "graph": {},
-    "workspace": {},
     "neo4j": {
         "protocol": "bolt",
         "address": "localhost",
         "port": 7687,
-        "uri": "bolt://localhost:7687",
         "user": "neo4j",
         "password": "password",
-        "name": None,  # must be None to preserve compatibility with neo4j-3.x
     },
 }
 
@@ -31,33 +27,8 @@ config_parser.read(PROJECT_DIR / "supergraph.conf")
 # FIXME option false in config gets converted from 'false' to True
 ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
 
-# neo4j config
-NEO4J = ini_config["neo4j"]
-
 # settings for custom data design
-SERIALIZATION_SCHEMA = {
-    "keys": {
-        "parent_key": "key",
-        "position": "pos",
-    },
-    "labels": {
-        "array": "Array",
-        "attribute": "Attribute",
-        "composite": "Composite",
-        "data": "Data",
-        "entity": "Entity",
-        "fragment": "Fragment",
-        "item": "Item",
-    },
-    "types": {
-        "contains_item": "CONTAINS_ITEM",
-        "contains_entity": "CONTAINS_ENTITY",
-        "has_attribute": "HAS_ATTRIBUTE",
-        "has_data": "HAS_DATA",
-    },
-}
-
-EXCHANGE_SCHEMA = {
+SCHEMA = {
     "keys": {
         "edges": "edges",
         "groups": "groups",
@@ -79,11 +50,6 @@ EXCHANGE_SCHEMA = {
         "out": "OUT",
     },
 }
-
-SCHEMA = merge_dicts(SERIALIZATION_SCHEMA, EXCHANGE_SCHEMA)
-
-# custom types / aliases
-DEFAULT_ID_TYPE = str  # type for id field on vertices, edges, etc.
 
 # neomodel
 # https://neomodel.readthedocs.io/en/latest/configuration.html
