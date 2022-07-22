@@ -2,21 +2,21 @@ import logging
 
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-from rest_framework.permissions import AllowAny
 from rest_framework.request import Request
-from rest_framework.views import APIView
 
+from rest.permissions import AllowAny
 from rest.response import SuccessResponse
+from rest.views import APIView
 
 from . import settings
 from .models import Fragment
 from .serializers import GraphSerializer, FragmentSerializer
-from .exceptions import FragmentDoesNotExist, LoadingError
+from .exceptions import LoadingError
 from .managers import Neo4jGraphManager
 from .converters import Converter
 
 
-logger = logging.getLogger("complex_rest_dtcd_supergraph")
+logger = logging.getLogger("supergraph")
 
 GRAPH_MANAGER = Neo4jGraphManager(
     settings.NEO4J["uri"],
@@ -26,16 +26,17 @@ GRAPH_MANAGER = Neo4jGraphManager(
 
 
 def get_fragment_or_404(manager: Neo4jGraphManager, id_: int) -> Fragment:
-    """Return a fragment with a given id from the provided manager.
+    """Return a fragment with the given id from the provided manager.
 
-    Calls `.fragments.get()` on a given manager, but raises `NotFound`
-    instead of `FragmentDoesNotExist`.
+    Raises `NotFound` if the fragment does not exist.
     """
 
-    try:
-        return manager.fragments.get_or_exception(id_)
-    except FragmentDoesNotExist as e:
-        raise NotFound(detail=str(e))
+    fragment = manager.fragments.get(id_)
+
+    if fragment is not None:
+        return fragment
+    else:
+        raise NotFound
 
 
 def load_or_400(loader: Converter, data: dict):
@@ -134,7 +135,7 @@ class FragmentGraphView(APIView):
 
         # read fragment's graph
         fragment = get_fragment_or_404(self.graph_manager, pk)
-        subgraph = self.graph_manager.fragments.content.get(fragment)
+        subgraph = self.graph_manager.fragments.content.read(fragment)
         logger.info(
             f"Read {len(subgraph.nodes)} nodes, "
             f"{len(subgraph.relationships)} relationships."
@@ -143,8 +144,8 @@ class FragmentGraphView(APIView):
         # convert to representation format
         converter = self.converter_class()
         payload = converter.dump(subgraph)
-        n, m = describe(payload)
-        logger.info(f"Converted to payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Converted to payload with {v} vertices, {e} edges, {g} groups.")
 
         # TODO validation checks?
         # TODO move hard-coded key to config
@@ -157,8 +158,8 @@ class FragmentGraphView(APIView):
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data["graph"]
-        n, m = describe(payload)
-        logger.info(f"Got payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Got payload with {v} vertices, {e} edges, {g} groups.")
 
         # convert dict to subgraph
         converter = self.converter_class()
@@ -195,7 +196,7 @@ class RootGraphView(APIView):
         """Read all content."""
 
         # TODO copy-paste from FragmentGraphView
-        subgraph = self.graph_manager.fragments.content.get()
+        subgraph = self.graph_manager.fragments.content.read()
         logger.info(
             f"Read {len(subgraph.nodes)} nodes, "
             f"{len(subgraph.relationships)} relationships."
@@ -203,8 +204,8 @@ class RootGraphView(APIView):
 
         converter = self.converter_class()
         payload = converter.dump(subgraph)
-        n, m = describe(payload)
-        logger.info(f"Converted to payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Converted to payload with {v} vertices, {e} edges, {g} groups.")
 
         return SuccessResponse({"graph": payload})
 
@@ -214,8 +215,8 @@ class RootGraphView(APIView):
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         payload = serializer.validated_data["graph"]
-        n, m = describe(payload)
-        logger.info(f"Got payload with {n} vertices, {m} edges.")
+        v, e, g = describe(payload)
+        logger.info(f"Got payload with {v} vertices, {e} edges, {g} groups.")
 
         converter = self.converter_class()
         subgraph = load_or_400(converter, payload)
@@ -248,5 +249,6 @@ class ResetNeo4j(APIView):
 
 
 def describe(data):
-    """Return (num_nodes, num_edges) tuple from data."""
-    return len(data["nodes"]), len(data["edges"])
+    """Return (num_nodes, num_edges, num_groups) tuple from data."""
+    # TODO get from settings
+    return len(data["nodes"]), len(data["edges"]), len(data.get("groups", []))

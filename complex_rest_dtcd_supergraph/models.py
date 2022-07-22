@@ -6,8 +6,6 @@ from .settings import SCHEMA
 
 
 class Fragment(ogm.Model):
-    """Graph fragment."""
-
     __primarylabel__ = SCHEMA["labels"]["fragment"]
     name = ogm.Property()
 

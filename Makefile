@@ -25,7 +25,7 @@ Addition section:\n\
 
 .PHONY: pack
 pack: build
-	cd $(build_dir); tar --transform=$(expression) -czf ../$(plugin)-$(version)-$(branch).tar.gz $(plugin)
+	cd $(build_dir); tar --transform=$(expression) --totals -czf ../$(plugin)-$(version)-$(branch).tar.gz $(plugin)
 
 .PHONY: clean_pack
 clean_pack: clean_build

@@ -1,24 +1,22 @@
-import configparser
 import json
 import unittest
 from pathlib import Path
 
 from django.test import SimpleTestCase, tag
 
-from complex_rest_dtcd_supergraph.converters import Converter
+from complex_rest_dtcd_supergraph.converters import Converter, Dumper, Loader
 
 from .misc import generate_data, sort_payload
-from .misc import KEYS, LABELS, TYPES
+from .misc import KEYS, LABELS, TYPES, SCHEMA
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
-# testing config
-config = configparser.ConfigParser()
-config.read(TEST_DIR / "config.ini")
-N = config["general"].getint("num_iter")
+N = 30  # deprecated
 
 
-class TestConverter(SimpleTestCase):
+class TestLoader(SimpleTestCase):
+    loader = Loader(SCHEMA)
+
     def test_load_data(self):
         data = {
             "name": "amy",
@@ -27,27 +25,25 @@ class TestConverter(SimpleTestCase):
             "layout": {"x": 0, "y": 0},
         }
 
-        converter = Converter()
-        tree = converter._load_data(data)
+        tree = self.loader._load_data(data)
         self.assertEqual(len(tree.subgraph.nodes), 2)
         self.assertEqual(len(tree.subgraph.relationships), 1)
         self.assertTrue(tree.root.has_label(LABELS["data"]))
 
-    def test_load_entity(self):
+    def test_entity(self):
         data = {
             "name": "amy",
             "online": True,
             "address": ["bob", "dan"],
             "layout": {"x": 0, "y": 0},
         }
-        converter = Converter()
-        tree = converter._load_entity(data)
+        tree = self.loader._entity(data)
         self.assertEqual(len(tree.subgraph.nodes), 3)
         self.assertEqual(len(tree.subgraph.relationships), 2)
         self.assertTrue(tree.root.has_label(LABELS["entity"]))
         self.assertIn(TYPES["has_data"], tree.subgraph.types())
 
-    def test_load_vertex(self):
+    def test_vertex(self):
         data = {
             "name": "amy",
             "primitiveID": "abc",
@@ -55,8 +51,7 @@ class TestConverter(SimpleTestCase):
             "address": ["bob", "dan"],
             "layout": {"x": 0, "y": 0},
         }
-        converter = Converter()
-        tree = converter._load_vertex(data)
+        tree = self.loader._vertex(data)
         self.assertEqual(len(tree.subgraph.nodes), 3)
         self.assertEqual(len(tree.subgraph.relationships), 2)
         self.assertTrue(tree.root.has_label(LABELS["node"]))
@@ -64,15 +59,14 @@ class TestConverter(SimpleTestCase):
         self.assertIn(key, tree.root)
         self.assertEqual(tree.root[key], "abc")
 
-    def test_load_edge(self):
+    def test_edge(self):
         data = {
             "sourceNode": "amy",
             "sourcePort": "o1",
             "targetNode": "bob",
             "targetPort": "i1",
         }
-        converter = Converter()
-        tree = converter._load_edge(data)
+        tree = self.loader._edge(data)
         self.assertEqual(len(tree.subgraph.nodes), 2)
         self.assertEqual(len(tree.subgraph.relationships), 1)
         self.assertTrue(tree.root.has_label(LABELS["edge"]))
@@ -88,30 +82,32 @@ class TestConverter(SimpleTestCase):
 
     def test_load(self):
         data = generate_data()["data"]
-        converter = Converter()
-        subgraph = converter.load(data)
+        subgraph = self.loader.load(data)
         self.assertEqual(len(subgraph.nodes), 17)
         self.assertEqual(len(subgraph.relationships), 16)
 
-    def test_load_from_json(self):
+    def test_from_json(self):
         with open(DATA_DIR / "graph-sample-small.json") as f:
             data = json.load(f)
 
-        converter = Converter()
-        subgraph = converter.load(data)
+        subgraph = self.loader.load(data)
         self.assertEqual(len(subgraph.nodes), 19)
         self.assertEqual(len(subgraph.relationships), 18)
 
+
+class TestDumper:
     def test_dump(self):
         d = generate_data()
         data = d["data"]
         sort_payload(data)
         subgraph = d["subgraph"]
-        converter = Converter()
-        exported = converter.dump(subgraph)
+        dumper = Dumper(SCHEMA)
+        exported = dumper.dump(subgraph)
         sort_payload(exported)
         self.assertEqual(exported, data)
 
+
+class TestConverter(SimpleTestCase):
     def _check_load_dump(self, data):
         sort_payload(data)
         converter = Converter()
@@ -119,7 +115,7 @@ class TestConverter(SimpleTestCase):
         exported = converter.dump(subgraph)
         sort_payload(exported)
         # TODO log difference like in api test suite
-        self.assertEqual(data, exported)
+        self.assertEqual(exported, data)
 
     def _check_load_dump_from_json(self, path):
         with open(path) as f:

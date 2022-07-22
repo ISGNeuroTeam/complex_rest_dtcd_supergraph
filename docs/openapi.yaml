@@ -1,7 +1,7 @@
 openapi: 3.0.0
 
 info:
-  title: REST API for dtcd plugin
+  title: REST API for supergraph plugin
   description: |
     This API allows interaction with Neo4j graph database.
   # TODO better version handling?

@@ -1,5 +1,4 @@
 import configparser
-import json
 from pathlib import Path
 
 from core.settings.ini_config import merge_ini_config_with_defaults, merge_dicts
@@ -17,12 +16,12 @@ default_ini_config = {
         "uri": "bolt://localhost:7687",
         "user": "neo4j",
         "password": "password",
-        "name": "neo4j",
+        "name": None,  # must be None to preserve compatibility with neo4j-3.x
     },
 }
 
 # main config
-config_parser = configparser.ConfigParser()
+config_parser = configparser.ConfigParser(allow_no_value=True)
 config_parser.read(PROJECT_DIR / "supergraph.conf")
 # FIXME option false in config gets converted from 'false' to True
 ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
@@ -56,7 +55,9 @@ SERIALIZATION_SCHEMA = {
 EXCHANGE_SCHEMA = {
     "keys": {
         "edges": "edges",
+        "groups": "groups",
         "nodes": "nodes",
+        "parent_id": "parentID",
         "source_node": "sourceNode",
         "source_port": "sourcePort",
         "target_node": "targetNode",
@@ -65,11 +66,12 @@ EXCHANGE_SCHEMA = {
     },
     "labels": {
         "edge": "Edge",
+        "group": "Group",
         "node": "Node",
     },
     "types": {
-        "out": "OUT",
         "in": "IN",
+        "out": "OUT",
     },
 }
 

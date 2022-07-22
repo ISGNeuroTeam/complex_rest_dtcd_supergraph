@@ -2,6 +2,7 @@
 Helper module for tests.
 """
 
+import json
 from operator import itemgetter
 
 from py2neo import Node, Relationship
@@ -35,6 +36,16 @@ def sort_payload(data: dict) -> None:
             KEYS["target_port"],
         ),
     )
+
+
+def load_data(path) -> dict:
+    """Load and sort graph data."""
+
+    with open(path) as f:
+        data = json.load(f)
+    sort_payload(data)
+
+    return data
 
 
 def generate_dummy():

@@ -2,7 +2,9 @@
 
 [Complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop) plugin for graph management.
 
-## Getting Started
+For an introduction check out the [User guide](docs/user-guide.md).
+
+## Installation
 
 > **WARNING**: `py2neo` library has a *bug* [[Issue 942](https://github.com/py2neo-org/py2neo/issues/942)]. Depending on deployment option, you might have to run a fixing script on your local machine. Follow [*Fixing `py2neo`* section](#fixing-py2neo).
 
@@ -11,7 +13,7 @@ These instructions will get you a copy of the project up and running on your loc
 ### Prerequisites
 
 1. Deploy [complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop).
-2. Install [Neo4j](https://neo4j.com/docs/operations-manual/current/installation/) graph database.
+2. Install [Neo4j](https://neo4j.com/docs/operations-manual/current/installation/) graph database. We recommend latest patch of version `4.4`, although we support versions `3.5, <=4.4`.
     1. Follow installation instructions [ [Linux](https://neo4j.com/docs/operations-manual/current/installation/linux/) | [Windows](https://neo4j.com/docs/operations-manual/current/installation/windows/) | [Mac](https://neo4j.com/docs/operations-manual/current/installation/osx/) ]. Pay attention to the [required Java version](https://neo4j.com/docs/operations-manual/current/installation/requirements/#deployment-requirements-java); you may need to change system defaults.
     2. Run the service, make sure it is as available at port `7687`.
         ```sh

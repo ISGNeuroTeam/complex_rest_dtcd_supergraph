@@ -1,4 +1,3 @@
-import configparser
 import unittest
 from pathlib import Path
 
@@ -7,10 +6,7 @@ from py2neo import Graph
 
 from complex_rest_dtcd_supergraph import settings
 from complex_rest_dtcd_supergraph.models import Fragment
-from complex_rest_dtcd_supergraph.exceptions import (
-    FragmentDoesNotExist,
-    FragmentIsNotBound,
-)
+from complex_rest_dtcd_supergraph.exceptions import FragmentIsNotBound
 from complex_rest_dtcd_supergraph.managers import (
     FragmentManager,
     ContentManager,
@@ -18,24 +14,18 @@ from complex_rest_dtcd_supergraph.managers import (
 
 
 TEST_DIR = Path(__file__).resolve().parent
-# testing config
-config = configparser.ConfigParser()
-config.read(TEST_DIR / "config.ini")
-USE_DB = config["general"].getboolean("use_db")
 # service settings for Neo4j operations
 KEYS = settings.SCHEMA["keys"]
 LABELS = settings.SCHEMA["labels"]
 TYPES = settings.SCHEMA["types"]
 # connection to Neo4j db
-if USE_DB:
-    GRAPH = Graph(
-        settings.NEO4J["uri"],
-        settings.NEO4J["name"],
-        auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
-    )
+GRAPH = Graph(
+    settings.NEO4J["uri"],
+    settings.NEO4J["name"],
+    auth=(settings.NEO4J["user"], settings.NEO4J["password"]),
+)
 
 
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestFragmentManager(SimpleTestCase):
     @classmethod
@@ -75,16 +65,6 @@ class TestFragmentManager(SimpleTestCase):
         fromdb = self.manager.get(orig.__primaryvalue__)
         self.assertEqual(fromdb, orig)
 
-    def test_get_or_exception(self):
-        with self.assertRaises(FragmentDoesNotExist):
-            self.manager.get_or_exception(42)
-
-        # real fragment
-        orig = Fragment(name="amy")
-        self.manager.save(orig)
-        fromdb = self.manager.get_or_exception(orig.__primaryvalue__)
-        self.assertEqual(fromdb, orig)
-
     def test_save(self):
         # TODO same as get test???
         orig = Fragment(name="amy")
@@ -100,7 +80,6 @@ class TestFragmentManager(SimpleTestCase):
         self.assertIsNone(fromdb)
 
 
-@unittest.skipUnless(USE_DB, "use_db=False")
 @tag("neo4j")
 class TestContentManager(SimpleTestCase):
     @classmethod
@@ -125,18 +104,18 @@ class TestContentManager(SimpleTestCase):
         # unbound fragment
         f = Fragment(name="unbound")
         with self.assertRaises(FragmentIsNotBound):
-            self.content_manager.get(f)
+            self.content_manager.read(f)
 
         # TODO fragment from different graph?
 
     def test_get_empty_content(self):
         # all content
-        subgraph = self.content_manager.get()
+        subgraph = self.content_manager.read()
         self.assertEqual(len(subgraph.nodes), 0)
         self.assertEqual(len(subgraph.relationships), 0)
 
         # content of a fragment
-        subgraph = self.content_manager.get(self.fragment)
+        subgraph = self.content_manager.read(self.fragment)
         self.assertEqual(len(subgraph.nodes), 0)
         self.assertEqual(len(subgraph.relationships), 0)
 
