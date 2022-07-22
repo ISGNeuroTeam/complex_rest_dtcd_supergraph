@@ -1,3 +1,11 @@
+"""
+This module contains classes from domain/business layer.
+
+For now, classes here represent intermediary step between presentation
+layer and database-related activities.
+"""
+
+
 from dataclasses import dataclass, field
 from typing import Any, MutableMapping, MutableSet, MutableSequence
 
@@ -8,6 +16,13 @@ ID = str
 
 @dataclass
 class Primitive:
+    """A primitive entity.
+
+    Primitive entities have unique IDs and may contain user-defined
+    properties and metadata.
+    """
+
+    # TODO ABC?
     uid: ID
     properties: MutableMapping[str, Any] = field(default_factory=dict)
     meta: MutableMapping[str, Any] = field(default_factory=dict, repr=False)
@@ -15,37 +30,57 @@ class Primitive:
 
 @dataclass
 class Port(Primitive):
-    pass
+    """A vertex port.
+
+    Vertices connect to one another using input and output ports.
+    """
 
 
 @dataclass
 class InputPort(Port):
-    pass
+    """A vertex port for incoming connections."""
 
 
 @dataclass
 class OutputPort(Port):
-    pass
+    """A vertex port for outgoing connections."""
 
 
 @dataclass
 class Hub:
+    """Abstraction for collections of input and output ports."""
+
     incoming: MutableSet[ID] = field(default_factory=set)
     outgoing: MutableSet[ID] = field(default_factory=set)
 
 
 @dataclass
 class Vertex(Primitive):
+    """A vertex coming from Y-files.
+
+    Vertices contain user-defined properties and additional metadata
+    for front-end.
+    Vertices may have input and output ports, through which they connect
+    to other vertices.
+    """
+
     ports: Hub = Hub()
 
 
 @dataclass
 class Group(Primitive):
+    """A group is a container for vertices or other groups.
+
+    Front-end needs it to group objects. Currently it has no backend use.
+    """
+
     objects: MutableSet[ID] = field(default_factory=set)
 
 
 @dataclass
 class Edge:
+    """An edge between an input and an output ports of two vertices."""
+
     start: ID
     end: ID
     meta: MutableMapping[str, Any] = field(default_factory=dict)
@@ -63,9 +98,7 @@ class Content:
     all ids are unique, etc.
     """
 
-    vertices: MutableSequence[Vertex]  # TODO different structure? dict[ID, Vertex]
+    vertices: MutableSequence[Vertex]
     edges: MutableSequence[Edge]
     ports: MutableSequence[Port]
     groups: MutableSequence[Group]
-
-    # TODO empty content?

@@ -1,5 +1,7 @@
 """
 Node classes for neomodel.
+
+The models here closely mirror classes from `structures` module.
 """
 
 from neomodel import (
@@ -35,7 +37,7 @@ class AbstractPrimitive(SemiStructuredNode):
 class Port(AbstractPrimitive):
     """Abstract node for a vertex port.
 
-    An output ports connect to an input ports via an edge relationship.
+    An output port connects to an input port via the edge relationship.
     """
 
     # TODO rel back to parent vertex?
@@ -62,7 +64,7 @@ class Vertex(AbstractPrimitive):
 
     def delete(self, cascade=True):
         """Delete this vertex.
-        
+
         If cascade is enabled, also delete all connected ports.
         """
 
@@ -96,7 +98,7 @@ class Fragment(StructuredNode):
 
     def delete(self, cascade=True):
         """Delete this fragment.
-        
+
         If cascade is enabled, delete all related vertices and groups in
         a cascading fashion.
         """
@@ -111,6 +113,6 @@ class Fragment(StructuredNode):
 
         for vertex in self.vertices.all():
             vertex.delete(cascade=True)
-        
+
         for group in self.groups.all():
             group.delete()

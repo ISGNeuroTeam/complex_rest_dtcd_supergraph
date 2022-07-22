@@ -18,4 +18,4 @@ class EdgeRel(StructuredRel):
     """An edge between the ports of vertices."""
 
     # TODO this must be semi-structured too
-    data = JSONProperty()
+    meta_ = JSONProperty()
