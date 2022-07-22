@@ -1,17 +1,16 @@
 from dataclasses import dataclass, field
 from typing import Any, MutableMapping, MutableSet, MutableSequence
 
-from .settings import DEFAULT_ID_TYPE
-
 
 # custom types / aliases
-ID = DEFAULT_ID_TYPE
+ID = str
 
 
 @dataclass
 class Primitive:
     uid: ID
-    data: MutableMapping[str, Any] = field(default_factory=dict)
+    properties: MutableMapping[str, Any] = field(default_factory=dict)
+    meta: MutableMapping[str, Any] = field(default_factory=dict, repr=False)
 
 
 @dataclass
@@ -49,7 +48,7 @@ class Group(Primitive):
 class Edge:
     start: ID
     end: ID
-    data: MutableMapping[str, Any] = field(default_factory=dict)
+    meta: MutableMapping[str, Any] = field(default_factory=dict)
 
     def __post_init__(self):
         self.uid = (self.start, self.end)
