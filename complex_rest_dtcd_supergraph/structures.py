@@ -99,6 +99,6 @@ class Content:
     """
 
     vertices: MutableSequence[Vertex]
-    edges: MutableSequence[Edge]
     ports: MutableSequence[Port]
+    edges: MutableSequence[Edge]
     groups: MutableSequence[Group]

@@ -60,7 +60,10 @@ class Vertex(AbstractPrimitive):
     Vertices have ports, through which they connect to other vertices.
     """
 
+    # TODO explicit input and output ports?
     ports = Relationship(Port, RELATION_TYPES.default)
+    input_ports = Relationship(InputPort, RELATION_TYPES.default)
+    output_ports = Relationship(OutputPort, RELATION_TYPES.default)
 
     def delete(self, cascade=True):
         """Delete this vertex.
