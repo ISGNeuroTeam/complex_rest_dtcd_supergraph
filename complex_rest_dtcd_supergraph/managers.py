@@ -19,6 +19,7 @@ from .exceptions import (
 )
 from .models import Fragment
 from .settings import SCHEMA
+from .structures import Content
 from .utils import filter_nodes, match_nodes, subgraph_from_match_clause
 
 
@@ -315,3 +316,11 @@ class ContentManager:
         link = self._graph.match_one((n,), r_type=TYPES["contains_entity"])
 
         return link is None
+
+
+class Manager:
+    def read(self, fragment: Fragment) -> Content:
+        raise NotImplementedError
+
+    def replace(self, fragment: Fragment, content: Content):
+        raise NotImplementedError
