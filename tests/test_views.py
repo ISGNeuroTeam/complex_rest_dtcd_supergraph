@@ -16,7 +16,7 @@ CLIENT = Client()
 
 
 def reset_db():
-    CLIENT.post(URL_RESET)
+    pass  # TODO reset db
 
 
 class Neo4jTestCaseMixin:
