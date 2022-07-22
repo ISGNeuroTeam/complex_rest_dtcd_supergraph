@@ -22,14 +22,14 @@ CustomUniqueIdProperty = StringProperty
 class AbstractPrimitive(SemiStructuredNode):
     """Abstract entity.
 
-    May contain nested data in its `data` property, as well as ad-hoc
+    May contain nested metadata in its `meta_` property, as well as ad-hoc
     properties not specified here.
     """
 
     __abstract_node__ = True
 
     uid = CustomUniqueIdProperty(unique_index=True, required=True)
-    data_ = JSONProperty()
+    meta_ = JSONProperty()
 
 
 class Port(AbstractPrimitive):
