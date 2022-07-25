@@ -24,8 +24,11 @@ CustomUniqueIdProperty = StringProperty  # TODO better validation for IDs
 class AbstractPrimitive(SemiStructuredNode):
     """Abstract entity.
 
-    May contain nested metadata in its `meta_` property, as well as ad-hoc
-    properties not specified here.
+    May contain nested metadata in its `meta_` property, as well as 
+    ad-hoc properties not defined here.
+    
+    We assume that ad-hoc properties are user-defined valid Neo4j 
+    properties. Invalid ones are stored in `meta_`.
     """
 
     __abstract_node__ = True

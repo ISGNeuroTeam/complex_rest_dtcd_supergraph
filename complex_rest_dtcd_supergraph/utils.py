@@ -5,6 +5,7 @@ This module provides custom utility functions.
 import uuid
 
 import neomodel
+from neomodel import contrib
 from rest_framework.exceptions import NotFound
 
 
@@ -36,3 +37,17 @@ def get_node_or_404(
         return model.nodes.get(lazy=lazy, **kwargs)
     except neomodel.DoesNotExist:
         raise NotFound
+
+
+def free_properties(node: contrib.SemiStructuredNode):
+    """Return a dictionary with ad-hoc properties for a given node.
+    
+    Ad-hoc properties are those not specified at node's definition.
+    """
+
+    # see SemiStructuredNode.inflate, NodeMeta and PropertyManager
+    defined: dict = node.defined_properties(aliases=False, rels=False)
+    existing: dict = node.__properties__
+    free = set(existing) - set(defined) - {"id"}
+
+    return {key: existing[key] for key in free}
