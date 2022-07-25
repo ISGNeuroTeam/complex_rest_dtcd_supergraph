@@ -6,7 +6,7 @@ from django.test import SimpleTestCase, tag
 
 from complex_rest_dtcd_supergraph.converters import Converter, Dumper, Loader
 
-from .misc import generate_data, sort_payload
+from .misc import sort_payload
 from .misc import KEYS, LABELS, TYPES, SCHEMA
 
 TEST_DIR = Path(__file__).resolve().parent
@@ -14,7 +14,7 @@ DATA_DIR = TEST_DIR / "data"
 
 
 class TestLoader(SimpleTestCase):
-    loader = Loader(SCHEMA)
+    loader = Loader()
 
 
 class TestDumper:

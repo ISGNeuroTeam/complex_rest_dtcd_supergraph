@@ -1,6 +1,7 @@
 import unittest
 from pathlib import Path
 
+import neomodel
 from django.urls import reverse
 from django.test import Client, tag
 from rest_framework import status
@@ -16,7 +17,7 @@ CLIENT = Client()
 
 
 def reset_db():
-    pass  # TODO reset db
+    neomodel.clear_neo4j_database(neomodel.db)
 
 
 class Neo4jTestCaseMixin:
@@ -65,7 +66,7 @@ class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
     def setUp(self) -> None:
         # default fragment
         response = self.client.post(
-            reverse("supergraph:fragments"),
+            TestFragmentListView.url,
             data={"name": "sales"},
             format="json",
         )
@@ -117,6 +118,7 @@ class GraphEndpointTestCaseMixin:
         self.assert_merge_retrieve_eq(data)
 
 
+@unittest.skip("not implemented")
 @tag("neo4j")
 class TestRootGraphView(
     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
@@ -186,6 +188,7 @@ class TestRootGraphView(
         self.assert_merge_retrieve_eq_from_json(new_path)
 
 
+@unittest.skip("not implemented")
 class TestFragmentGraphView(
     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
 ):
@@ -222,6 +225,7 @@ class TestFragmentGraphView(
 
 
 # TODO combined tests
+@unittest.skip("not implemented")
 class TestFragmentGroupInteraction(
     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
 ):

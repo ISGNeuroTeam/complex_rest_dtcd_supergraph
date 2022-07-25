@@ -3,7 +3,9 @@ from pathlib import Path
 
 from django.test import SimpleTestCase, tag
 
-from complex_rest_dtcd_supergraph.managers import Manager
+# TODO import here causes a strange error; something with the way neomodel
+# builds up the registry & django runs the tests maybe?
+# from complex_rest_dtcd_supergraph.managers import Manager
 
 
 TEST_DIR = Path(__file__).resolve().parent
