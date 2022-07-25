@@ -18,8 +18,8 @@ class HexUUIDConverter:
     def to_python(self, value: str):
         return uuid.UUID(value)
 
-    def to_url(self, value: uuid.UUID):
-        return value.hex
+    def to_url(self, value: str):
+        return str(value)
 
 
 # shortcuts for working with Neomodel
