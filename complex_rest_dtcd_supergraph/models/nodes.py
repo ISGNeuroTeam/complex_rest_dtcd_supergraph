@@ -18,7 +18,7 @@ from .relations import EdgeRel, RELATION_TYPES
 
 
 # type aliases
-CustomUniqueIdProperty = StringProperty
+CustomUniqueIdProperty = StringProperty  # TODO better validation for IDs
 
 
 class AbstractPrimitive(SemiStructuredNode):

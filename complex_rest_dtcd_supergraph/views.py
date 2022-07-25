@@ -3,7 +3,6 @@ import uuid
 
 import neomodel
 from rest_framework import status
-from rest_framework.exceptions import NotFound
 from rest_framework.request import Request
 
 from rest.permissions import AllowAny
@@ -12,21 +11,10 @@ from rest.views import APIView
 
 from .models import Fragment
 from .serializers import FragmentSerializer
+from .utils import get_node_or_404
 
 
 logger = logging.getLogger("supergraph")
-
-
-def get_node_or_404(model: neomodel.StructuredNode, lazy=False, **kwargs):
-    """Call `.nodes.get()` on a given node.
-
-    Raises `rest_framework.exceptions.NotFound` if a node is missing.
-    """
-
-    try:
-        return model.nodes.get(lazy=lazy, **kwargs)
-    except neomodel.DoesNotExist:
-        raise NotFound
 
 
 class FragmentListView(APIView):

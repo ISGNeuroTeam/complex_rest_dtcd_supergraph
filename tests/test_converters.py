@@ -17,9 +17,9 @@ class TestLoader(SimpleTestCase):
     loader = Loader(SCHEMA)
 
 
-
 class TestDumper:
     pass
+
 
 class TestConverter(SimpleTestCase):
     def _check_load_dump(self, data):
