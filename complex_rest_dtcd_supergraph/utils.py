@@ -51,3 +51,12 @@ def free_properties(node: contrib.SemiStructuredNode):
     free = set(existing) - set(defined) - {"id"}
 
     return {key: existing[key] for key in free}
+
+
+def save_properties(properties: dict, node: contrib.SemiStructuredNode):
+    """Save properties dictionary on a given node."""
+
+    for key, val in properties.items():
+        setattr(node, key, val)
+
+    return node

@@ -13,16 +13,7 @@ import neomodel
 
 from . import models
 from . import structures
-from .utils import free_properties
-
-
-def save_properties(properties, node):
-    """Save dictionary with properties on a given node."""
-
-    for key, val in properties.items():
-        setattr(node, key, val)
-
-    return node
+from .utils import free_properties, save_properties
 
 
 class Reader:
@@ -67,7 +58,7 @@ class Reader:
         for op in output_ports:
             neighbor = op.neighbor.single()  # can be None
 
-            # skip missing ports or ports from outside this fragment
+            # skip missing neighbors or neighbors from outside this fragment
             if neighbor is None or neighbor.uid not in self._input_port_ids:
                 continue
 
@@ -104,6 +95,7 @@ class Reader:
         # step 1 - get the insides
         # TODO a lot of queries
         vertices = fragment.vertices.all()
+        # TODO mention somehow that order matters here!
         input_ports = self._query_input_ports(vertices)
         output_ports = self._query_output_ports(vertices)
         edges = self._query_edges(output_ports)
@@ -184,9 +176,14 @@ class Writer:
         deprecated = old_uids - new_uids
         # FIXME remove edges with start-end ports in deprecated iterable
 
-    def _merge_group(self, fragment: models.Fragment, group: structures.Group):
-        node = models.Group(uid=group.uid, meta_=group.meta).save()
-        fragment.groups.connect(node)
+    def _merge_groups(
+        self, fragment: models.Fragment, groups: Iterable[structures.Group]
+    ):
+        data = [dict(uid=g.uid, meta_=g.meta) for g in groups]
+        nodes = models.Group.create_or_update(*data, lazy=True)
+
+        for node in nodes:
+            fragment.groups.replace(node)
 
     def _merge(self, fragment: models.Fragment, content: structures.Content):
         # merge ports
@@ -198,32 +195,30 @@ class Writer:
         for edge in content.edges:
             output_port_node = output_ports[edge.start]
             input_port_node = input_ports[edge.end]
-            # TODO what if we already have this edge?
-            output_port_node.neighbor.connect(
+            output_port_node.neighbor.replace(
                 input_port_node, properties={"meta_": edge.meta}
             )
 
         # merge vertices
+        # TODO bulk merge?
         for vertex in content.vertices:
             vertex_node = models.Vertex(uid=vertex.uid, meta_=vertex.meta)
             save_properties(vertex.properties, vertex_node)  # save user-defined props
-            vertex_node.save()  # TODO merge of existing stuff?
+            vertex_node.save()  # TODO replace with create_or_update
 
             # connect this vertex to ports
             for port_id in vertex.ports.incoming:
-                inpu_port_node = input_ports[port_id]
-                vertex_node.input_ports.connect(inpu_port_node)
+                input_port_node = input_ports[port_id]
+                vertex_node.input_ports.replace(input_port_node)
 
             for port_id in vertex.ports.outgoing:
                 output_port_node = output_ports[port_id]
-                vertex_node.output_ports.connect(output_port_node)
+                vertex_node.output_ports.replace(output_port_node)
 
             # link to fragment
-            fragment.vertices.connect(vertex_node)
+            fragment.vertices.replace(vertex_node)
 
-        # merge groups
-        for group in content.groups:
-            self._merge_group(fragment, group)
+        self._merge_groups(fragment, content.groups)
 
     def replace(self, fragment: models.Fragment, content: structures.Content):
         self._delete_difference(fragment, content)
