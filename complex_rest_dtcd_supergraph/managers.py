@@ -9,6 +9,8 @@ from collections import defaultdict
 from itertools import chain
 from typing import Dict, Iterable, List, Tuple
 
+import neomodel
+
 from . import models
 from . import structures
 from .utils import free_properties
@@ -118,9 +120,77 @@ class Reader:
         )
 
 
+class Writer:
+    """Write operations on a fragment."""
+
+    def _delete_nodes(self, uids: Iterable[structures.ID]):
+        pass
+
+    def _delete_difference(
+        self, fragment: models.Fragment, content: structures.Content
+    ):
+        # get uids of nodes (vertices, groups, ports) in the fragment
+        results, _ = fragment.cypher(
+            "MATCH (f) --> (v:Vertex) WHERE id(f)={self} "
+            "OPTIONAL MATCH path = (v) --> (:Port) "
+            "UNWIND nodes(path) AS n "
+            "RETURN DISTINCT n.uid"
+        )  # TODO delete old nodes right here
+        old_uids = set(row[0] for row in results)
+        for group in fragment.groups.all():
+            old_uids.add(group.uid)
+
+        new_uids = set(
+            item.uid
+            for item in chain(
+                content.vertices,
+                content.ports,
+                content.groups,
+            )
+        )
+        deprecated_uids = old_uids - new_uids
+        neomodel.db.cypher_query(
+            query=(
+                "MATCH (n) "
+                "WHERE "
+                "  n.uid IS NOT NULL"
+                "  AND n.uid IN $deprecated"
+                "DETACH DELETE n"
+            ),
+            params={"deprecated": list(deprecated_uids)},
+        )
+
+        # edges
+        results, _ = fragment.cypher(
+            "MATCH (f) WHERE id(f)={self} "
+            "MATCH (f) -- (:Vertex) "
+            "  -- (start:Port) -[:EDGE]-> (end:Port) "
+            "  -- (:Vertex) -- (f) "
+            "RETURN start, end"
+        )
+        old_uids = set((row[0], row[1]) for row in results)
+        new_uids = set(edge.uid for edge in content.edges)
+        deprecated = old_uids - new_uids
+        # FIXME remove edges with start-end ports in deprecated iterable
+
+    def replace(self, fragment: models.Fragment, content: structures.Content):
+        # clean up old entities
+        self._delete_difference(fragment, content)
+
+        # merge new entities
+
+        # link new entities
+        #   together
+        #   to fragment
+        #   to root
+
+        return
+
+
 class Manager:
     def __init__(self) -> None:
         self._reader = Reader()
+        self._writer = Writer()
 
     def read(self, fragment: models.Fragment):
         """Return the content of a given fragment."""
@@ -130,4 +200,4 @@ class Manager:
     def replace(self, fragment: models.Fragment, content: structures.Content):
         """Replace the content of a given fragment."""
 
-        raise NotImplementedError
+        return self._writer.replace(fragment, content)
