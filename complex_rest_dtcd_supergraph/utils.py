@@ -41,7 +41,7 @@ def get_node_or_404(
 
 def free_properties(node: contrib.SemiStructuredNode):
     """Return a dictionary with ad-hoc properties for a given node.
-    
+
     Ad-hoc properties are those not specified at node's definition.
     """
 

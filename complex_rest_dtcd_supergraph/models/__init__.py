@@ -5,3 +5,4 @@ from .nodes import (
     OutputPort,
     Vertex,
 )
+from .relations import EdgeRel
