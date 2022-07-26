@@ -5,7 +5,6 @@ For now, classes here represent intermediary step between presentation
 layer and database-related activities.
 """
 
-
 from dataclasses import dataclass, field
 from typing import Any, MutableMapping, MutableSet, MutableSequence
 
