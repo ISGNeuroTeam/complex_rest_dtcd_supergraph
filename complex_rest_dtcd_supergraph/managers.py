@@ -14,7 +14,9 @@ from . import structures
 from .utils import free_properties
 
 
-class Manager:
+class Reader:
+    """Read operations on a fragment."""
+
     def __init__(self) -> None:
         self._foreign_key_mapping = defaultdict(set)  # parent:children uid pairs
         self._input_port_ids = set()
@@ -115,5 +117,17 @@ class Manager:
             groups=groups,
         )
 
+
+class Manager:
+    def __init__(self) -> None:
+        self._reader = Reader()
+
+    def read(self, fragment: models.Fragment):
+        """Return the content of a given fragment."""
+
+        return self._reader.read(fragment)
+
     def replace(self, fragment: models.Fragment, content: structures.Content):
+        """Replace the content of a given fragment."""
+
         raise NotImplementedError
