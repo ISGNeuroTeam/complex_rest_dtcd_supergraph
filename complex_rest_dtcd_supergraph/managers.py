@@ -16,6 +16,15 @@ from . import structures
 from .utils import free_properties
 
 
+def save_properties(properties, node):
+    """Save dictionary with properties on a given node."""
+
+    for key, val in properties.items():
+        setattr(node, key, val)
+
+    return node
+
+
 class Reader:
     """Read operations on a fragment."""
 
@@ -123,6 +132,8 @@ class Reader:
 class Writer:
     """Write operations on a fragment."""
 
+    # TODO maybe instantiate with fragment & content? avoids passing args around
+
     def _delete_nodes(self, uids: Iterable[structures.ID]):
         pass
 
@@ -173,18 +184,50 @@ class Writer:
         deprecated = old_uids - new_uids
         # FIXME remove edges with start-end ports in deprecated iterable
 
+    def _merge_group(self, fragment: models.Fragment, group: structures.Group):
+        node = models.Group(uid=group.uid, meta_=group.meta).save()
+        fragment.groups.connect(node)
+
+    def _merge(self, fragment: models.Fragment, content: structures.Content):
+        # merge ports
+        # FIXME here we need incoming and outgoing ports from content
+        input_ports = {}
+        output_ports = {}
+
+        # link ports with edges
+        for edge in content.edges:
+            output_port_node = output_ports[edge.start]
+            input_port_node = input_ports[edge.end]
+            # TODO what if we already have this edge?
+            output_port_node.neighbor.connect(
+                input_port_node, properties={"meta_": edge.meta}
+            )
+
+        # merge vertices
+        for vertex in content.vertices:
+            vertex_node = models.Vertex(uid=vertex.uid, meta_=vertex.meta)
+            save_properties(vertex.properties, vertex_node)  # save user-defined props
+            vertex_node.save()  # TODO merge of existing stuff?
+
+            # connect this vertex to ports
+            for port_id in vertex.ports.incoming:
+                inpu_port_node = input_ports[port_id]
+                vertex_node.input_ports.connect(inpu_port_node)
+
+            for port_id in vertex.ports.outgoing:
+                output_port_node = output_ports[port_id]
+                vertex_node.output_ports.connect(output_port_node)
+
+            # link to fragment
+            fragment.vertices.connect(vertex_node)
+
+        # merge groups
+        for group in content.groups:
+            self._merge_group(fragment, group)
+
     def replace(self, fragment: models.Fragment, content: structures.Content):
-        # clean up old entities
         self._delete_difference(fragment, content)
-
-        # merge new entities
-
-        # link new entities
-        #   together
-        #   to fragment
-        #   to root
-
-        return
+        self._merge(fragment, content)
 
 
 class Manager:
