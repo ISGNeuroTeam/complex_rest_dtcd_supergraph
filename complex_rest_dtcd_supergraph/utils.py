@@ -60,3 +60,20 @@ def save_properties(properties: dict, node: contrib.SemiStructuredNode):
         setattr(node, key, val)
 
     return node
+
+
+def connect_if_not_connected(
+    manager: neomodel.RelationshipManager,
+    node: neomodel.StructuredNode,
+    properties: dict = None,
+) -> neomodel.StructuredRel:
+    """Use the relationship manager to connect a node.
+
+    If the connection exists, return it. Otherwise, create new relation
+    with the given properties and return it.
+    """
+
+    if not manager.is_connected(node):
+        return manager.connect(node, properties)
+    else:
+        return manager.relationship(node)

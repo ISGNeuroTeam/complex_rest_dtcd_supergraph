@@ -13,7 +13,7 @@ import neomodel
 
 from . import models
 from . import structures
-from .utils import free_properties, save_properties
+from .utils import connect_if_not_connected, free_properties
 
 
 class Reader:
@@ -126,22 +126,21 @@ class Writer:
 
     # TODO maybe instantiate with fragment & content? avoids passing args around
 
-    def _delete_nodes(self, uids: Iterable[structures.ID]):
-        pass
-
-    def _delete_difference(
+    def _delete_deprecated_vertices_groups_ports(
         self, fragment: models.Fragment, content: structures.Content
     ):
-        # get uids of nodes (vertices, groups, ports) in the fragment
-        results, _ = fragment.cypher(
-            "MATCH (f) --> (v:Vertex) WHERE id(f)={self} "
-            "OPTIONAL MATCH path = (v) --> (:Port) "
-            "UNWIND nodes(path) AS n "
-            "RETURN DISTINCT n.uid"
-        )  # TODO delete old nodes right here
-        old_uids = set(row[0] for row in results)
-        for group in fragment.groups.all():
-            old_uids.add(group.uid)
+
+        # get uids of primitive nodes (vertices, groups, ports) in the fragment
+        uid2node = {}
+
+        for vertex in fragment.vertices.all():
+            uid2node[vertex.uid] = vertex
+
+            for port in vertex.ports.all():
+                uid2node[port.uid] = port
+
+        for group in vertex.groups.all():
+            uid2node[group.uid] = group
 
         new_uids = set(
             item.uid
@@ -151,30 +150,41 @@ class Writer:
                 content.groups,
             )
         )
-        deprecated_uids = old_uids - new_uids
-        neomodel.db.cypher_query(
-            query=(
-                "MATCH (n) "
-                "WHERE "
-                "  n.uid IS NOT NULL"
-                "  AND n.uid IN $deprecated"
-                "DETACH DELETE n"
-            ),
-            params={"deprecated": list(deprecated_uids)},
-        )
+        deprecated_uids = set(uid2node) - new_uids
 
-        # edges
+        for uid in deprecated_uids:
+            uid2node[uid].delete()
+
+    def _delete_deprecated_edges(
+        self, fragment: models.Fragment, content: structures.Content
+    ):
         results, _ = fragment.cypher(
             "MATCH (f) WHERE id(f)={self} "
             "MATCH (f) -- (:Vertex) "
-            "  -- (start:Port) -[:EDGE]-> (end:Port) "
+            "  -- (src:OutputPort) -[:EDGE]-> (dst:InputPort) "
             "  -- (:Vertex) -- (f) "
-            "RETURN start, end"
+            "RETURN src.uid, dst.uid"
         )
-        old_uids = set((row[0], row[1]) for row in results)
+        current_uids = set((row[0], row[1]) for row in results)  # opID, ipID pairs
         new_uids = set(edge.uid for edge in content.edges)
-        deprecated = old_uids - new_uids
-        # FIXME remove edges with start-end ports in deprecated iterable
+        deprecated_uids = current_uids - new_uids
+
+        neomodel.db.cypher_query(
+            query=(
+                "UNWIND $list AS pair"
+                "MATCH (:OutputPort {uid: pair[0]}) -[r:EDGE]-> (:InputPort {uid: pair[1]}) "
+                "DELETE r"
+            ),
+            params={"list": list(deprecated_uids)},
+        )
+
+    def _delete_difference(
+        self, fragment: models.Fragment, content: structures.Content
+    ):
+        """Delete entities in the fragment that are not in the new content."""
+
+        self._delete_deprecated_vertices_groups_ports(fragment, content)
+        self._delete_deprecated_edges(fragment, content)
 
     def _merge_groups(
         self, fragment: models.Fragment, groups: Iterable[structures.Group]
@@ -183,7 +193,7 @@ class Writer:
         nodes = models.Group.create_or_update(*data, lazy=True)
 
         for node in nodes:
-            fragment.groups.replace(node)
+            connect_if_not_connected(fragment.groups, node)
 
     def _merge(self, fragment: models.Fragment, content: structures.Content):
         # merge ports
@@ -202,21 +212,22 @@ class Writer:
         # merge vertices
         # TODO bulk merge?
         for vertex in content.vertices:
-            vertex_node = models.Vertex(uid=vertex.uid, meta_=vertex.meta)
-            save_properties(vertex.properties, vertex_node)  # save user-defined props
-            vertex_node.save()  # TODO replace with create_or_update
+            vertex_node = models.Vertex.create_or_update(
+                dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
+                lazy=True,
+            )
 
             # connect this vertex to ports
             for port_id in vertex.ports.incoming:
                 input_port_node = input_ports[port_id]
-                vertex_node.input_ports.replace(input_port_node)
+                connect_if_not_connected(vertex_node.input_ports, input_port_node)
 
             for port_id in vertex.ports.outgoing:
                 output_port_node = output_ports[port_id]
-                vertex_node.output_ports.replace(output_port_node)
+                connect_if_not_connected(vertex_node.output_ports, output_port_node)
 
             # link to fragment
-            fragment.vertices.replace(vertex_node)
+            connect_if_not_connected(fragment.vertices, vertex_node)
 
         self._merge_groups(fragment, content.groups)
 

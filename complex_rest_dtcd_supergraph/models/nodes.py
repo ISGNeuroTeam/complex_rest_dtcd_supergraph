@@ -38,7 +38,7 @@ class AbstractPrimitive(SemiStructuredNode):
 
 
 class Port(AbstractPrimitive):
-    """Abstract node for a vertex port.
+    """A vertex port.
 
     An output port connects to an input port via the edge relationship.
     """
