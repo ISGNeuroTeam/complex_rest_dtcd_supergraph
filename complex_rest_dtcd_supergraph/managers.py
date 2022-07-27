@@ -7,6 +7,7 @@ and isolate details and complexity.
 
 from collections import defaultdict
 from itertools import chain
+from operator import attrgetter
 from typing import Dict, Iterable, List, Tuple
 
 import neomodel
@@ -190,50 +191,89 @@ class Writer:
         self, fragment: models.Fragment, groups: Iterable[structures.Group]
     ):
         data = [dict(uid=g.uid, meta_=g.meta) for g in groups]
-        nodes = models.Group.create_or_update(*data, lazy=True)
 
-        for node in nodes:
-            connect_if_not_connected(fragment.groups, node)
+        return models.Group.create_or_update(*data, lazy=True)
 
-    def _merge(self, fragment: models.Fragment, content: structures.Content):
-        # merge ports
-        # FIXME here we need incoming and outgoing ports from content
-        input_ports = {}
-        output_ports = {}
+    def _merge_input_ports(self, ports: Iterable[structures.Port]):
+        data = [
+            dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
+        ]
 
-        # link ports with edges
-        for edge in content.edges:
-            output_port_node = output_ports[edge.start]
-            input_port_node = input_ports[edge.end]
-            output_port_node.neighbor.replace(
-                input_port_node, properties={"meta_": edge.meta}
+        return models.InputPort.create_or_update(*data)
+
+    def _merge_output_ports(self, ports: Iterable[structures.Port]):
+        data = [
+            dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
+        ]
+
+        return models.OutputPort.create_or_update(*data)
+
+    def _merge_edges(
+        self, edges: Iterable[structures.Edge], uid2port: dict
+    ) -> List[models.EdgeRel]:
+        relations = []
+
+        for edge in edges:
+            output_port = uid2port[edge.start]
+            input_port = uid2port[edge.end]
+            rel = output_port.neighbor.replace(
+                input_port, properties={"meta_": edge.meta}
             )
+            relations.append(rel)
 
-        # merge vertices
-        # TODO bulk merge?
-        for vertex in content.vertices:
-            vertex_node = models.Vertex.create_or_update(
+        return relations
+
+    def _merge_vertices(
+        self, vertices: Iterable[structures.Vertex], uid2port: dict
+    ) -> List[models.Vertex]:
+        nodes = []
+
+        for vertex in vertices:
+            node = models.Vertex.create_or_update(
                 dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
                 lazy=True,
-            )
+            )[0]
+            nodes.append(node)
 
             # connect this vertex to ports
-            for port_id in vertex.ports.incoming:
-                input_port_node = input_ports[port_id]
-                connect_if_not_connected(vertex_node.input_ports, input_port_node)
+            for uid in vertex.ports.incoming:
+                input_port = uid2port[uid]
+                connect_if_not_connected(node.input_ports, input_port)
 
-            for port_id in vertex.ports.outgoing:
-                output_port_node = output_ports[port_id]
-                connect_if_not_connected(vertex_node.output_ports, output_port_node)
+            for uid in vertex.ports.outgoing:
+                output_port = uid2port[uid]
+                connect_if_not_connected(node.output_ports, output_port)
 
-            # link to fragment
-            connect_if_not_connected(fragment.vertices, vertex_node)
+        return nodes
 
-        self._merge_groups(fragment, content.groups)
+    def _merge(self, fragment: models.Fragment, content: structures.Content):
+        input_ports = self._merge_input_ports(content.input_ports)
+        output_ports = self._merge_output_ports(content.output_ports)
+
+        uid2port = {port.uid: port for port in chain(input_ports, output_ports)}
+
+        self._merge_edges(content.edges, uid2port)
+        vertices = self._merge_vertices(content.vertices, uid2port)
+        groups = self._merge_groups(fragment, content.groups)
+
+        return vertices, groups
+
+    def _reconnect_to_fragment(
+        self,
+        fragment: models.Fragment,
+        vertices: Iterable[models.Vertex],
+        groups: Iterable[models.Group],
+    ):
+        for vertex in vertices:
+            connect_if_not_connected(fragment.vertices, vertex)
+
+        for group in groups:
+            connect_if_not_connected(fragment.groups, group)
 
     def replace(self, fragment: models.Fragment, content: structures.Content):
         self._delete_difference(fragment, content)
-        self._merge(fragment, content)
+        vertices, groups = self._merge(fragment, content)
+        self._reconnect_to_fragment(fragment, vertices, groups)
 
 
 class Manager:

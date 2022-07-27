@@ -6,6 +6,8 @@ layer and database-related activities.
 """
 
 from dataclasses import dataclass, field
+from itertools import chain
+from operator import attrgetter
 from typing import Any, MutableMapping, MutableSet, MutableSequence
 
 
@@ -101,3 +103,31 @@ class Content:
     ports: MutableSequence[Port]
     edges: MutableSequence[Edge]
     groups: MutableSequence[Group]
+    # TODO how about keeping explicit input/output ports here and using
+    #   just .ports attribute with IDs on vertices?
+
+    @property
+    def input_ports(self):
+        """A list of input ports."""
+
+        uids = set(
+            uid
+            for uid in chain.from_iterable(
+                map(attrgetter("ports.incoming"), self.vertices)
+            )
+        )
+
+        return [port for port in self.ports if port.uid in uids]
+
+    @property
+    def output_ports(self):
+        """A list of output ports."""
+
+        uids = set(
+            uid
+            for uid in chain.from_iterable(
+                map(attrgetter("ports.outgoing"), self.vertices)
+            )
+        )
+
+        return [port for port in self.ports if port.uid in uids]
