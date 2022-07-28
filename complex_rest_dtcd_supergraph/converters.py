@@ -17,7 +17,8 @@ class GraphDataConverter:
     def __init__(self, config):
         self._config = config
 
-    def _extract_savable_properties(self, properties: Dict[str, dict]):
+    @staticmethod
+    def _extract_savable_properties(properties: Dict[str, dict]):
         result = {}
 
         for name in properties:
@@ -28,7 +29,13 @@ class GraphDataConverter:
 
         return result
 
-    def _get_ports(self, nodes: Iterable[dict]):
+    @staticmethod
+    def _restore_properties(original: dict, properties: dict):
+        for key, value in properties.items():
+            original[key]["value"] = value
+
+    @staticmethod
+    def _get_ports(nodes: Iterable[dict]):
         # TODO hardcoded
         return chain.from_iterable(map(itemgetter("initPorts"), nodes))
 
@@ -45,26 +52,68 @@ class GraphDataConverter:
 
         return Vertex(uid=uid, properties=properties, meta=meta)
 
+    def _from_vertex(self, vertex: Vertex, id2port: dict):
+        data = deepcopy(vertex.meta)
+        data["primitiveID"] = vertex.uid
+        self._restore_properties(data["properties"], vertex.properties)
+        ports = [
+            id2port[port_id]
+            for port_id in chain(vertex.ports.incoming, vertex.ports.outgoing)
+        ]
+        data["initPorts"] = ports
+
+        return data
+
     def _to_port(self, data: dict):
         meta = deepcopy(data)
         uid = meta.pop("primitiveID")
-        # TODO
         properties = self._extract_savable_properties(meta["properties"])
 
         return Port(uid=uid, properties=properties, meta=meta)
 
-    def _to_edge(self, data: dict):
+    def _from_port(self, port: Port):
+        data = deepcopy(port.meta)
+        data["primitiveID"] = port.uid
+        self._restore_properties(data["properties"], port.properties)
+
+        return data
+
+    @staticmethod
+    def _to_edge(data: dict):
         meta = deepcopy(data)
         start = meta.pop("sourcePort")
         end = meta.pop("targetPort")
 
         return Edge(start=start, end=end, meta=meta)
 
-    def _to_group(self, data: dict):
+    @staticmethod
+    def _from_edge(edge: Edge):
+        data = deepcopy(edge.meta)
+        data["sourcePort"] = edge.start
+        data["targetPort"] = edge.end
+
+        return data
+
+    @staticmethod
+    def _to_group( data: dict):
         meta = deepcopy(data)
         uid = meta.pop("primitiveID")
 
         return Group(uid=uid, meta=meta)
+
+    @staticmethod
+    def _from_group(group: Group):
+        data = deepcopy(group.meta)
+        data["primitiveID"] = group.uid
+
+        return data
+
+    def _from_vertices_and_ports(self, content: Content):
+        ports = list(map(self._from_port, content.ports))
+        id2port = {p["primitiveID"]: p for p in ports}
+        nodes = [self._from_vertex(v, id2port) for v in content.vertices]
+
+        return nodes
 
     def to_content(self, data: dict) -> Content:
         # pre-condition: data is valid
@@ -80,49 +129,6 @@ class GraphDataConverter:
             edges=edges,
             groups=groups,
         )
-
-    def _from_group(self, group: Group):
-        data = deepcopy(group.meta)
-        data["primitiveID"] = group.uid
-
-        return data
-
-    def _from_edge(self, edge: Edge):
-        data = deepcopy(edge.meta)
-        data["sourcePort"] = edge.start
-        data["targetPort"] = edge.end
-
-        return data
-
-    def _restore_properties(self, original: dict, properties: dict):
-        for key, value in properties.items():
-            original[key]["value"] = value
-
-    def _from_port(self, port: Port):
-        data = deepcopy(port.meta)
-        data["primitiveID"] = port.uid
-        self._restore_properties(data["properties"], port.properties)
-
-        return data
-
-    def _from_vertex(self, vertex: Vertex, id2port: dict):
-        data = deepcopy(vertex.meta)
-        data["primitiveID"] = vertex.uid
-        self._restore_properties(data["properties"], vertex.properties)
-        ports = [
-            id2port[port_id]
-            for port_id in chain(vertex.ports.incoming, vertex.ports.outgoing)
-        ]
-        data["initPorts"] = ports
-
-        return data
-
-    def _from_vertices_and_ports(self, content: Content):
-        ports = list(map(self._from_port, content.ports))
-        id2port = {p["primitiveID"]: p for p in ports}
-        nodes = [self._from_vertex(v, id2port) for v in content.vertices]
-
-        return nodes
 
     def to_data(self, content: Content) -> dict:
         nodes = self._from_vertices_and_ports(content)
