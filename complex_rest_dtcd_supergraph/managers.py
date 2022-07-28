@@ -94,7 +94,7 @@ class Writer:
     def __init__(self):
         self._fragment = None
         self._content = None
-        self._uid2port = None  # mapping of ID to merged input/output ports
+        self._uid2port = None  # mapping of ID to merged ports
         # merged nodes
         self._vertices = None
         self._groups = None

@@ -44,22 +44,16 @@ class GraphDataConverter:
         # TODO hardcoded
         uid = meta.pop("primitiveID")
         properties = self._extract_savable_properties(meta["properties"])
-        # ports - save only ids
-        # TODO hub with incoming / outgoing ports
-        ports = meta.pop("initPorts")
+        ports = meta.pop("initPorts")  #  save only ids
         port_ids = set(map(itemgetter("primitiveID"), ports))
-        # TODO Hub? ports?
 
-        return Vertex(uid=uid, properties=properties, meta=meta)
+        return Vertex(uid=uid, properties=properties, meta=meta, ports=port_ids)
 
     def _from_vertex(self, vertex: Vertex, id2port: dict):
         data = deepcopy(vertex.meta)
         data["primitiveID"] = vertex.uid
         self._restore_properties(data["properties"], vertex.properties)
-        ports = [
-            id2port[port_id]
-            for port_id in chain(vertex.ports.incoming, vertex.ports.outgoing)
-        ]
+        ports = [id2port[port_id] for port_id in vertex.ports]
         data["initPorts"] = ports
 
         return data
