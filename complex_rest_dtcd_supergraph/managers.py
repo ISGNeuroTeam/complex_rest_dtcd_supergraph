@@ -7,7 +7,6 @@ and isolate details and complexity.
 
 from collections import defaultdict
 from itertools import chain
-from operator import attrgetter
 from typing import Dict, Iterable, List, Tuple
 
 import neomodel
@@ -109,8 +108,8 @@ class Reader:
             for node in chain(input_ports, output_ports)
         ]
         edges = [
-            structures.Edge(start=opID, end=ipID, meta=edge.meta_)
-            for (opID, ipID), edge in edges.items()
+            structures.Edge(start=op_uid, end=ip_uid, meta=edge.meta_)
+            for (op_uid, ip_uid), edge in edges.items()
         ]
         groups = [self._to_primitive(node, structures.Group) for node in groups]
 
@@ -125,16 +124,20 @@ class Reader:
 class Writer:
     """Write operations on a fragment."""
 
-    # TODO maybe instantiate with fragment & content? avoids passing args around
+    def __init__(self):
+        self._fragment = None
+        self._content = None
+        self._uid2port = None  # mapping of ID to merged input/output ports
+        # merged nodes
+        self._vertices = None
+        self._groups = None
 
-    def _delete_deprecated_vertices_groups_ports(
-        self, fragment: models.Fragment, content: structures.Content
-    ):
+    def _delete_deprecated_vertices_groups_ports(self):
 
         # get uids of primitive nodes (vertices, groups, ports) in the fragment
         uid2node = {}
 
-        for vertex in fragment.vertices.all():
+        for vertex in self._fragment.vertices.all():
             uid2node[vertex.uid] = vertex
 
             for port in vertex.ports.all():
@@ -146,9 +149,9 @@ class Writer:
         new_uids = set(
             item.uid
             for item in chain(
-                content.vertices,
-                content.ports,
-                content.groups,
+                self._content.vertices,
+                self._content.ports,
+                self._content.groups,
             )
         )
         deprecated_uids = set(uid2node) - new_uids
@@ -156,10 +159,8 @@ class Writer:
         for uid in deprecated_uids:
             uid2node[uid].delete()
 
-    def _delete_deprecated_edges(
-        self, fragment: models.Fragment, content: structures.Content
-    ):
-        results, _ = fragment.cypher(
+    def _delete_deprecated_edges(self):
+        results, _ = self._fragment.cypher(
             "MATCH (f) WHERE id(f)={self} "
             "MATCH (f) -- (:Vertex) "
             "  -- (src:OutputPort) -[:EDGE]-> (dst:InputPort) "
@@ -167,7 +168,7 @@ class Writer:
             "RETURN src.uid, dst.uid"
         )
         current_uids = set((row[0], row[1]) for row in results)  # opID, ipID pairs
-        new_uids = set(edge.uid for edge in content.edges)
+        new_uids = set(edge.uid for edge in self._content.edges)
         deprecated_uids = current_uids - new_uids
 
         neomodel.db.cypher_query(
@@ -179,43 +180,34 @@ class Writer:
             params={"list": list(deprecated_uids)},
         )
 
-    def _delete_difference(
-        self, fragment: models.Fragment, content: structures.Content
-    ):
+    def _delete_difference(self):
         """Delete entities in the fragment that are not in the new content."""
 
-        self._delete_deprecated_vertices_groups_ports(fragment, content)
-        self._delete_deprecated_edges(fragment, content)
+        self._delete_deprecated_vertices_groups_ports()
+        self._delete_deprecated_edges()
 
-    def _merge_groups(
-        self, fragment: models.Fragment, groups: Iterable[structures.Group]
-    ):
-        data = [dict(uid=g.uid, meta_=g.meta) for g in groups]
-
-        return models.Group.create_or_update(*data, lazy=True)
-
-    def _merge_input_ports(self, ports: Iterable[structures.Port]):
+    def _merge_input_ports(self):
         data = [
-            dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
+            dict(uid=port.uid, meta_=port.meta, **port.properties)
+            for port in self._content.input_ports
         ]
 
         return models.InputPort.create_or_update(*data)
 
-    def _merge_output_ports(self, ports: Iterable[structures.Port]):
+    def _merge_output_ports(self):
         data = [
-            dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
+            dict(uid=port.uid, meta_=port.meta, **port.properties)
+            for port in self._content.output_ports
         ]
 
         return models.OutputPort.create_or_update(*data)
 
-    def _merge_edges(
-        self, edges: Iterable[structures.Edge], uid2port: dict
-    ) -> List[models.EdgeRel]:
+    def _merge_edges(self) -> List[models.EdgeRel]:
         relations = []
 
-        for edge in edges:
-            output_port = uid2port[edge.start]
-            input_port = uid2port[edge.end]
+        for edge in self._content.edges:
+            output_port = self._uid2port[edge.start]
+            input_port = self._uid2port[edge.end]
             rel = output_port.neighbor.replace(
                 input_port, properties={"meta_": edge.meta}
             )
@@ -223,12 +215,10 @@ class Writer:
 
         return relations
 
-    def _merge_vertices(
-        self, vertices: Iterable[structures.Vertex], uid2port: dict
-    ) -> List[models.Vertex]:
+    def _merge_vertices(self) -> List[models.Vertex]:
         nodes = []
 
-        for vertex in vertices:
+        for vertex in self._content.vertices:
             node = models.Vertex.create_or_update(
                 dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
                 lazy=True,
@@ -237,43 +227,55 @@ class Writer:
 
             # connect this vertex to ports
             for uid in vertex.ports.incoming:
-                input_port = uid2port[uid]
+                input_port = self._uid2port[uid]
                 connect_if_not_connected(node.input_ports, input_port)
 
             for uid in vertex.ports.outgoing:
-                output_port = uid2port[uid]
+                output_port = self._uid2port[uid]
                 connect_if_not_connected(node.output_ports, output_port)
 
         return nodes
 
-    def _merge(self, fragment: models.Fragment, content: structures.Content):
-        input_ports = self._merge_input_ports(content.input_ports)
-        output_ports = self._merge_output_ports(content.output_ports)
+    def _merge_groups(self):
+        data = [dict(uid=group.uid, meta_=group.meta) for group in self._content.groups]
 
-        uid2port = {port.uid: port for port in chain(input_ports, output_ports)}
+        return models.Group.create_or_update(*data, lazy=True)
 
-        self._merge_edges(content.edges, uid2port)
-        vertices = self._merge_vertices(content.vertices, uid2port)
-        groups = self._merge_groups(fragment, content.groups)
+    def _merge(self):
+        """Merge content entities."""
 
-        return vertices, groups
+        input_ports = self._merge_input_ports()
+        output_ports = self._merge_output_ports()
 
-    def _reconnect_to_fragment(
-        self,
-        fragment: models.Fragment,
-        vertices: Iterable[models.Vertex],
-        groups: Iterable[models.Group],
-    ):
-        for vertex in vertices:
-            connect_if_not_connected(fragment.vertices, vertex)
+        self._uid2port = {port.uid: port for port in chain(input_ports, output_ports)}
 
-        for group in groups:
-            connect_if_not_connected(fragment.groups, group)
+        self._merge_edges()
+        self._vertices = self._merge_vertices()
+        self._groups = self._merge_groups()
+
+    def _reconnect_to_fragment(self):
+        """Reconnect merged entities to parent fragment."""
+
+        for vertex in self._vertices:
+            connect_if_not_connected(self._fragment.vertices, vertex)
+
+        for group in self._groups:
+            connect_if_not_connected(self._fragment.groups, group)
 
     def replace(self, fragment: models.Fragment, content: structures.Content):
-        self._delete_difference(fragment, content)
-        vertices, groups = self._merge(fragment, content)
-        self._reconnect_to_fragment(fragment, vertices, groups)
+        """Replace the content of a given fragment."""
+
+        # content pre-conditions (referential integrity within the content):
+        # - for each edge, start (output) & end (input) ports exist in content
+        # - for each vertex, all ports exist in content
+
+        # initialize working variables
+        self._fragment = fragment
+        self._content = content
+
+        self._delete_difference()
+        self._merge()
+        self._reconnect_to_fragment()
 
 
 class Manager:
