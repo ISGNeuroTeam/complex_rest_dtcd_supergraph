@@ -55,49 +55,48 @@ class ContentSerializer(serializers.Serializer):
     edges = serializers.ListField(child=EdgeField())
     groups = serializers.ListField(required=False, child=GroupField())
 
-    def validate_nodes(self, value):
-        groups = value
-        ids = set(map(itemgetter(self.keys.id), groups))
+    # TODO validate uniqueness of all IDs
 
-        if len(ids) != len(groups):
+    def validate_nodes(self, value):
+        ids = set(map(itemgetter(self.keys.id), value))
+
+        if len(ids) != len(value):
             self.fail("not_unique")
 
-        return groups
+        return value
 
     def validate_edges(self, value):
-        edges = value
         keys = (
             self.keys.src_node,
             self.keys.tgt_node,
             self.keys.src_port,
             self.keys.tgt_port,
         )
-        ids = set(map(itemgetter(*keys), edges))
+        ids = set(map(itemgetter(*keys), value))
 
-        if len(ids) != len(edges):
+        if len(ids) != len(value):
             self.fail("not_unique")
 
-        return edges
+        return value
 
     def validate_groups(self, value):
-        groups = value
-
         # unique IDs
-        groups = self.validate_nodes(groups)
+        value = self.validate_nodes(value)
 
         # no self-reference
-        for obj in groups:
+        for obj in value:
             id_ = obj[self.keys.id]
             parent_id = obj.get(self.keys.parent_id)
 
             if parent_id == id_:
                 self.fail("self_reference", value=id_)
 
-        return groups
+        return value
 
     def validate(self, data: dict):
         self._validate_references(data)
         self._validate_parent_groups_exist(data)
+
         return data
 
     def _validate_references(self, data: dict):
@@ -111,6 +110,8 @@ class ContentSerializer(serializers.Serializer):
         ):
             if id_ not in node_ids:
                 self.fail("does_not_exist", value=id_)
+
+        # TODO make sure ports exist
 
     def _validate_parent_groups_exist(self, data: dict):
         # make sure parent groups exist for vertices and groups
