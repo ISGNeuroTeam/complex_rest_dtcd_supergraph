@@ -34,10 +34,12 @@ KEYS.groups = "groups"
 KEYS.init_ports = "initPorts"
 KEYS.nodes = "nodes"
 KEYS.parent_id = "parentID"
+KEYS.properties = "properties"
 KEYS.source_node = "sourceNode"
 KEYS.source_port = "sourcePort"
 KEYS.target_node = "targetNode"
 KEYS.target_port = "targetPort"
+KEYS.value = "value"
 KEYS.yfiles_id = "primitiveID"
 
 
