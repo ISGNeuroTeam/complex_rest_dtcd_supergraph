@@ -81,19 +81,3 @@ class Content:
     ports: MutableSequence[Port]
     edges: MutableSequence[Edge]
     groups: MutableSequence[Group]
-
-    @property
-    def input_ports(self):
-        """A list of input ports."""
-
-        ids = set(edge.end for edge in self.edges)
-
-        return [port for port in self.ports if port.uid in ids]
-
-    @property
-    def output_ports(self):
-        """A list of output ports."""
-
-        ids = set(edge.start for edge in self.edges)
-
-        return [port for port in self.ports if port.uid in ids]
