@@ -3,10 +3,16 @@ This module provides custom utility functions.
 """
 
 import uuid
+from typing import Sequence
 
 import neomodel
 from neomodel import contrib
 from rest_framework.exceptions import NotFound
+
+
+# allowed property types in neo4j
+# see https://neo4j.com/docs/cypher-manual/current/syntax/values/#property-types
+PROPERTY_TYPES = (int, float, str, bool)
 
 
 # custom Django path converters
@@ -77,3 +83,47 @@ def connect_if_not_connected(
         return manager.connect(node, properties)
     else:
         return manager.relationship(node)
+
+
+def valid_property(value) -> bool:
+    """
+    Return `True` if the value is a valid Neo4j property, `False` otherwise.
+    """
+
+    return isinstance(value, PROPERTY_TYPES)
+
+
+def homogeneous(seq: Sequence) -> bool:
+    """Return `True` if all items in a sequence have the same type,
+    `False` otherwise."""
+
+    if len(seq) == 0:
+        return True
+
+    t = type(seq[0])
+
+    return all(type(item) is t for item in seq)
+
+
+def savable_as_property(value) -> bool:
+    """Return `True` if the value can be stored as Neo4j property,
+    `False` otherwise.
+
+    See https://neo4j.com/docs/cypher-manual/current/syntax/values/ for
+    more information on property types.
+    """
+
+    # valid property
+    if valid_property(value):
+        return True
+
+    # homogeneous lists of valid properties
+    if (
+        isinstance(value, list)
+        and all(map(valid_property, value))
+        and homogeneous(value)
+    ):
+        return True
+
+    # anything else is invalid
+    return False

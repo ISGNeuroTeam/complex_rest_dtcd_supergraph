@@ -136,4 +136,5 @@ class ResetNeo4j(APIView):
         """Delete all nodes and relationships from Neo4j database."""
 
         neomodel.clear_neo4j_database(neomodel.db)  # TODO constraints? indexes?
+
         return SuccessResponse()
