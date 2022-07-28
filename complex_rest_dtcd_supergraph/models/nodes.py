@@ -4,7 +4,10 @@ Node classes for neomodel.
 The models here closely mirror classes from `structures` module.
 """
 
+from typing import List, Tuple
+
 from neomodel import (
+    db,
     JSONProperty,
     Relationship,
     StringProperty,
@@ -111,3 +114,18 @@ class Fragment(StructuredNode):
 
         for group in self.groups.all():
             group.delete()
+
+    @property
+    def edges(self) -> List[Tuple[Port, EdgeRel, Port]]:
+        """Return a list of tuples (start, edge, end) inside this fragment."""
+
+        q = (
+            f"MATCH (f) WHERE id(f)={self.id} "
+            "MATCH (f) -- (:Vertex) "
+            f"  -- (src:Port) -[e:{RELATION_TYPES.edge}]-> (dst:Port) "
+            "  -- (:Vertex) -- (f) "
+            "RETURN src, e, dst"
+        )
+        results, _ = db.cypher_query(q, resolve_objects=True)
+
+        return [(r[0], r[1], r[2]) for r in results]

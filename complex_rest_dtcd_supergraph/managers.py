@@ -21,52 +21,26 @@ class Reader:
 
     def __init__(self) -> None:
         self._foreign_key_mapping = defaultdict(set)  # parent:children uid pairs
-        self._input_port_ids = set()
 
-    def _clear(self):
-        self._foreign_key_mapping.clear()
-        self._input_port_ids.clear()
-
-    def _query_input_ports(self, vertices: Iterable[models.Vertex]):
-        # saves: foreign keys from vertex to ports, input port ids
-        ports: List[models.InputPort] = []
+    def _query_ports(self, vertices: Iterable[models.Vertex]):
+        ports: List[models.Port] = []
 
         for vertex in vertices:
-            for port in vertex.input_ports.all():
-                ports.append(port)
-                self._foreign_key_mapping[vertex.uid].add(port.uid)
-                self._input_port_ids.add(port.uid)
-
-        return ports
-
-    def _query_output_ports(self, vertices: Iterable[models.Vertex]):
-        # saves foreign keys from vertex to ports
-        ports: List[models.OutputPort] = []
-
-        for vertex in vertices:
-            for port in vertex.output_ports.all():
+            for port in vertex.ports.all():
                 ports.append(port)
                 self._foreign_key_mapping[vertex.uid].add(port.uid)
 
         return ports
 
     def _query_edges(
-        self, output_ports: Iterable[models.OutputPort]
+        self,
+        fragment: models.Fragment,
     ) -> Dict[Tuple[structures.ID, structures.ID], models.EdgeRel]:
-        edges = {}
 
-        for op in output_ports:
-            neighbor = op.neighbor.single()  # can be None
-
-            # skip missing neighbors or neighbors from outside this fragment
-            if neighbor is None or neighbor.uid not in self._input_port_ids:
-                continue
-
-            edge = op.neighbor.relationship(neighbor)
-            edge_id = (op.uid, neighbor.uid)
-            edges[edge_id] = edge
-
-        return edges
+        return {
+            (output_port.uid, input_port.uid): edge
+            for output_port, edge, input_port in fragment.edges
+        }
 
     @staticmethod
     def _to_primitive(node, subclass):
@@ -82,31 +56,24 @@ class Reader:
 
         # populate ports mappings
         for child_id in self._foreign_key_mapping.get(vertex.uid, []):
-            if child_id in self._input_port_ids:
-                vertex.ports.incoming.add(child_id)
-            else:
-                vertex.ports.outgoing.add(child_id)
+            vertex.ports.add(child_id)
 
         return vertex
 
     def read(self, fragment: models.Fragment) -> structures.Content:
-        self._clear()
+        self._foreign_key_mapping.clear()
 
         # step 1 - get the insides
         # TODO a lot of queries
         vertices = fragment.vertices.all()
         # TODO mention somehow that order matters here!
-        input_ports = self._query_input_ports(vertices)
-        output_ports = self._query_output_ports(vertices)
-        edges = self._query_edges(output_ports)
+        ports = self._query_ports(vertices)
+        edges = self._query_edges(fragment)
         groups = fragment.groups.all()
 
         # step 2 - map to content
         vertices = [self._to_vertex(node) for node in vertices]
-        ports = [
-            self._to_primitive(node, structures.Port)
-            for node in chain(input_ports, output_ports)
-        ]
+        ports = [self._to_primitive(node, structures.Port) for node in ports]
         edges = [
             structures.Edge(start=op_uid, end=ip_uid, meta=edge.meta_)
             for (op_uid, ip_uid), edge in edges.items()
@@ -160,14 +127,9 @@ class Writer:
             uid2node[uid].delete()
 
     def _delete_deprecated_edges(self):
-        results, _ = self._fragment.cypher(
-            "MATCH (f) WHERE id(f)={self} "
-            "MATCH (f) -- (:Vertex) "
-            "  -- (src:OutputPort) -[:EDGE]-> (dst:InputPort) "
-            "  -- (:Vertex) -- (f) "
-            "RETURN src.uid, dst.uid"
-        )
-        current_uids = set((row[0], row[1]) for row in results)  # opID, ipID pairs
+        results = self._fragment.edges
+
+        current_uids = set((op.uid, ip.uid) for op, _, ip in results)
         new_uids = set(edge.uid for edge in self._content.edges)
         deprecated_uids = current_uids - new_uids
 
@@ -186,21 +148,13 @@ class Writer:
         self._delete_deprecated_vertices_groups_ports()
         self._delete_deprecated_edges()
 
-    def _merge_input_ports(self):
+    def _merge_ports(self):
         data = [
             dict(uid=port.uid, meta_=port.meta, **port.properties)
-            for port in self._content.input_ports
+            for port in self._content.ports
         ]
 
-        return models.InputPort.create_or_update(*data)
-
-    def _merge_output_ports(self):
-        data = [
-            dict(uid=port.uid, meta_=port.meta, **port.properties)
-            for port in self._content.output_ports
-        ]
-
-        return models.OutputPort.create_or_update(*data)
+        return models.Port.create_or_update(*data)
 
     def _merge_edges(self) -> List[models.EdgeRel]:
         relations = []
@@ -208,8 +162,8 @@ class Writer:
         for edge in self._content.edges:
             output_port = self._uid2port[edge.start]
             input_port = self._uid2port[edge.end]
-            rel = output_port.neighbor.replace(
-                input_port, properties={"meta_": edge.meta}
+            rel = connect_if_not_connected(
+                output_port.neighbor, input_port, {"meta_": edge.meta}
             )
             relations.append(rel)
 
@@ -226,13 +180,9 @@ class Writer:
             nodes.append(node)
 
             # connect this vertex to ports
-            for uid in vertex.ports.incoming:
-                input_port = self._uid2port[uid]
-                connect_if_not_connected(node.input_ports, input_port)
-
-            for uid in vertex.ports.outgoing:
-                output_port = self._uid2port[uid]
-                connect_if_not_connected(node.output_ports, output_port)
+            for uid in vertex.ports:
+                port = self._uid2port[uid]
+                connect_if_not_connected(node.ports, port)
 
         return nodes
 
@@ -244,11 +194,8 @@ class Writer:
     def _merge(self):
         """Merge content entities."""
 
-        input_ports = self._merge_input_ports()
-        output_ports = self._merge_output_ports()
-
-        self._uid2port = {port.uid: port for port in chain(input_ports, output_ports)}
-
+        ports = self._merge_ports()
+        self._uid2port = {port.uid: port for port in ports}
         self._merge_edges()
         self._vertices = self._merge_vertices()
         self._groups = self._merge_groups()
