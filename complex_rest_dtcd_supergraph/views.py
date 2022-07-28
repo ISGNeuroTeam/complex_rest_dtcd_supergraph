@@ -100,7 +100,7 @@ class FragmentGraphView(APIView):
         payload = self.converter.to_data(content)
         serializer = ContentSerializer(instance=payload)
 
-        return SuccessResponse(data=serializer.data)
+        return SuccessResponse(data={"graph": serializer.data})
 
     def put(self, request: Request, pk: uuid.UUID):
         """Replace graph content of a fragment with given id."""

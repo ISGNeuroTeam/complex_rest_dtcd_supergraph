@@ -4,7 +4,7 @@ from pathlib import Path
 
 from django.test import SimpleTestCase, tag
 
-from complex_rest_dtcd_supergraph.converters import Converter, Dumper, Loader
+from complex_rest_dtcd_supergraph.converters import GraphDataConverter
 
 from .misc import sort_payload
 
@@ -12,28 +12,21 @@ TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
 
 
-class TestLoader(SimpleTestCase):
-    loader = Loader()
+class TestGraphDataConverter(SimpleTestCase):
+    converter = GraphDataConverter()
 
-
-class TestDumper:
-    pass
-
-
-class TestConverter(SimpleTestCase):
-    def _check_load_dump(self, data):
+    def _check_to_content_to_data(self, data):
         sort_payload(data)
-        converter = Converter()
-        subgraph = converter.load(data)
-        exported = converter.dump(subgraph)
+        content = self.converter.to_content(data)
+        exported = self.converter.to_data(content)
         sort_payload(exported)
         # TODO log difference like in api test suite
         self.assertEqual(exported, data)
 
-    def _check_load_dump_from_json(self, path):
+    def _check_to_content_to_data_from_json(self, path):
         with open(path) as f:
             data = json.load(f)
-        self._check_load_dump(data)
+        self._check_to_content_to_data(data)
 
     # def test_load_dump_small(self):
     #     self._check_load_dump_from_json(DATA_DIR / "graph-sample-small.json")
