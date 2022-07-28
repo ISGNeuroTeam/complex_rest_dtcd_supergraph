@@ -32,8 +32,8 @@ class GraphDataConverter:
         # TODO hardcoded
         return chain.from_iterable(map(itemgetter("initPorts"), nodes))
 
-    def _to_vertex(self, node: dict):
-        meta = deepcopy(node)
+    def _to_vertex(self, data: dict):
+        meta = deepcopy(data)
         # TODO hardcoded
         uid = meta.pop("primitiveID")
         properties = self._extract_savable_properties(meta["properties"])
@@ -45,23 +45,23 @@ class GraphDataConverter:
 
         return Vertex(uid=uid, properties=properties, meta=meta)
 
-    def _to_port(self, port: dict):
-        meta = deepcopy(port)
+    def _to_port(self, data: dict):
+        meta = deepcopy(data)
         uid = meta.pop("primitiveID")
         # TODO
         properties = self._extract_savable_properties(meta["properties"])
 
         return Port(uid=uid, properties=properties, meta=meta)
 
-    def _to_edge(self, edge: dict):
-        meta = deepcopy(edge)
+    def _to_edge(self, data: dict):
+        meta = deepcopy(data)
         start = meta.pop("sourcePort")
         end = meta.pop("targetPort")
 
         return Edge(start=start, end=end, meta=meta)
 
-    def _to_group(self, group: dict):
-        meta = deepcopy(group)
+    def _to_group(self, data: dict):
+        meta = deepcopy(data)
         uid = meta.pop("primitiveID")
 
         return Group(uid=uid, meta=meta)
@@ -81,5 +81,58 @@ class GraphDataConverter:
             groups=groups,
         )
 
+    def _from_group(self, group: Group):
+        data = deepcopy(group.meta)
+        data["primitiveID"] = group.uid
+
+        return data
+
+    def _from_edge(self, edge: Edge):
+        data = deepcopy(edge.meta)
+        data["sourcePort"] = edge.start
+        data["targetPort"] = edge.end
+
+        return data
+
+    def _restore_properties(self, original: dict, properties: dict):
+        for key, value in properties.items():
+            original[key]["value"] = value
+
+    def _from_port(self, port: Port):
+        data = deepcopy(port.meta)
+        data["primitiveID"] = port.uid
+        self._restore_properties(data["properties"], port.properties)
+
+        return data
+
+    def _from_vertex(self, vertex: Vertex, id2port: dict):
+        data = deepcopy(vertex.meta)
+        data["primitiveID"] = vertex.uid
+        self._restore_properties(data["properties"], vertex.properties)
+        ports = [
+            id2port[port_id]
+            for port_id in chain(vertex.ports.incoming, vertex.ports.outgoing)
+        ]
+        data["initPorts"] = ports
+
+        return data
+
+    def _from_vertices_and_ports(self, content: Content):
+        ports = list(map(self._from_port, content.ports))
+        id2port = {p["primitiveID"]: p for p in ports}
+        nodes = [self._from_vertex(v, id2port) for v in content.vertices]
+
+        return nodes
+
     def to_data(self, content: Content) -> dict:
-        raise NotImplementedError
+        nodes = self._from_vertices_and_ports(content)
+        edges = list(map(self._from_edge, content.edges))
+        groups = list(map(self._from_group, content.groups))
+
+        result = {
+            "nodes": nodes,
+            "edges": edges,
+            "groups": groups,
+        }
+
+        return result
