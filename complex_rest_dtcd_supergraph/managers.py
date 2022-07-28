@@ -226,6 +226,8 @@ class Writer:
 
 
 class Manager:
+    """Handles read and write operations on fragment's content."""
+
     def __init__(self) -> None:
         self._reader = Reader()
         self._writer = Writer()

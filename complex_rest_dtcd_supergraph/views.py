@@ -9,8 +9,10 @@ from rest.permissions import AllowAny
 from rest.response import SuccessResponse
 from rest.views import APIView
 
+from .converters import GraphDataConverter
+from .managers import Manager
 from .models import Fragment
-from .serializers import FragmentSerializer
+from .serializers import ContentSerializer, FragmentSerializer, GraphSerializer
 from .utils import get_node_or_404
 
 
@@ -87,21 +89,37 @@ class FragmentGraphView(APIView):
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
+    manager = Manager()
+    converter = GraphDataConverter()
 
-    def get(self, request: Request, pk):
+    def get(self, request: Request, pk: uuid.UUID):
         """Read graph content of a fragment with the given id."""
 
-        raise NotImplementedError
+        fragment = get_node_or_404(Fragment, uid=pk.hex)
+        content = self.manager.read(fragment)
+        payload = self.converter.to_data(content)
+        serializer = ContentSerializer(instance=payload)
 
-    def put(self, request: Request, pk):
+        return SuccessResponse(data=serializer.data)
+
+    def put(self, request: Request, pk: uuid.UUID):
         """Replace graph content of a fragment with given id."""
 
-        raise NotImplementedError
+        serializer = GraphSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        new_content = self.converter.to_content(serializer.data)
+        fragment = get_node_or_404(Fragment, uid=pk.hex)
+        self.manager.replace(fragment, new_content)
 
-    def delete(self, request: Request, pk):
+        return SuccessResponse()
+
+    def delete(self, request: Request, pk: uuid.UUID):
         """Delete graph content of a fragment with the given id."""
 
-        raise NotImplementedError
+        fragment = get_node_or_404(Fragment, uid=pk.hex)
+        fragment.clear()
+
+        return SuccessResponse()
 
 
 class RootGraphView(APIView):

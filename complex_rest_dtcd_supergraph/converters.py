@@ -15,9 +15,6 @@ from .utils import savable_as_property
 class GraphDataConverter:
     """Supports conversion between front-end data and internal classes."""
 
-    def __init__(self, config):
-        self._config = config
-
     @staticmethod
     def _extract_savable_properties(properties: Dict[str, dict]):
         result = {}
