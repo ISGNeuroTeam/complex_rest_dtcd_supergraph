@@ -9,13 +9,13 @@ from types import SimpleNamespace
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .fields import EdgeField, GroupField, VertexField
+from .fields import CustomUUIDFIeld, EdgeField, GroupField, VertexField
 from .models import Fragment
 from .settings import KEYS
 
 
 class FragmentSerializer(serializers.Serializer):
-    id = serializers.UUIDField(read_only=True, source="uid")
+    id = CustomUUIDFIeld(read_only=True, source="uid")
     name = serializers.CharField(max_length=255)  # TODO value in settings
 
     def create(self, validated_data):
