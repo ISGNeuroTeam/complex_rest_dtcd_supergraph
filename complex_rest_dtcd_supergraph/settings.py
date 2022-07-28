@@ -1,5 +1,6 @@
 import configparser
 from pathlib import Path
+from types import SimpleNamespace
 
 import neomodel
 
@@ -27,29 +28,18 @@ config_parser.read(PROJECT_DIR / "supergraph.conf")
 # FIXME option false in config gets converted from 'false' to True
 ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
 
-# settings for custom data design
-SCHEMA = {
-    "keys": {
-        "edges": "edges",
-        "groups": "groups",
-        "nodes": "nodes",
-        "parent_id": "parentID",
-        "source_node": "sourceNode",
-        "source_port": "sourcePort",
-        "target_node": "targetNode",
-        "target_port": "targetPort",
-        "yfiles_id": "primitiveID",
-    },
-    "labels": {
-        "edge": "Edge",
-        "group": "Group",
-        "node": "Node",
-    },
-    "types": {
-        "in": "IN",
-        "out": "OUT",
-    },
-}
+KEYS = SimpleNamespace()
+KEYS.edges = "edges"
+KEYS.groups = "groups"
+KEYS.init_ports = "initPorts"
+KEYS.nodes = "nodes"
+KEYS.parent_id = "parentID"
+KEYS.source_node = "sourceNode"
+KEYS.source_port = "sourcePort"
+KEYS.target_node = "targetNode"
+KEYS.target_port = "targetPort"
+KEYS.yfiles_id = "primitiveID"
+
 
 # neomodel
 # https://neomodel.readthedocs.io/en/latest/configuration.html

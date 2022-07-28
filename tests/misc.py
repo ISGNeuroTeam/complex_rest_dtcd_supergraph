@@ -5,33 +5,28 @@ Helper module for tests.
 import json
 from operator import itemgetter
 
-from complex_rest_dtcd_supergraph.settings import SCHEMA
-
-
-KEYS = SCHEMA["keys"]
-LABELS = SCHEMA["labels"]
-TYPES = SCHEMA["types"]
+from complex_rest_dtcd_supergraph.settings import KEYS
 
 
 def sort_payload(data: dict) -> None:
     """Sort payload dict according to spec in-place."""
 
-    nodes = data[KEYS["nodes"]]
+    nodes = data[KEYS.nodes]
 
     for node in nodes:
-        if "initPorts" in node:
-            node["initPorts"] = sorted(
-                node["initPorts"], key=itemgetter(KEYS["yfiles_id"])
+        if KEYS.init_ports in node:
+            node[KEYS.init_ports] = sorted(
+                node[KEYS.init_ports], key=itemgetter(KEYS.yfiles_id)
             )
 
-    data[KEYS["nodes"]] = sorted(nodes, key=itemgetter(KEYS["yfiles_id"]))
-    data[KEYS["edges"]] = sorted(
-        data[KEYS["edges"]],
+    data[KEYS.nodes] = sorted(nodes, key=itemgetter(KEYS.yfiles_id))
+    data[KEYS.edges] = sorted(
+        data[KEYS.edges],
         key=itemgetter(
-            KEYS["source_node"],
-            KEYS["source_port"],
-            KEYS["target_node"],
-            KEYS["target_port"],
+            KEYS.source_node,
+            KEYS.source_port,
+            KEYS.target_node,
+            KEYS.target_port,
         ),
     )
 

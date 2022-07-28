@@ -11,7 +11,7 @@ from rest_framework import serializers
 
 from .fields import EdgeField, GroupField, VertexField
 from .models import Fragment
-from .settings import SCHEMA
+from .settings import KEYS
 
 
 class FragmentSerializer(serializers.Serializer):
@@ -43,12 +43,12 @@ class ContentSerializer(serializers.Serializer):
     }
 
     keys = SimpleNamespace(
-        id=SCHEMA["keys"]["yfiles_id"],
-        src_node=SCHEMA["keys"]["source_node"],
-        tgt_node=SCHEMA["keys"]["target_node"],
-        src_port=SCHEMA["keys"]["source_port"],
-        tgt_port=SCHEMA["keys"]["target_port"],
-        parent_id=SCHEMA["keys"]["parent_id"],
+        id=KEYS.yfiles_id,
+        src_node=KEYS.source_node,
+        tgt_node=KEYS.target_node,
+        src_port=KEYS.source_port,
+        tgt_port=KEYS.target_port,
+        parent_id=KEYS.parent_id,
     )
 
     nodes = serializers.ListField(child=VertexField(), allow_empty=False)

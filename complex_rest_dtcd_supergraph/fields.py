@@ -5,7 +5,7 @@ Custom fields.
 from django.utils.translation import gettext_lazy as _
 from rest_framework.serializers import DictField
 
-from .settings import SCHEMA
+from .settings import KEYS
 
 
 class ContainsOrFailMixin:
@@ -24,7 +24,7 @@ class VertexField(ContainsOrFailMixin, DictField):
     Validates the vertex to have an ID field.
     """
 
-    id_key = SCHEMA["keys"]["yfiles_id"]
+    id_key = KEYS.yfiles_id
 
     def to_internal_value(self, data: dict):
         data = super().to_internal_value(data)
@@ -44,10 +44,10 @@ class EdgeField(ContainsOrFailMixin, DictField):
     """
 
     keys = (
-        SCHEMA["keys"]["source_node"],
-        SCHEMA["keys"]["target_node"],
-        SCHEMA["keys"]["source_port"],
-        SCHEMA["keys"]["target_port"],
+        KEYS.source_node,
+        KEYS.target_node,
+        KEYS.source_port,
+        KEYS.target_port,
     )
 
     def to_internal_value(self, data):

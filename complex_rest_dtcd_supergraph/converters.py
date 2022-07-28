@@ -95,7 +95,7 @@ class GraphDataConverter:
         return data
 
     @staticmethod
-    def _to_group( data: dict):
+    def _to_group(data: dict):
         meta = deepcopy(data)
         uid = meta.pop("primitiveID")
 
