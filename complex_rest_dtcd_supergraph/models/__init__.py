@@ -1,8 +1,7 @@
 from .nodes import (
     Fragment,
     Group,
-    InputPort,
-    OutputPort,
+    Port,
     Vertex,
 )
 from .relations import EdgeRel

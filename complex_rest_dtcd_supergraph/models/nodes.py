@@ -43,18 +43,9 @@ class Port(AbstractPrimitive):
     An output port connects to an input port via the edge relationship.
     """
 
-    # TODO rel back to parent vertex?
     neighbor = Relationship(
         "Port", RELATION_TYPES.edge, cardinality=ZeroOrOne, model=EdgeRel
     )
-
-
-class InputPort(Port):
-    pass
-
-
-class OutputPort(Port):
-    pass
 
 
 class Vertex(AbstractPrimitive):
@@ -65,8 +56,6 @@ class Vertex(AbstractPrimitive):
 
     # TODO explicit input and output ports?
     ports = Relationship(Port, RELATION_TYPES.default)
-    input_ports = Relationship(InputPort, RELATION_TYPES.default)
-    output_ports = Relationship(OutputPort, RELATION_TYPES.default)
 
     def delete(self, cascade=True):
         """Delete this vertex.
