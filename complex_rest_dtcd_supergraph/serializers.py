@@ -49,6 +49,7 @@ class ContentSerializer(serializers.Serializer):
         src_port=KEYS.source_port,
         tgt_port=KEYS.target_port,
         parent_id=KEYS.parent_id,
+        init_ports=KEYS.init_ports,
     )
 
     nodes = serializers.ListField(child=VertexField(), allow_empty=False)
@@ -100,18 +101,28 @@ class ContentSerializer(serializers.Serializer):
         return data
 
     def _validate_references(self, data: dict):
-        # for each edge, make sure referred nodes really exist
         nodes = data["nodes"]
-        node_ids = set(map(itemgetter(self.keys.id), nodes))
         edges = data["edges"]
 
+        # for each edge, make sure referred nodes really exist
+        node_ids = set(map(itemgetter(self.keys.id), nodes))
         for id_ in chain.from_iterable(
             map(itemgetter(self.keys.src_node, self.keys.tgt_node), edges)
         ):
             if id_ not in node_ids:
                 self.fail("does_not_exist", value=id_)
 
-        # TODO make sure ports exist
+        # for each edge, make sure referred ports really exist
+        port_ids = set()
+        for node in nodes:
+            for port in node.get(self.keys.init_ports, []):
+                port_ids.add(port.get(self.keys.id))
+
+        for id_ in chain.from_iterable(
+            map(itemgetter(self.keys.src_port, self.keys.tgt_port), edges)
+        ):
+            if id_ not in port_ids:
+                self.fail("does_not_exist", value=id_)
 
     def _validate_parent_groups_exist(self, data: dict):
         # make sure parent groups exist for vertices and groups
