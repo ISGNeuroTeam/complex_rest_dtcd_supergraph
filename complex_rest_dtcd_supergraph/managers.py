@@ -110,7 +110,7 @@ class Writer:
             for port in vertex.ports.all():
                 uid2node[port.uid] = port
 
-        for group in vertex.groups.all():
+        for group in self._fragment.groups.all():
             uid2node[group.uid] = group
 
         new_uids = set(
@@ -135,7 +135,7 @@ class Writer:
 
         neomodel.db.cypher_query(
             query=(
-                "UNWIND $list AS pair"
+                "UNWIND $list AS pair "
                 "MATCH (:OutputPort {uid: pair[0]}) -[r:EDGE]-> (:InputPort {uid: pair[1]}) "
                 "DELETE r"
             ),

@@ -107,7 +107,7 @@ class FragmentGraphView(APIView):
 
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        new_content = self.converter.to_content(serializer.data)
+        new_content = self.converter.to_content(serializer.data["graph"])
         fragment = get_node_or_404(Fragment, uid=pk.hex)
         self.manager.replace(fragment, new_content)
 

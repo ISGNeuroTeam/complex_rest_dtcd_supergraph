@@ -24,7 +24,7 @@ class Primitive:
     # TODO ABC?
     uid: ID
     properties: MutableMapping[str, Any] = field(default_factory=dict)
-    meta: MutableMapping[str, Any] = field(default_factory=dict, repr=False)
+    meta: MutableMapping[str, Any] = field(default_factory=dict)
 
 
 @dataclass
