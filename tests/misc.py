@@ -29,6 +29,9 @@ def sort_payload(data: dict) -> None:
             KEYS.target_port,
         ),
     )
+    data[KEYS.groups] = sorted(
+        data.get(KEYS.groups, []), key=itemgetter(KEYS.yfiles_id)
+    )
 
 
 def load_data(path) -> dict:
