@@ -133,7 +133,7 @@ class Writer:
         neomodel.db.cypher_query(
             query=(
                 "UNWIND $list AS pair "
-                "MATCH (:OutputPort {uid: pair[0]}) -[r:EDGE]-> (:InputPort {uid: pair[1]}) "
+                "MATCH ({uid: pair[0]}) -[r:EDGE]-> ({uid: pair[1]}) "
                 "DELETE r"
             ),
             params={"list": list(deprecated_uids)},
