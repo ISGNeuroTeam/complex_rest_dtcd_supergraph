@@ -123,7 +123,7 @@ class Fragment(StructuredNode):
             f"MATCH (f) WHERE id(f)={self.id} "
             "MATCH (f) -- (:Vertex) "
             f"  -- (src:Port) -[e:{RELATION_TYPES.edge}]-> (dst:Port) "
-            "  -- (:Vertex) -- (f) "
+            "MATCH (dst)  -- (:Vertex) -- (f) "
             "RETURN src, e, dst"
         )
         results, _ = db.cypher_query(q, resolve_objects=True)
