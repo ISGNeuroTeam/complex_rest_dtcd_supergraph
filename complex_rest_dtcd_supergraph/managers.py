@@ -44,7 +44,6 @@ class Reader:
 
     @staticmethod
     def _to_primitive(node, subclass):
-        # TODO move it somewhere else?
         uid = node.uid
         properties = free_properties(node)
         meta = node.meta_
@@ -64,9 +63,7 @@ class Reader:
         self._foreign_key_mapping.clear()
 
         # step 1 - get the insides
-        # TODO a lot of queries
         vertices = fragment.vertices.all()
-        # TODO mention somehow that order matters here!
         ports = self._query_ports(vertices)
         edges = self._query_edges(fragment)
         groups = fragment.groups.all()
