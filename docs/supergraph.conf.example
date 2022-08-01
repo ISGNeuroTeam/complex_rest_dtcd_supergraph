@@ -5,7 +5,6 @@ level = INFO
 protocol = bolt
 address = localhost
 port = 7687
-uri = bolt://localhost:7687
 user = neo4j
 password = password
 # set name to empty to preserve compatibility with Neo4j 3.x

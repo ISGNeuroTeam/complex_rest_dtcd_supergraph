@@ -1,4 +1,0 @@
-# packages from PyPI
-neo4j-driver==4.3.6
-neomodel==4.0.8
-py2neo==2021.2.3
