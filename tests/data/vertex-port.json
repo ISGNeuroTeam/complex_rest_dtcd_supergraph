@@ -1,0 +1,38 @@
+{
+	"nodes": [
+		{
+			"primitiveID": "amy",
+			"initPorts": [
+				{
+					"primitiveID": "mobile",
+					"field-meta": "out",
+					"properties": {
+						"value-array-of-strings": {
+							"status": "online",
+							"value": [
+								"arock@corp.org",
+								"amy.rock@mail.com"
+							]
+						},
+						"bad-value0": {
+							"value": [
+								{
+									"id": 1
+								}
+							]
+						},
+						"bad-value1": {
+							"value": [
+								42,
+								"string",
+								true
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"edges": [],
+	"groups": []
+}

@@ -1,0 +1,21 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "parentID": "g1"
+        },
+        {
+            "primitiveID": "bob"
+        }
+    ],
+    "edges": [],
+    "groups": [
+        {
+            "primitiveID": "g1",
+            "parentID": "g2"
+        },
+        {
+            "primitiveID": "g2"
+        }
+    ]
+}

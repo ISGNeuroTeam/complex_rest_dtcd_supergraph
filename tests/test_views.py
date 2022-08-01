@@ -15,6 +15,9 @@ DATA_DIR = TEST_DIR / "data"
 URL_RESET = reverse("supergraph:reset")  # post here resets the db
 CLIENT = Client()
 
+# DEBUG
+filepath = "debug.txt"
+
 
 def reset_db():
     neomodel.clear_neo4j_database(neomodel.db)
@@ -111,7 +114,20 @@ class GraphEndpointTestCaseMixin:
         self.merge(graph)
         fromdb = self.retrieve()
         sort_payload(fromdb)
-        self.assertEqual(fromdb, graph)
+        try:
+            self.assertEqual(fromdb, graph)
+        except Exception:
+            from pprint import pformat
+            import dictdiffer
+
+            diff = dictdiffer.diff(graph, fromdb)
+            diff = list(diff)
+            msg = pformat(diff, depth=4, compact=True)
+            msg = "Graphs do not match. Difference:\n" + msg
+            with open(filepath, "w") as f:
+                f.write(msg)
+
+            raise
 
     def assert_merge_retrieve_eq_from_json(self, path):
         data = load_data(path)
@@ -188,30 +204,65 @@ class TestRootGraphView(
         self.assert_merge_retrieve_eq_from_json(new_path)
 
 
-@unittest.skip("not implemented")
+# TODO initial write
+# TODO re-writing the same fragment
+# TODO 2 fragments ops
+# TODO merge
+# TODO root interaction
 class TestFragmentGraphView(
     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
 ):
     def setUp(self):
         super().setUp()
 
-        # create a fragment
-        r = self.client.post(
-            TestFragmentListView.url, data={"name": "marketing"}, format="json"
+        # default fragment
+        response = self.client.post(
+            TestFragmentListView.url,
+            data={"name": "sales"},
+            format="json",
         )
-        id_ = r.data["fragment"]["id"]
-        self.url = reverse("supergraph:fragment-graph", args=(id_,))
+        self.fragment = response.data["fragment"]
+        self.pk = self.fragment["id"]
+        self.url = reverse("supergraph:fragment-graph", args=(self.pk,))
 
+    def test_vertex(self):
+        path = DATA_DIR / "vertex.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_vertex_port(self):
+        path = DATA_DIR / "vertex-port.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_2vertices_1edge(self):
+        path = DATA_DIR / "2v-1e.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_2vertices_2groups(self):
+        path = DATA_DIR / "2v-2g.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_basic(self):
+        path = DATA_DIR / "basic.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    @unittest.expectedFailure
+    def test_sample(self):
+        path = DATA_DIR / "sample.json"
+        self.assert_merge_retrieve_eq_from_json(path)
+
+    @unittest.skip("not implemented")
     @tag("slow")
     def test_n25_e25(self):
         path = DATA_DIR / "n25_e25.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
+    @unittest.skip("not implemented")
     @tag("slow")
     def test_n50_e25(self):
         path = DATA_DIR / "n50_e25.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
+    @unittest.skip("not implemented")
     @tag("slow")
     def test_n25_then_n50(self):
         old = load_data(DATA_DIR / "n25_e25.json")
@@ -219,6 +270,7 @@ class TestFragmentGraphView(
         new_path = DATA_DIR / "n50_e25.json"
         self.assert_merge_retrieve_eq_from_json(new_path)
 
+    @unittest.skip("not implemented")
     def test_basic_groups(self):
         path = DATA_DIR / "basic-groups.json"
         self.assert_merge_retrieve_eq_from_json(path)

@@ -1,0 +1,30 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "field-meta": "Amy Rock",
+            "properties": {
+                "meta&value-num": {
+                    "type": "cm",
+                    "value": 167
+                },
+                "value-string": {
+                    "value": "spam"
+                },
+                "empty-value": {
+                    "type": "ham"
+                },
+                "bad-value": {
+                    "expression": "ml.recommendations (bob)",
+                    "value": [
+                        {
+                            "id": 1
+                        }
+                    ]
+                }
+            }
+        }
+    ],
+    "edges": [],
+    "groups": []
+}
