@@ -81,3 +81,16 @@ class Content:
     ports: MutableSequence[Port]
     edges: MutableSequence[Edge]
     groups: MutableSequence[Group]
+
+    @property
+    def info(self):
+        """Print basic statistics about the content."""
+
+        return ", ".join(
+            (
+                f"{len(self.vertices)} vertices",
+                f"{len(self.ports)} ports",
+                f"{len(self.edges)} edges",
+                f"{len(self.groups)} groups",
+            )
+        )

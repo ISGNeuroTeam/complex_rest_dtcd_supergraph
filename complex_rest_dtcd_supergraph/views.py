@@ -97,6 +97,7 @@ class FragmentGraphView(APIView):
 
         fragment = get_node_or_404(Fragment, uid=pk.hex)
         content = self.manager.read(fragment)
+        logger.info("Queried content: " + content.info)
         payload = self.converter.to_data(content)
         serializer = ContentSerializer(instance=payload)
 
@@ -108,6 +109,7 @@ class FragmentGraphView(APIView):
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_content = self.converter.to_content(serializer.data["graph"])
+        logger.info("Converted to content: " + new_content.info)
         fragment = get_node_or_404(Fragment, uid=pk.hex)
         self.manager.replace(fragment, new_content)
 
@@ -153,6 +155,6 @@ class ResetNeo4j(APIView):
     def post(self, request, *args, **kwargs):
         """Delete all nodes and relationships from Neo4j database."""
 
-        neomodel.clear_neo4j_database(neomodel.db)  # TODO constraints? indexes?
+        neomodel.clear_neo4j_database(neomodel.db)
 
         return SuccessResponse()
