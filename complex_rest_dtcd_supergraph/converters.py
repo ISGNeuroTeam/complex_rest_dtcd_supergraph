@@ -50,9 +50,13 @@ class GraphDataConverter:
     def _from_vertex(self, vertex: Vertex, id2port: dict):
         data = deepcopy(vertex.meta)
         data[KEYS.yfiles_id] = vertex.uid
-        self._restore_properties(data.get(KEYS.properties, {}), vertex.properties)
+
+        if KEYS.properties in data:
+            self._restore_properties(data[KEYS.properties], vertex.properties)
+
         ports = [id2port[port_id] for port_id in vertex.ports]
-        data[KEYS.init_ports] = ports
+        if ports:
+            data[KEYS.init_ports] = ports
 
         return data
 
@@ -66,7 +70,9 @@ class GraphDataConverter:
     def _from_port(self, port: Port):
         data = deepcopy(port.meta)
         data[KEYS.yfiles_id] = port.uid
-        self._restore_properties(data.get(KEYS.properties, {}), port.properties)
+
+        if KEYS.properties in data:
+            self._restore_properties(data[KEYS.properties], port.properties)
 
         return data
 

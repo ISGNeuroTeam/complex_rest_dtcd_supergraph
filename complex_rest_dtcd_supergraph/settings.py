@@ -25,7 +25,6 @@ default_ini_config = {
 # main config
 config_parser = configparser.ConfigParser(allow_no_value=True)
 config_parser.read(PROJECT_DIR / "supergraph.conf")
-# FIXME option false in config gets converted from 'false' to True
 ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
 
 KEYS = SimpleNamespace()

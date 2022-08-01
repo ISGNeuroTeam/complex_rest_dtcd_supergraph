@@ -7,7 +7,7 @@ and isolate details and complexity.
 
 from collections import defaultdict
 from itertools import chain
-from typing import Dict, Iterable, List, Mapping, Tuple
+from typing import Iterable, List, Mapping
 
 import neomodel
 
@@ -32,16 +32,6 @@ class _Reader:
 
         return ports
 
-    def _query_edges(
-        self,
-        fragment: models.Fragment,
-    ) -> Dict[Tuple[structures.ID, structures.ID], models.EdgeRel]:
-
-        return {
-            (output_port.uid, input_port.uid): edge
-            for output_port, edge, input_port in fragment.edges
-        }
-
     @staticmethod
     def _to_primitive(node, subclass):
         uid = node.uid
@@ -65,15 +55,15 @@ class _Reader:
         # step 1 - get the insides
         vertices = fragment.vertices.all()
         ports = self._query_ports(vertices)
-        edges = self._query_edges(fragment)
+        edges = fragment.edges
         groups = fragment.groups.all()
 
         # step 2 - map to content
         vertices = [self._to_vertex(node) for node in vertices]
         ports = [self._to_primitive(node, structures.Port) for node in ports]
         edges = [
-            structures.Edge(start=op_uid, end=ip_uid, meta=edge.meta_)
-            for (op_uid, ip_uid), edge in edges.items()
+            structures.Edge(start=start.uid, end=end.uid, meta=edge.meta_)
+            for (start, edge, end) in edges
         ]
         groups = [self._to_primitive(node, structures.Group) for node in groups]
 
@@ -150,14 +140,6 @@ class _Deprecator:
 class _Merger:
     """Merges content entities into the fragment."""
 
-    def __init__(self):
-        self._fragment = None
-        self._content = None
-        self._uid2port = None  # mapping of ID to merged ports
-        # merged nodes
-        self._vertices = None
-        self._groups = None
-
     @staticmethod
     def _merge_ports(ports: Iterable[structures.Port]):
         data = [
@@ -176,9 +158,9 @@ class _Merger:
         for edge in edges:
             output_port = uid2port[edge.start]
             input_port = uid2port[edge.end]
-            rel = connect_if_not_connected(
-                output_port.neighbor, input_port, {"meta_": edge.meta}
-            )
+            rel = connect_if_not_connected(output_port.neighbor, input_port)
+            rel.meta_ = edge.meta  # over-write metadata
+            rel.save()
             relations.append(rel)
 
         return relations
