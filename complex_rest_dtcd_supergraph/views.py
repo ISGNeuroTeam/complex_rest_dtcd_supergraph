@@ -75,6 +75,7 @@ class FragmentDetailView(APIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
+    @neomodel.db.transaction
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete a fragment and its content."""
 
@@ -92,6 +93,7 @@ class FragmentGraphView(APIView):
     manager = Manager()
     converter = GraphDataConverter()
 
+    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Read graph content of a fragment with the given id."""
 
@@ -103,6 +105,7 @@ class FragmentGraphView(APIView):
 
         return SuccessResponse(data={"graph": serializer.data})
 
+    @neomodel.db.transaction
     def put(self, request: Request, pk: uuid.UUID):
         """Replace graph content of a fragment with given id."""
 
@@ -115,6 +118,7 @@ class FragmentGraphView(APIView):
 
         return SuccessResponse()
 
+    @neomodel.db.transaction
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete graph content of a fragment with the given id."""
 
