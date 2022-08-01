@@ -16,7 +16,7 @@ from . import structures
 from .utils import connect_if_not_connected, free_properties
 
 
-class Reader:
+class _Reader:
     """Read operations on a fragment."""
 
     def __init__(self) -> None:
@@ -85,7 +85,7 @@ class Reader:
         )
 
 
-class Deprecator:
+class _Deprecator:
     """Deletes deprecated content of a fragment."""
 
     @staticmethod
@@ -147,7 +147,7 @@ class Deprecator:
         self._delete_deprecated_edges(fragment, content)
 
 
-class Merger:
+class _Merger:
     """Merges content entities into the fragment."""
 
     def __init__(self):
@@ -236,12 +236,12 @@ class Merger:
         self._reconnect_to_fragment(fragment, vertices, groups)
 
 
-class Writer:
+class _Writer:
     """Write operations on a fragment."""
 
     def __init__(self):
-        self._deprecator = Deprecator()
-        self._merger = Merger()
+        self._deprecator = _Deprecator()
+        self._merger = _Merger()
 
     def replace(self, fragment: models.Fragment, content: structures.Content):
         """Replace the content of a given fragment."""
@@ -257,8 +257,8 @@ class Manager:
     """Handles read and write operations on fragment's content."""
 
     def __init__(self) -> None:
-        self._reader = Reader()
-        self._writer = Writer()
+        self._reader = _Reader()
+        self._writer = _Writer()
 
     def read(self, fragment: models.Fragment):
         """Return the content of a given fragment."""
