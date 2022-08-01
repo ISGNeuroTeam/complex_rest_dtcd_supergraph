@@ -13,7 +13,6 @@ from neomodel import (
     StringProperty,
     StructuredNode,
     UniqueIdProperty,
-    ZeroOrOne,
 )
 from neomodel.contrib import SemiStructuredNode
 
@@ -46,9 +45,7 @@ class Port(AbstractPrimitive):
     An output port connects to an input port via the edge relationship.
     """
 
-    neighbor = Relationship(
-        "Port", RELATION_TYPES.edge, cardinality=ZeroOrOne, model=EdgeRel
-    )
+    neighbor = Relationship("Port", RELATION_TYPES.edge, model=EdgeRel)
 
 
 class Vertex(AbstractPrimitive):
