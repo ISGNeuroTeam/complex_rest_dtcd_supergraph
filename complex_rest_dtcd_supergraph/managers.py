@@ -13,6 +13,7 @@ import neomodel
 
 from . import models
 from . import structures
+from .models.relations import RELATION_TYPES
 from .utils import connect_if_not_connected, free_properties
 
 
@@ -124,7 +125,9 @@ class _Deprecator:
         neomodel.db.cypher_query(
             query=(
                 "UNWIND $list AS pair "
-                "MATCH ({uid: pair[0]}) -[r:EDGE]-> ({uid: pair[1]}) "
+                "MATCH ({uid: pair[0]}) "
+                f" -[r:{RELATION_TYPES.edge}]-> "
+                "({uid: pair[1]}) "
                 "DELETE r"
             ),
             params={"list": list(deprecated_uids)},
