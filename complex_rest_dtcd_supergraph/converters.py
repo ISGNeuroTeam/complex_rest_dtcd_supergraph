@@ -30,7 +30,8 @@ class GraphDataConverter:
     @staticmethod
     def _restore_properties(original: dict, properties: dict):
         for name, value in properties.items():
-            original[name][KEYS.value] = value
+            if name in original:  # FIXME handle this elsewhere
+                original[name][KEYS.value] = value
 
     @staticmethod
     def _get_ports(nodes: Iterable[dict]):
@@ -51,6 +52,7 @@ class GraphDataConverter:
         data = deepcopy(vertex.meta)
         data[KEYS.yfiles_id] = vertex.uid
 
+        # FIXME better way to handle stale properties on nodes?
         if KEYS.properties in data:
             self._restore_properties(data[KEYS.properties], vertex.properties)
 
