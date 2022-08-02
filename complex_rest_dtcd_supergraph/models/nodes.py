@@ -119,7 +119,7 @@ class Container(StructuredNode):
             f"MATCH (this) WHERE id(this)={self.id} "
             "MATCH (this) -- (:Vertex) "
             f"  -- (src:Port) -[r:{RELATION_TYPES.edge}]-> (dst:Port) "
-            "MATCH (dst)  -- (:Vertex) -- (f) "
+            "MATCH (dst)  -- (:Vertex) -- (this) "
             "RETURN src, r, dst"
         )
         results, _ = db.cypher_query(q, resolve_objects=True)

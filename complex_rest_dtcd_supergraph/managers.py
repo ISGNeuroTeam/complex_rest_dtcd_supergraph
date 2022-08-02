@@ -145,7 +145,7 @@ class _Deprecator:
                 "({uid: pair[1]}) "
                 "DELETE r"
             ),
-            params={"list": list(deprecated_uids)},
+            params={"list": list(map(list, deprecated_uids))},
         )
 
     def delete_difference(
