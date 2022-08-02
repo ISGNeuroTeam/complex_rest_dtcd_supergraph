@@ -6,8 +6,9 @@ and isolate details and complexity.
 """
 
 from collections import defaultdict
+from dataclasses import dataclass
 from itertools import chain
-from typing import Iterable, List, Mapping
+from typing import Iterable, List, Mapping, Sequence
 
 import neomodel
 
@@ -15,6 +16,20 @@ from . import models
 from . import structures
 from .models.relations import RELATION_TYPES
 from .utils import connect_if_not_connected, free_properties
+
+
+def reconnect_to_container(
+    container: models.Container,
+    vertices: Iterable[models.Vertex],
+    groups: Iterable[models.Group],
+):
+    """Reconnect merged entities to parent container."""
+
+    for vertex in vertices:
+        connect_if_not_connected(container.vertices, vertex)
+
+    for group in groups:
+        connect_if_not_connected(container.groups, group)
 
 
 class _Reader:
@@ -143,10 +158,17 @@ class _Deprecator:
 
 
 class _Merger:
-    """Merges content entities into the container."""
+    """Merges content entities."""
 
-    # TODO dataclass MergedResult
-    # TODO separate re-connection from merging
+    @dataclass(frozen=True)
+    class MergedResult:
+        """Lightweight container for merged entities."""
+
+        __slots__ = ["vertices", "ports", "edges", "groups"]
+        vertices: Sequence[models.Vertex]
+        ports: Sequence[models.Port]
+        edges: Sequence[models.EdgeRel]
+        groups: Sequence[models.Group]
 
     @staticmethod
     def _merge_ports(ports: Iterable[structures.Port]):
@@ -200,47 +222,21 @@ class _Merger:
 
         return models.Group.create_or_update(*data, lazy=True)
 
-    @staticmethod
-    def _reconnect_to_container(
-        container: models.Container,
-        vertices: Iterable[models.Vertex],
-        groups: Iterable[models.Group],
-    ):
-        """Reconnect merged entities to parent container."""
-
-        for vertex in vertices:
-            connect_if_not_connected(container.vertices, vertex)
-
-        for group in groups:
-            connect_if_not_connected(container.groups, group)
-
-    def merge(self, container: models.Container, content: structures.Content):
+    def merge(self, content: structures.Content):
         """Merge content entities."""
 
         ports = self._merge_ports(content.ports)
         uid2port = {port.uid: port for port in ports}
-        self._merge_edges(content.edges, uid2port)
+        edges = self._merge_edges(content.edges, uid2port)
         vertices = self._merge_vertices(content.vertices, uid2port)
         groups = self._merge_groups(content.groups)
 
-        self._reconnect_to_container(container, vertices, groups)
-
-
-class _Writer:
-    """Write operations on a container."""
-
-    def __init__(self):
-        self._deprecator = _Deprecator()
-        self._merger = _Merger()
-
-    def replace(self, container: models.Container, content: structures.Content):
-        """Replace the content of a given container."""
-
-        # content pre-conditions (referential integrity within the content):
-        # - for each edge, start (output) & end (input) ports exist in content
-        # - for each vertex, all ports exist in content
-        self._deprecator.delete_difference(container, content)
-        self._merger.merge(container, content)
+        return self.MergedResult(
+            vertices=vertices,
+            ports=ports,
+            edges=edges,
+            groups=groups,
+        )
 
 
 class Manager:
@@ -248,7 +244,8 @@ class Manager:
 
     def __init__(self) -> None:
         self._reader = _Reader()
-        self._writer = _Writer()
+        self._deprecator = _Deprecator()
+        self._merger = _Merger()
 
     def read(self, container: models.Container):
         """Return the content of a given container."""
@@ -258,12 +255,14 @@ class Manager:
     def replace(self, container: models.Container, content: structures.Content):
         """Replace the content of a given container."""
 
-        return self._writer.replace(container, content)
+        # content pre-conditions (referential integrity within the content):
+        # - for each edge, start (output) & end (input) ports exist in content
+        # - for each vertex, all ports exist in content
+        self._deprecator.delete_difference(container, content)
+        result = self._merger.merge(content)  # TODO does not replace old properties
+        reconnect_to_container(container, result.vertices, result.groups)
 
     def reconnect(self, parent: models.Container, child: models.Container):
         """Reconnect the content of a child container to parent."""
 
-        # FIXME this knows about writer's guts - refactor!
-        self._writer._merger._reconnect_to_container(
-            parent, child.vertices, child.groups
-        )
+        reconnect_to_container(parent, child.vertices, child.groups)
