@@ -24,6 +24,15 @@ from .utils import get_node_or_404
 logger = logging.getLogger("supergraph")
 
 
+def get_root_then_fragment_or_404(
+    root_pk: uuid.UUID, fragment_pk: uuid.UUID
+) -> Fragment:
+    root = get_node_or_404(Root.nodes, uid=root_pk.hex)
+    fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
+
+    return fragment
+
+
 class RootListView(APIView):
     """List existing roots or create a new one."""
 
@@ -103,16 +112,16 @@ class RootFragmentListView(APIView):
 
         return SuccessResponse({"fragments": serializer.data})
 
+    @neomodel.db.transaction
     def post(self, request: Request, pk: uuid.UUID):
         """Create a new fragment for this root."""
 
+        root = get_node_or_404(Root.nodes, uid=pk.hex)
         # create a fragment
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         fragment = serializer.save()
-
         # connect root to this fragment
-        root = get_node_or_404(Root.nodes, uid=pk.hex)
         root.fragments.connect(fragment)
 
         return SuccessResponse(
@@ -128,27 +137,20 @@ class RootFragmentDetailView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
-    @staticmethod
-    def get_root_fragment_or_404(
-        root_pk: uuid.UUID, fragment_pk: uuid.UUID
-    ) -> Fragment:
-        root = get_node_or_404(Root.nodes, uid=root_pk.hex)
-        fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
-
-        return fragment
-
+    @neomodel.db.transaction
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Return root's fragment."""
 
-        fragment = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        fragment = get_root_then_fragment_or_404(root_pk, fragment_pk)
         serializer = self.serializer_class(fragment)
 
         return SuccessResponse({"fragment": serializer.data})
 
+    @neomodel.db.transaction
     def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Update this root's fragment."""
 
-        old = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        old = get_root_then_fragment_or_404(root_pk, fragment_pk)
         serializer = self.serializer_class(old, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -159,7 +161,7 @@ class RootFragmentDetailView(APIView):
     def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Delete this root's fragment and its content."""
 
-        fragment = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        fragment = get_root_then_fragment_or_404(root_pk, fragment_pk)
         fragment.delete(cascade=True)
 
         return SuccessResponse()
@@ -173,20 +175,11 @@ class RootFragmentGraphView(APIView):
     converter = GraphDataConverter()
     manager = Manager()
 
-    @staticmethod
-    def get_root_fragment_or_404(
-        root_pk: uuid.UUID, fragment_pk: uuid.UUID
-    ) -> Fragment:
-        root = get_node_or_404(Root.nodes, uid=root_pk.hex)
-        fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
-
-        return fragment
-
     @neomodel.db.transaction
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Read graph content of the given root's fragment."""
 
-        fragment = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        fragment = get_root_then_fragment_or_404(root_pk, fragment_pk)
         content = self.manager.read(fragment)
         logger.info("Queried content: " + content.info)
         payload = self.converter.to_data(content)
@@ -218,7 +211,7 @@ class RootFragmentGraphView(APIView):
     def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Delete graph content this root's fragment."""
 
-        fragment = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        fragment = get_root_then_fragment_or_404(root_pk, fragment_pk)
         fragment.clear()
 
         return SuccessResponse()
@@ -333,7 +326,7 @@ class GraphView(APIView):
         return SuccessResponse()
 
 
-class ResetNeo4j(APIView):
+class ResetNeo4jView(APIView):
     """A view to reset Neo4j database."""
 
     http_method_names = ["post"]

@@ -1,13 +1,13 @@
 from django.urls import path
 
 from .views import (
-    GraphView,
     FragmentDetailView,
     FragmentListView,
-    ResetNeo4j,
+    GraphView,
+    ResetNeo4jView,
     RootDetailView,
-    RootFragmentGraphView,
     RootFragmentDetailView,
+    RootFragmentGraphView,
     RootFragmentListView,
     RootListView,
 )
@@ -15,8 +15,11 @@ from .views import (
 
 app_name = "supergraph"
 urlpatterns = [
+    # root management
     path("roots", RootListView.as_view(), name="roots"),
     path("roots/<uuid:pk>", RootDetailView.as_view(), name="root-detail"),
+    path("roots/<uuid:pk>/graph", GraphView.as_view(), name="root-graph"),
+    # root fragments
     path(
         "roots/<uuid:pk>/fragments",
         RootFragmentListView.as_view(),
@@ -32,9 +35,10 @@ urlpatterns = [
         RootFragmentGraphView.as_view(),
         name="root-fragment-graph",
     ),
-    path("roots/<uuid:pk>/graph", GraphView.as_view(), name="root-graph"),
+    # fragment management
     path("fragments", FragmentListView.as_view(), name="fragments"),
     path("fragments/<uuid:pk>", FragmentDetailView.as_view(), name="fragment-detail"),
     path("fragments/<uuid:pk>/graph", GraphView.as_view(), name="fragment-graph"),
-    path("reset", ResetNeo4j.as_view(), name="reset"),
+    # services
+    path("reset", ResetNeo4jView.as_view(), name="reset"),
 ]
