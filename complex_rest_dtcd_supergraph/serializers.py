@@ -25,14 +25,14 @@ class ContainerSerializer(serializers.Serializer):
 
         return self.container_class(**validated_data).save()
 
-    def update(self, instance, validated_data: dict):
+    def update(self, instance: container_class, validated_data: dict):
         """Update the instance in the database."""
 
         instance.name = validated_data["name"]
 
         return instance.save()
 
-    def save(self, **kwargs):
+    def save(self, **kwargs) -> container_class:
         """Create or update an instance in the database."""
 
         return super().save(**kwargs)

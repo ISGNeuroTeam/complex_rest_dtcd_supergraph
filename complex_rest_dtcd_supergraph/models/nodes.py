@@ -138,7 +138,7 @@ class Fragment(Container):
 
 class Root(Container):
     """A root is a collection of fragments and content.
-    
+
     Roots partition global Neo4j graph into non-overlapping subgraphs."""
 
     fragments = RelationshipTo(Fragment, RELATION_TYPES.contains)

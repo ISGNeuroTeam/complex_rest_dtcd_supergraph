@@ -3,7 +3,7 @@ This module provides custom utility functions.
 """
 
 import uuid
-from typing import Sequence
+from typing import Sequence, Union
 
 import neomodel
 from neomodel import contrib
@@ -32,15 +32,15 @@ class HexUUIDConverter:
 # shortcuts for working with Neomodel
 # a la https://docs.djangoproject.com/en/4.0/topics/http/shortcuts/
 def get_node_or_404(
-    model: neomodel.StructuredNode, lazy=False, **kwargs
+    queryset: Union[neomodel.NodeSet, neomodel.RelationshipManager], **kwargs
 ) -> neomodel.StructuredNode:
-    """Call `.nodes.get()` on a given node.
+    """Call `.get()` on a given node set or relationship manager.
 
     Raises `rest_framework.exceptions.NotFound` if a node is missing.
     """
 
     try:
-        return model.nodes.get(lazy=lazy, **kwargs)
+        return queryset.get(**kwargs)
     except neomodel.DoesNotExist:
         raise NotFound
 

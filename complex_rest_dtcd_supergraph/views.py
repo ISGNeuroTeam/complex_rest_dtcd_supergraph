@@ -62,7 +62,7 @@ class RootDetailView(APIView):
     def get(self, request: Request, pk: uuid.UUID):
         """Return a root."""
 
-        root = get_node_or_404(Root, uid=pk.hex)
+        root = get_node_or_404(Root.nodes, uid=pk.hex)
         serializer = self.serializer_class(root)
 
         return SuccessResponse({"root": serializer.data})
@@ -70,7 +70,7 @@ class RootDetailView(APIView):
     def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
-        old = get_node_or_404(Root, uid=pk.hex)
+        old = get_node_or_404(Root.nodes, uid=pk.hex)
         serializer = self.serializer_class(old, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -81,8 +81,86 @@ class RootDetailView(APIView):
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete a fragment and its content."""
 
-        root = get_node_or_404(Root, uid=pk.hex)
+        root = get_node_or_404(Root.nodes, uid=pk.hex)
         root.delete()
+
+        return SuccessResponse()
+
+
+class RootFragmentListView(APIView):
+    """List existing fragments of a root or create a new one."""
+
+    http_method_names = ["get", "post"]
+    permission_classes = (AllowAny,)
+    serializer_class = FragmentSerializer
+
+    def get(self, request: Request, pk: uuid.UUID):
+        """Read a list of root's fragments."""
+
+        root = get_node_or_404(Root.nodes, uid=pk.hex)
+        fragments = list(root.fragments.all())
+        serializer = self.serializer_class(fragments, many=True)
+
+        return SuccessResponse({"fragments": serializer.data})
+
+    def post(self, request: Request, pk: uuid.UUID):
+        """Create a new fragment for this root."""
+
+        # create a fragment
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        fragment = serializer.save()
+
+        # connect root to this fragment
+        root = get_node_or_404(Root.nodes, uid=pk.hex)
+        root.fragments.connect(fragment)
+
+        return SuccessResponse(
+            data={"fragment": serializer.data},
+            http_status=status.HTTP_201_CREATED,
+        )
+
+
+class RootFragmentDetailView(APIView):
+    """Retrieve, update or delete this root's fragment."""
+
+    http_method_names = ["get", "put", "delete"]
+    permission_classes = (AllowAny,)
+    serializer_class = FragmentSerializer
+
+    @staticmethod
+    def get_root_fragment_or_404(
+        root_pk: uuid.UUID, fragment_pk: uuid.UUID
+    ) -> Fragment:
+        root = get_node_or_404(Root.nodes, uid=root_pk.hex)
+        fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
+
+        return fragment
+
+    def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
+        """Return root's fragment."""
+
+        fragment = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        serializer = self.serializer_class(fragment)
+
+        return SuccessResponse({"fragment": serializer.data})
+
+    def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
+        """Update this root's fragment."""
+
+        old = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        serializer = self.serializer_class(old, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return SuccessResponse({"fragment": serializer.data})
+
+    @neomodel.db.transaction
+    def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
+        """Delete this root's fragment and its content."""
+
+        fragment = self.get_root_fragment_or_404(root_pk, fragment_pk)
+        fragment.delete(cascade=True)
 
         return SuccessResponse()
 
@@ -128,7 +206,7 @@ class FragmentDetailView(APIView):
         """Return a fragment."""
 
         # Neo4j generates and stored uuid in hex format
-        fragment = get_node_or_404(Fragment, uid=pk.hex)
+        fragment = get_node_or_404(Fragment.nodes, uid=pk.hex)
         serializer = self.serializer_class(fragment)
 
         return SuccessResponse({"fragment": serializer.data})
@@ -136,7 +214,7 @@ class FragmentDetailView(APIView):
     def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
-        old = get_node_or_404(Fragment, uid=pk.hex)
+        old = get_node_or_404(Fragment.nodes, uid=pk.hex)
         serializer = self.serializer_class(old, data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -147,7 +225,7 @@ class FragmentDetailView(APIView):
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete a fragment and its content."""
 
-        fragment = get_node_or_404(Fragment, uid=pk.hex)
+        fragment = get_node_or_404(Fragment.nodes, uid=pk.hex)
         fragment.delete(cascade=True)
 
         return SuccessResponse()
@@ -165,7 +243,7 @@ class ContainerView(APIView):
     def get(self, request: Request, pk: uuid.UUID):
         """Read graph content of a container with the given id."""
 
-        container = get_node_or_404(Container, uid=pk.hex)
+        container = get_node_or_404(Container.nodes, uid=pk.hex)
         content = self.manager.read(container)
         logger.info("Queried content: " + content.info)
         payload = self.converter.to_data(content)
@@ -181,7 +259,7 @@ class ContainerView(APIView):
         serializer.is_valid(raise_exception=True)
         new_content = self.converter.to_content(serializer.data["graph"])
         logger.info("Converted to content: " + new_content.info)
-        container = get_node_or_404(Container, uid=pk.hex)
+        container = get_node_or_404(Container.nodes, uid=pk.hex)
         self.manager.replace(container, new_content)
 
         return SuccessResponse()
@@ -190,7 +268,7 @@ class ContainerView(APIView):
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete graph content of a container with the given id."""
 
-        container = get_node_or_404(Container, uid=pk.hex)
+        container = get_node_or_404(Container.nodes, uid=pk.hex)
         container.clear()
 
         return SuccessResponse()

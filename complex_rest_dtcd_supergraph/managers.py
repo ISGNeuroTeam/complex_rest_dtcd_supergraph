@@ -133,7 +133,9 @@ class _Deprecator:
             params={"list": list(deprecated_uids)},
         )
 
-    def delete_difference(self, container: models.Container, content: structures.Content):
+    def delete_difference(
+        self, container: models.Container, content: structures.Content
+    ):
         """Delete entities from the container that are not in the content."""
 
         self._delete_deprecated_vertices_groups_ports(container, content)
