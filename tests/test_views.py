@@ -134,74 +134,74 @@ class GraphEndpointTestCaseMixin:
         self.assert_merge_retrieve_eq(data)
 
 
-@unittest.skip("not implemented")
-@tag("neo4j")
-class TestRootGraphView(
-    GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
-):
-    url = reverse("supergraph:root-graph")
+# @unittest.skip("not implemented")
+# @tag("neo4j")
+# class TestRootGraphView(
+#     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
+# ):
+#     url = reverse("supergraph:root-graph")
 
-    def test_get_empty(self):
-        r = self.client.get(self.url)
-        self.assertEqual(r.status_code, status.HTTP_200_OK)
-        graph = r.data["graph"]
-        self.assertEqual(graph, {"nodes": [], "edges": []})
+#     def test_get_empty(self):
+#         r = self.client.get(self.url)
+#         self.assertEqual(r.status_code, status.HTTP_200_OK)
+#         graph = r.data["graph"]
+#         self.assertEqual(graph, {"nodes": [], "edges": []})
 
-    def test_basic(self):
-        path = DATA_DIR / "basic.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic(self):
+#         path = DATA_DIR / "basic.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_attributes(self):
-        path = DATA_DIR / "basic-attributes.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_attributes(self):
+#         path = DATA_DIR / "basic-attributes.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_nested_attributes(self):
-        path = DATA_DIR / "basic-nested-attributes.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_nested_attributes(self):
+#         path = DATA_DIR / "basic-nested-attributes.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_edges(self):
-        path = DATA_DIR / "basic-edges.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_edges(self):
+#         path = DATA_DIR / "basic-edges.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_nested_edges(self):
-        path = DATA_DIR / "basic-nested-edges.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_nested_edges(self):
+#         path = DATA_DIR / "basic-nested-edges.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_ports(self):
-        path = DATA_DIR / "basic-ports.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_ports(self):
+#         path = DATA_DIR / "basic-ports.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_nested_ports(self):
-        path = DATA_DIR / "basic-nested-ports.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_nested_ports(self):
+#         path = DATA_DIR / "basic-nested-ports.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_basic_groups(self):
-        path = DATA_DIR / "basic-groups.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_basic_groups(self):
+#         path = DATA_DIR / "basic-groups.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    def test_sample(self):
-        path = DATA_DIR / "sample.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     def test_sample(self):
+#         path = DATA_DIR / "sample.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    @tag("slow")
-    def test_n25_e25(self):
-        path = DATA_DIR / "n25_e25.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     @tag("slow")
+#     def test_n25_e25(self):
+#         path = DATA_DIR / "n25_e25.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    @tag("slow")
-    def test_n50_e25(self):
-        path = DATA_DIR / "n50_e25.json"
-        self.assert_merge_retrieve_eq_from_json(path)
+#     @tag("slow")
+#     def test_n50_e25(self):
+#         path = DATA_DIR / "n50_e25.json"
+#         self.assert_merge_retrieve_eq_from_json(path)
 
-    @tag("slow")
-    def test_n25_then_n50(self):
-        # first merge
-        old = load_data(DATA_DIR / "n25_e25.json")
-        self.merge(old)
+#     @tag("slow")
+#     def test_n25_then_n50(self):
+#         # first merge
+#         old = load_data(DATA_DIR / "n25_e25.json")
+#         self.merge(old)
 
-        # over-write
-        new_path = DATA_DIR / "n50_e25.json"
-        self.assert_merge_retrieve_eq_from_json(new_path)
+#         # over-write
+#         new_path = DATA_DIR / "n50_e25.json"
+#         self.assert_merge_retrieve_eq_from_json(new_path)
 
 
 # TODO initial write

@@ -143,6 +143,9 @@ class _Deprecator:
 class _Merger:
     """Merges content entities into the fragment."""
 
+    # TODO dataclass MergedResult
+    # TODO separate re-connection from merging
+
     @staticmethod
     def _merge_ports(ports: Iterable[structures.Port]):
         data = [

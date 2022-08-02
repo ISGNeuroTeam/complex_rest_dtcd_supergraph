@@ -11,12 +11,80 @@ from rest.views import APIView
 
 from .converters import GraphDataConverter
 from .managers import Manager
-from .models import Fragment
-from .serializers import ContentSerializer, FragmentSerializer, GraphSerializer
+from .models import Container, Fragment, Root
+from .serializers import (
+    ContentSerializer,
+    FragmentSerializer,
+    GraphSerializer,
+    RootSerializer,
+)
 from .utils import get_node_or_404
 
 
 logger = logging.getLogger("supergraph")
+
+
+class RootListView(APIView):
+    """List existing roots or create a new one."""
+
+    http_method_names = ["get", "post"]
+    permission_classes = (AllowAny,)
+    serializer_class = RootSerializer
+
+    def get(self, request: Request):
+        """Read a list of existing roots."""
+
+        roots = list(Root.nodes)
+        serializer = self.serializer_class(roots, many=True)
+
+        return SuccessResponse({"roots": serializer.data})
+
+    def post(self, request: Request):
+        """Create a new root."""
+
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return SuccessResponse(
+            data={"root": serializer.data},
+            http_status=status.HTTP_201_CREATED,
+        )
+
+
+class RootDetailView(APIView):
+    """Retrieve, update or delete a root."""
+
+    http_method_names = ["get", "put", "delete"]
+    permission_classes = (AllowAny,)
+    serializer_class = RootSerializer
+
+    def get(self, request: Request, pk: uuid.UUID):
+        """Return a root."""
+
+        root = get_node_or_404(Root, uid=pk.hex)
+        serializer = self.serializer_class(root)
+
+        return SuccessResponse({"root": serializer.data})
+
+    def put(self, request: Request, pk: uuid.UUID):
+        """Update a fragment."""
+
+        old = get_node_or_404(Root, uid=pk.hex)
+        serializer = self.serializer_class(old, data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+
+        return SuccessResponse({"root": serializer.data})
+
+    @neomodel.db.transaction
+    def delete(self, request: Request, pk: uuid.UUID):
+        """Delete a fragment and its content."""
+
+        root = get_node_or_404(Root, uid=pk.hex)
+        root.delete()
+
+        return SuccessResponse()
 
 
 class FragmentListView(APIView):
@@ -85,8 +153,8 @@ class FragmentDetailView(APIView):
         return SuccessResponse()
 
 
-class FragmentGraphView(APIView):
-    """Retrieve, replace or delete graph content of a fragment."""
+class ContainerView(APIView):
+    """Retrieve, replace or delete graph content of a container."""
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
@@ -95,10 +163,10 @@ class FragmentGraphView(APIView):
 
     @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
-        """Read graph content of a fragment with the given id."""
+        """Read graph content of a container with the given id."""
 
-        fragment = get_node_or_404(Fragment, uid=pk.hex)
-        content = self.manager.read(fragment)
+        container = get_node_or_404(Container, uid=pk.hex)
+        content = self.manager.read(container)
         logger.info("Queried content: " + content.info)
         payload = self.converter.to_data(content)
         serializer = ContentSerializer(instance=payload)
@@ -107,47 +175,25 @@ class FragmentGraphView(APIView):
 
     @neomodel.db.transaction
     def put(self, request: Request, pk: uuid.UUID):
-        """Replace graph content of a fragment with given id."""
+        """Replace graph content of a container with the given id."""
 
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         new_content = self.converter.to_content(serializer.data["graph"])
         logger.info("Converted to content: " + new_content.info)
-        fragment = get_node_or_404(Fragment, uid=pk.hex)
-        self.manager.replace(fragment, new_content)
+        container = get_node_or_404(Container, uid=pk.hex)
+        self.manager.replace(container, new_content)
 
         return SuccessResponse()
 
     @neomodel.db.transaction
     def delete(self, request: Request, pk: uuid.UUID):
-        """Delete graph content of a fragment with the given id."""
+        """Delete graph content of a container with the given id."""
 
-        fragment = get_node_or_404(Fragment, uid=pk.hex)
-        fragment.clear()
+        container = get_node_or_404(Container, uid=pk.hex)
+        container.clear()
 
         return SuccessResponse()
-
-
-class RootGraphView(APIView):
-    """Retrieve, replace or delete full graph content."""
-
-    http_method_names = ["get", "put", "delete"]
-    permission_classes = (AllowAny,)
-
-    def get(self, request: Request):
-        """Read all content."""
-
-        raise NotImplementedError
-
-    def put(self, request: Request):
-        """Replace graph content."""
-
-        raise NotImplementedError
-
-    def delete(self, request: Request):
-        """Delete whole graph content."""
-
-        raise NotImplementedError
 
 
 class ResetNeo4j(APIView):

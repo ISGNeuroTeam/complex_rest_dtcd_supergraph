@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from .fields import CustomUUIDFIeld, EdgeField, GroupField, VertexField
-from .models import Container, Fragment
+from .models import Container, Fragment, Root
 from .settings import KEYS
 
 
@@ -40,6 +40,12 @@ class ContainerSerializer(serializers.Serializer):
 
 class FragmentSerializer(ContainerSerializer):
     container_class = Fragment
+
+
+class RootSerializer(ContainerSerializer):
+    container_class = Root
+
+    fragments = FragmentSerializer(read_only=True, source="fragments.all", many=True)
 
 
 class ContentSerializer(serializers.Serializer):
