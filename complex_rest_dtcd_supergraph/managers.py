@@ -18,7 +18,7 @@ from .utils import connect_if_not_connected, free_properties
 
 
 class _Reader:
-    """Read operations on a fragment."""
+    """Read operations on a container."""
 
     def __init__(self) -> None:
         self._foreign_key_mapping = defaultdict(set)  # parent:children uid pairs
@@ -50,14 +50,14 @@ class _Reader:
 
         return vertex
 
-    def read(self, fragment: models.Fragment) -> structures.Content:
+    def read(self, container: models.Container) -> structures.Content:
         self._foreign_key_mapping.clear()
 
         # step 1 - get the insides
-        vertices = fragment.vertices.all()
+        vertices = container.vertices.all()
         ports = self._query_ports(vertices)
-        edges = fragment.edges
-        groups = fragment.groups.all()
+        edges = container.edges
+        groups = container.groups.all()
 
         # step 2 - map to content
         vertices = [self._to_vertex(node) for node in vertices]
@@ -77,24 +77,24 @@ class _Reader:
 
 
 class _Deprecator:
-    """Deletes deprecated content of a fragment."""
+    """Deletes deprecated content of a container."""
 
     @staticmethod
     def _delete_deprecated_vertices_groups_ports(
-        fragment: models.Fragment, content: structures.Content
+        container: models.Container, content: structures.Content
     ):
-        """Delete vertices, groups and ports in the fragment not in the content."""
+        """Delete vertices, groups and ports from the container not in the content."""
 
-        # query uids of primitive nodes (vertices, groups, ports) in the fragment
+        # query uids of primitive nodes (vertices, groups, ports) in the container
         uid2node = {}
 
-        for vertex in fragment.vertices.all():
+        for vertex in container.vertices.all():
             uid2node[vertex.uid] = vertex
 
             for port in vertex.ports.all():
                 uid2node[port.uid] = port
 
-        for group in fragment.groups.all():
+        for group in container.groups.all():
             uid2node[group.uid] = group
 
         new_uids = set(
@@ -114,11 +114,11 @@ class _Deprecator:
 
     @staticmethod
     def _delete_deprecated_edges(
-        fragment: models.Fragment, content: structures.Content
+        container: models.Container, content: structures.Content
     ):
-        """Delete edges in the fragment not in the content."""
+        """Delete edges from the container not in the content."""
 
-        current_uids = set((op.uid, ip.uid) for op, _, ip in fragment.edges)
+        current_uids = set((op.uid, ip.uid) for op, _, ip in container.edges)
         new_uids = set(edge.uid for edge in content.edges)
         deprecated_uids = current_uids - new_uids
 
@@ -133,15 +133,15 @@ class _Deprecator:
             params={"list": list(deprecated_uids)},
         )
 
-    def delete_difference(self, fragment: models.Fragment, content: structures.Content):
-        """Delete entities in the fragment that are not in the content."""
+    def delete_difference(self, container: models.Container, content: structures.Content):
+        """Delete entities from the container that are not in the content."""
 
-        self._delete_deprecated_vertices_groups_ports(fragment, content)
-        self._delete_deprecated_edges(fragment, content)
+        self._delete_deprecated_vertices_groups_ports(container, content)
+        self._delete_deprecated_edges(container, content)
 
 
 class _Merger:
-    """Merges content entities into the fragment."""
+    """Merges content entities into the container."""
 
     # TODO dataclass MergedResult
     # TODO separate re-connection from merging
@@ -199,20 +199,20 @@ class _Merger:
         return models.Group.create_or_update(*data, lazy=True)
 
     @staticmethod
-    def _reconnect_to_fragment(
-        fragment: models.Fragment,
+    def _reconnect_to_container(
+        container: models.Container,
         vertices: Iterable[models.Vertex],
         groups: Iterable[models.Group],
     ):
-        """Reconnect merged entities to parent fragment."""
+        """Reconnect merged entities to parent container."""
 
         for vertex in vertices:
-            connect_if_not_connected(fragment.vertices, vertex)
+            connect_if_not_connected(container.vertices, vertex)
 
         for group in groups:
-            connect_if_not_connected(fragment.groups, group)
+            connect_if_not_connected(container.groups, group)
 
-    def merge(self, fragment: models.Fragment, content: structures.Content):
+    def merge(self, container: models.Container, content: structures.Content):
         """Merge content entities."""
 
         ports = self._merge_ports(content.ports)
@@ -221,39 +221,39 @@ class _Merger:
         vertices = self._merge_vertices(content.vertices, uid2port)
         groups = self._merge_groups(content.groups)
 
-        self._reconnect_to_fragment(fragment, vertices, groups)
+        self._reconnect_to_container(container, vertices, groups)
 
 
 class _Writer:
-    """Write operations on a fragment."""
+    """Write operations on a container."""
 
     def __init__(self):
         self._deprecator = _Deprecator()
         self._merger = _Merger()
 
-    def replace(self, fragment: models.Fragment, content: structures.Content):
-        """Replace the content of a given fragment."""
+    def replace(self, container: models.Container, content: structures.Content):
+        """Replace the content of a given container."""
 
         # content pre-conditions (referential integrity within the content):
         # - for each edge, start (output) & end (input) ports exist in content
         # - for each vertex, all ports exist in content
-        self._deprecator.delete_difference(fragment, content)
-        self._merger.merge(fragment, content)
+        self._deprecator.delete_difference(container, content)
+        self._merger.merge(container, content)
 
 
 class Manager:
-    """Handles read and write operations on fragment's content."""
+    """Handles read and write operations on the container's content."""
 
     def __init__(self) -> None:
         self._reader = _Reader()
         self._writer = _Writer()
 
-    def read(self, fragment: models.Fragment):
-        """Return the content of a given fragment."""
+    def read(self, container: models.Container):
+        """Return the content of a given container."""
 
-        return self._reader.read(fragment)
+        return self._reader.read(container)
 
-    def replace(self, fragment: models.Fragment, content: structures.Content):
-        """Replace the content of a given fragment."""
+    def replace(self, container: models.Container, content: structures.Content):
+        """Replace the content of a given container."""
 
-        return self._writer.replace(fragment, content)
+        return self._writer.replace(container, content)
