@@ -259,3 +259,11 @@ class Manager:
         """Replace the content of a given container."""
 
         return self._writer.replace(container, content)
+
+    def reconnect(self, parent: models.Container, child: models.Container):
+        """Reconnect the content of a child container to parent."""
+
+        # FIXME this knows about writer's guts - refactor!
+        self._writer._merger._reconnect_to_container(
+            parent, child.vertices, child.groups
+        )

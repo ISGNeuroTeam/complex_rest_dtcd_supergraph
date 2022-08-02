@@ -1,11 +1,12 @@
 from django.urls import path
 
 from .views import (
-    ContainerView,
+    GraphView,
     FragmentDetailView,
     FragmentListView,
     ResetNeo4j,
     RootDetailView,
+    RootFragmentGraphView,
     RootFragmentDetailView,
     RootFragmentListView,
     RootListView,
@@ -26,14 +27,14 @@ urlpatterns = [
         RootFragmentDetailView.as_view(),
         name="root-fragment-detail",
     ),
-    # path(
-    #     "roots/<uuid:root_pk>/fragments/<uuid:fragment_pk>/graph",
-    #     .as_view(),
-    #     name="root-fragment-graph",
-    # ),
-    path("roots/<uuid:pk>/graph", ContainerView.as_view(), name="root-graph"),
+    path(
+        "roots/<uuid:root_pk>/fragments/<uuid:fragment_pk>/graph",
+        RootFragmentGraphView.as_view(),
+        name="root-fragment-graph",
+    ),
+    path("roots/<uuid:pk>/graph", GraphView.as_view(), name="root-graph"),
     path("fragments", FragmentListView.as_view(), name="fragments"),
     path("fragments/<uuid:pk>", FragmentDetailView.as_view(), name="fragment-detail"),
-    path("fragments/<uuid:pk>/graph", ContainerView.as_view(), name="fragment-graph"),
+    path("fragments/<uuid:pk>/graph", GraphView.as_view(), name="fragment-graph"),
     path("reset", ResetNeo4j.as_view(), name="reset"),
 ]
