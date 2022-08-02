@@ -245,24 +245,20 @@ class TestFragmentGraphView(
         path = DATA_DIR / "basic.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
-    @unittest.expectedFailure
     def test_sample(self):
         path = DATA_DIR / "sample.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
-    @unittest.skip("not implemented")
     @tag("slow")
     def test_n25_e25(self):
         path = DATA_DIR / "n25_e25.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
-    @unittest.skip("not implemented")
     @tag("slow")
     def test_n50_e25(self):
         path = DATA_DIR / "n50_e25.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
-    @unittest.skip("not implemented")
     @tag("slow")
     def test_n25_then_n50(self):
         old = load_data(DATA_DIR / "n25_e25.json")
@@ -277,41 +273,41 @@ class TestFragmentGraphView(
 
 
 # TODO combined tests
-@unittest.skip("not implemented")
-class TestFragmentGroupInteraction(
-    GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
-):
-    def setUp(self):
-        super().setUp()
+# @unittest.skip("not implemented")
+# class TestFragmentGroupInteraction(
+#     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
+# ):
+#     def setUp(self):
+#         super().setUp()
 
-        # create a fragment
-        r = self.client.post(
-            TestFragmentListView.url, data={"name": "marketing"}, format="json"
-        )
-        id_ = r.data["fragment"]["id"]
-        self.url = reverse("supergraph:fragment-graph", args=(id_,))
+#         # create a fragment
+#         r = self.client.post(
+#             TestFragmentListView.url, data={"name": "marketing"}, format="json"
+#         )
+#         id_ = r.data["fragment"]["id"]
+#         self.url = reverse("supergraph:fragment-graph", args=(id_,))
 
-    @unittest.expectedFailure
-    def test_root_merge_overwrite(self):
-        # merge fragment with some data
-        old = load_data(DATA_DIR / "basic.json")
-        self.merge(old)
+#     @unittest.expectedFailure
+#     def test_root_merge_overwrite(self):
+#         # merge fragment with some data
+#         old = load_data(DATA_DIR / "basic.json")
+#         self.merge(old)
 
-        # merge root with other data
-        new = {"nodes": [{"primitiveID": "cloe"}], "edges": []}
-        self.merge(new)  # FIXME this sends req to fragment URL, not root URL
+#         # merge root with other data
+#         new = {"nodes": [{"primitiveID": "cloe"}], "edges": []}
+#         self.merge(new)  # FIXME this sends req to fragment URL, not root URL
 
-        # make sure fragment is empty
-        fragment = self.retrieve()
-        self.assertEqual(fragment, {"nodes": [], "edges": []})
+#         # make sure fragment is empty
+#         fragment = self.retrieve()
+#         self.assertEqual(fragment, {"nodes": [], "edges": []})
 
-    # TODO interaction tests
-    # merge
-    # fragment, then root
-    # root management over-writes fragments data
-    # merge f1, f2, get root = combination
-    # merge of existing nodes preserves frontier connections
-    # merge fragment, then root with same vertices / edges
+# TODO interaction tests
+# merge
+# fragment, then root
+# root management over-writes fragments data
+# merge f1, f2, get root = combination
+# merge of existing nodes preserves frontier connections
+# merge fragment, then root with same vertices / edges
 
 
 if __name__ == "__main__":
