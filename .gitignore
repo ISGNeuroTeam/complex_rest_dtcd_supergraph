@@ -181,6 +181,7 @@ custom.txt
 start.sh
 stop.sh
 test.sh
+scripts/
 
 # symlinks to config files in plugin directory
 complex_rest_dtcd_supergraph/*.conf
