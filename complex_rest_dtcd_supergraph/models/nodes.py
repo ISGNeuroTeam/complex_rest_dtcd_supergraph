@@ -10,6 +10,7 @@ from neomodel import (
     db,
     JSONProperty,
     Relationship,
+    RelationshipTo,
     StringProperty,
     StructuredNode,
     UniqueIdProperty,
@@ -55,7 +56,7 @@ class Vertex(AbstractPrimitive):
     """
 
     # TODO explicit input and output ports?
-    ports = Relationship(Port, RELATION_TYPES.default)
+    ports = RelationshipTo(Port, RELATION_TYPES.default)
 
     def delete(self, cascade=True):
         """Delete this vertex.
@@ -77,22 +78,20 @@ class Group(AbstractPrimitive):
     """
 
 
-class Fragment(StructuredNode):
-    """Fragment is a container for primitives.
+class Container(StructuredNode):
+    """A container for the content.
 
-    A fragment may include vertices and groups.
-    We use fragments to partition the graph into regions for security
-    control and ease of work.
+    May include vertices and groups.
     """
 
     uid = UniqueIdProperty()
-    name = StringProperty(max_length=255, required=True)
+    name = StringProperty(max_length=255, required=True)  # TODO settings
 
-    vertices = Relationship(Vertex, RELATION_TYPES.contains)
-    groups = Relationship(Group, RELATION_TYPES.contains)
+    vertices = RelationshipTo(Vertex, RELATION_TYPES.contains)
+    groups = RelationshipTo(Group, RELATION_TYPES.contains)
 
     def delete(self, cascade=True):
-        """Delete this fragment.
+        """Delete this container.
 
         If cascade is enabled, delete all related vertices and groups in
         a cascading fashion.
@@ -114,11 +113,11 @@ class Fragment(StructuredNode):
 
     @property
     def edges(self) -> List[Tuple[Port, EdgeRel, Port]]:
-        """Return a list of tuples (start, edge, end) inside this fragment."""
+        """Return a list of tuples (start, edge, end) inside this container."""
 
         q = (
-            f"MATCH (f) WHERE id(f)={self.id} "
-            "MATCH (f) -- (:Vertex) "
+            f"MATCH (this) WHERE id(this)={self.id} "
+            "MATCH (this) -- (:Vertex) "
             f"  -- (src:Port) -[r:{RELATION_TYPES.edge}]-> (dst:Port) "
             "MATCH (dst)  -- (:Vertex) -- (f) "
             "RETURN src, r, dst"
@@ -126,3 +125,39 @@ class Fragment(StructuredNode):
         results, _ = db.cypher_query(q, resolve_objects=True)
 
         return [(r[0], r[1], r[2]) for r in results]
+
+
+class Fragment(Container):
+    """Fragment is a container for primitives.
+
+    A fragment may include vertices and groups.
+    We use fragments to partition the graph into regions for security
+    control and ease of work.
+    """
+
+
+class Root(Container):
+    """A root is a collection of fragments and content.
+    
+    Roots partition global Neo4j graph into non-overlapping subgraphs."""
+
+    fragments = RelationshipTo(Fragment, RELATION_TYPES.contains)
+
+    def delete(self):
+        """Delete this root.
+
+        Deletes all related fragments, vertices and groups in a cascading
+        fashion.
+        """
+
+        self.clear()
+
+        return super().delete(cascade=False)
+
+    def clear(self):
+        """Delete all related fragments, vertices and groups in a cascading fashion."""
+
+        super().clear()
+
+        for fragment in self.fragments.all():
+            fragment.delete(cascade=False)  # already cleared related content
