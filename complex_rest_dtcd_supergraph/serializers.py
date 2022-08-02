@@ -10,29 +10,36 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from .fields import CustomUUIDFIeld, EdgeField, GroupField, VertexField
-from .models import Fragment
+from .models import Container, Fragment
 from .settings import KEYS
 
 
-class FragmentSerializer(serializers.Serializer):
+class ContainerSerializer(serializers.Serializer):
     id = CustomUUIDFIeld(read_only=True, source="uid")
     name = serializers.CharField(max_length=255)  # TODO value in settings
 
+    container_class = Container
+
     def create(self, validated_data):
-        """Construct fragment instance and save it to the database."""
+        """Construct an instance and save it to the database."""
 
-        return Fragment(**validated_data).save()
+        return self.container_class(**validated_data).save()
 
-    def update(self, instance: Fragment, validated_data: dict):
-        """Update fragment instance in the database."""
+    def update(self, instance, validated_data: dict):
+        """Update the instance in the database."""
 
         instance.name = validated_data["name"]
+
         return instance.save()
 
-    def save(self, **kwargs) -> Fragment:
-        """Create or update a fragment instance in the database."""
+    def save(self, **kwargs):
+        """Create or update an instance in the database."""
 
         return super().save(**kwargs)
+
+
+class FragmentSerializer(ContainerSerializer):
+    container_class = Fragment
 
 
 class ContentSerializer(serializers.Serializer):
