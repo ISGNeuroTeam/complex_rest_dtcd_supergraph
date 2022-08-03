@@ -65,10 +65,15 @@ class Vertex(AbstractPrimitive):
         """
 
         if cascade:
-            for port in self.ports.all():
-                port.delete()
+            self.clear()
 
         return super().delete()
+
+    def clear(self):
+        """Delete all connected ports."""
+
+        for port in self.ports.all():
+            port.delete()
 
 
 class Group(AbstractPrimitive):
@@ -143,14 +148,15 @@ class Root(Container):
 
     fragments = RelationshipTo(Fragment, RELATION_TYPES.contains)
 
-    def delete(self):
+    def delete(self, cascade=True):
         """Delete this root.
 
         Deletes all related fragments, vertices and groups in a cascading
         fashion.
         """
 
-        self.clear()
+        if cascade:
+            self.clear()
 
         return super().delete(cascade=False)
 

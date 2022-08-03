@@ -162,7 +162,7 @@ class RootFragmentDetailView(APIView):
         """Delete this root's fragment and its content."""
 
         fragment = get_root_then_fragment_or_404(root_pk, fragment_pk)
-        fragment.delete(cascade=True)
+        fragment.delete()
 
         return SuccessResponse()
 
@@ -278,7 +278,7 @@ class FragmentDetailView(APIView):
         """Delete a fragment and its content."""
 
         fragment = get_node_or_404(Fragment.nodes, uid=pk.hex)
-        fragment.delete(cascade=True)
+        fragment.delete()
 
         return SuccessResponse()
 
