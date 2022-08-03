@@ -1,11 +1,9 @@
 import logging
-import uuid
 from typing import Union
 
 import neomodel
 from rest_framework.exceptions import NotFound
 
-from .. import models
 from ..exceptions import LoadingError, ManagerError
 
 
@@ -26,15 +24,6 @@ def get_node_or_404(
         return queryset.get(**kwargs)
     except neomodel.DoesNotExist:
         raise NotFound
-
-
-def get_root_then_fragment_or_404(
-    root_pk: uuid.UUID, fragment_pk: uuid.UUID
-) -> models.Fragment:
-    root = get_node_or_404(models.Root.nodes, uid=root_pk.hex)
-    fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
-
-    return fragment
 
 
 def func_or_400(func, *args, exception=None, **kwargs):
