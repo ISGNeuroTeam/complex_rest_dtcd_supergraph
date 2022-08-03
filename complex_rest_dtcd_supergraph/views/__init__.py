@@ -9,67 +9,23 @@ from rest.permissions import AllowAny
 from rest.response import SuccessResponse
 from rest.views import APIView
 
-from .converters import GraphDataConverter
-from .exceptions import LoadingError, ManagerError
-from .managers import Manager
-from .models import Container, Fragment, Root
-from .serializers import (
+from ..converters import GraphDataConverter
+from ..managers import Manager
+from ..models import Container, Fragment, Root
+from ..serializers import (
     ContentSerializer,
     FragmentSerializer,
     GraphSerializer,
     RootSerializer,
 )
-from .utils import get_node_or_404
-
+from .shortcuts import (
+    get_node_or_404,
+    get_root_then_fragment_or_404,
+    replace_or_400,
+    to_content_or_400,
+)
 
 logger = logging.getLogger("supergraph")
-
-
-def func_or_400(func, *args, exception=None, **kwargs):
-    try:
-        return func(*args, **kwargs)
-    except Exception as e:
-        logger.error("Error: \n" + str(e))
-        raise exception
-
-
-def to_content_or_400(converter, data):
-    """Try to use the converter to convert the data to content.
-
-    Calls `converter.to_content(data)` and returns the result. Raises
-    `LoadingError` on exception and logs it.
-    """
-
-    # FIXME too broad of an exception
-    try:
-        return converter.to_content(data)
-    except Exception as e:
-        logger.error("Loading error: \n" + str(e))
-        raise LoadingError
-
-
-def replace_or_400(manager, container, new_content):
-    """Try to use the manager to replace the content of a container with new one.
-
-    Calls `manager.replace(container, content)` and returns the result.
-    Raises `Manager` on exception and logs it.
-    """
-
-    # FIXME too broad of an exception
-    try:
-        return manager.replace(container, new_content)
-    except Exception as e:
-        logger.error("Manager error: \n" + str(e))
-        raise ManagerError
-
-
-def get_root_then_fragment_or_404(
-    root_pk: uuid.UUID, fragment_pk: uuid.UUID
-) -> Fragment:
-    root = get_node_or_404(Root.nodes, uid=root_pk.hex)
-    fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
-
-    return fragment
 
 
 class RootListView(APIView):

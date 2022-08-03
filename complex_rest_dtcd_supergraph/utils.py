@@ -3,11 +3,10 @@ This module provides custom utility functions.
 """
 
 import uuid
-from typing import Sequence, Union
+from typing import Sequence
 
 import neomodel
 from neomodel import contrib
-from rest_framework.exceptions import NotFound
 
 
 # allowed property types in neo4j
@@ -27,22 +26,6 @@ class HexUUIDConverter:
 
     def to_url(self, value: str):
         return str(value)
-
-
-# shortcuts for working with Neomodel
-# a la https://docs.djangoproject.com/en/4.0/topics/http/shortcuts/
-def get_node_or_404(
-    queryset: Union[neomodel.NodeSet, neomodel.RelationshipManager], **kwargs
-) -> neomodel.StructuredNode:
-    """Call `.get()` on a given node set or relationship manager.
-
-    Raises `rest_framework.exceptions.NotFound` if a node is missing.
-    """
-
-    try:
-        return queryset.get(**kwargs)
-    except neomodel.DoesNotExist:
-        raise NotFound
 
 
 def free_properties(node: contrib.SemiStructuredNode):
