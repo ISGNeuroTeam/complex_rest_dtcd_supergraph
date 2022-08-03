@@ -40,6 +40,7 @@ class RootListView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RootSerializer
 
+    @neomodel.db.transaction
     def get(self, request: Request):
         """Read a list of existing roots."""
 
@@ -48,6 +49,7 @@ class RootListView(APIView):
 
         return SuccessResponse({"roots": serializer.data})
 
+    @neomodel.db.transaction
     def post(self, request: Request):
         """Create a new root."""
 
@@ -68,6 +70,7 @@ class RootDetailView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = RootSerializer
 
+    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Return a root."""
 
@@ -76,6 +79,7 @@ class RootDetailView(APIView):
 
         return SuccessResponse({"root": serializer.data})
 
+    @neomodel.db.transaction
     def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
@@ -103,6 +107,7 @@ class RootFragmentListView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
+    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Read a list of root's fragments."""
 
@@ -224,6 +229,7 @@ class FragmentListView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
+    @neomodel.db.transaction
     def get(self, request: Request):
         """Read a list of existing fragment names."""
 
@@ -232,6 +238,7 @@ class FragmentListView(APIView):
 
         return SuccessResponse({"fragments": serializer.data})
 
+    @neomodel.db.transaction
     def post(self, request: Request):
         """Create a new fragment."""
 
@@ -254,6 +261,7 @@ class FragmentDetailView(APIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
+    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Return a fragment."""
 
@@ -263,6 +271,7 @@ class FragmentDetailView(APIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
+    @neomodel.db.transaction
     def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
@@ -332,6 +341,7 @@ class ResetNeo4jView(APIView):
     http_method_names = ["post"]
     permission_classes = (AllowAny,)
 
+    @neomodel.db.transaction
     def post(self, request, *args, **kwargs):
         """Delete all nodes and relationships from Neo4j database."""
 
