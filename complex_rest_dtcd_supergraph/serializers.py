@@ -77,6 +77,8 @@ class ContentSerializer(serializers.Serializer):
         if len(ids) != len(value):
             self.fail("not_unique")
 
+        # TODO validate ports
+
         return value
 
     def validate_edges(self, value):

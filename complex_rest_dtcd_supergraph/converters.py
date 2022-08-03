@@ -52,7 +52,7 @@ class GraphDataConverter:
         data = deepcopy(vertex.meta)
         data[KEYS.yfiles_id] = vertex.uid
 
-        # FIXME better way to handle stale properties on nodes?
+        # FIXME workaround to handle stale properties on nodes; find better way
         if KEYS.properties in data:
             self._restore_properties(data[KEYS.properties], vertex.properties)
 
@@ -73,6 +73,7 @@ class GraphDataConverter:
         data = deepcopy(port.meta)
         data[KEYS.yfiles_id] = port.uid
 
+        # FIXME workaround to handle stale properties on nodes; find better way
         if KEYS.properties in data:
             self._restore_properties(data[KEYS.properties], port.properties)
 

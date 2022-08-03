@@ -172,6 +172,7 @@ class _Merger:
 
     @staticmethod
     def _merge_ports(ports: Iterable[structures.Port]):
+        # FIXME possible clash between user-defined property name and uid/meta_ key
         data = [
             dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
         ]
@@ -203,6 +204,7 @@ class _Merger:
         nodes = []
 
         for vertex in vertices:
+            # FIXME possible clash between user-defined property name and uid/meta_ key
             node = models.Vertex.create_or_update(
                 dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
                 lazy=True,
