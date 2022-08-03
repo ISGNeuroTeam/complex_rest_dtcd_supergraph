@@ -10,6 +10,7 @@ from rest.response import SuccessResponse
 from rest.views import APIView
 
 from .converters import GraphDataConverter
+from .exceptions import LoadingError, ManagerError
 from .managers import Manager
 from .models import Container, Fragment, Root
 from .serializers import (
@@ -22,6 +23,44 @@ from .utils import get_node_or_404
 
 
 logger = logging.getLogger("supergraph")
+
+
+def func_or_400(func, *args, exception=None, **kwargs):
+    try:
+        return func(*args, **kwargs)
+    except Exception as e:
+        logger.error("Error: \n" + str(e))
+        raise exception
+
+
+def to_content_or_400(converter, data):
+    """Try to use the converter to convert the data to content.
+
+    Calls `converter.to_content(data)` and returns the result. Raises
+    `LoadingError` on exception and logs it.
+    """
+
+    # FIXME too broad of an exception
+    try:
+        return converter.to_content(data)
+    except Exception as e:
+        logger.error("Loading error: \n" + str(e))
+        raise LoadingError
+
+
+def replace_or_400(manager, container, new_content):
+    """Try to use the manager to replace the content of a container with new one.
+
+    Calls `manager.replace(container, content)` and returns the result.
+    Raises `Manager` on exception and logs it.
+    """
+
+    # FIXME too broad of an exception
+    try:
+        return manager.replace(container, new_content)
+    except Exception as e:
+        logger.error("Manager error: \n" + str(e))
+        raise ManagerError
 
 
 def get_root_then_fragment_or_404(
@@ -200,13 +239,13 @@ class RootFragmentGraphView(APIView):
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         # convert to domain classes
-        new_content = self.converter.to_content(serializer.data["graph"])
+        new_content = to_content_or_400(self.converter, serializer.data["graph"])
         logger.info("Converted to content: " + new_content.info)
         # query root and fragment
         root = get_node_or_404(Root.nodes, uid=root_pk.hex)
         fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
         # update fragment's content
-        self.manager.replace(fragment, new_content)
+        replace_or_400(self.manager, fragment, new_content)
         # re-connect root to content
         self.manager.reconnect(root, fragment)
 
@@ -318,10 +357,10 @@ class GraphView(APIView):
 
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        new_content = self.converter.to_content(serializer.data["graph"])
+        new_content = to_content_or_400(self.converter, serializer.data["graph"])
         logger.info("Converted to content: " + new_content.info)
         container = get_node_or_404(Container.nodes, uid=pk.hex)
-        self.manager.replace(container, new_content)
+        replace_or_400(self.manager, container, new_content)
 
         return SuccessResponse()
 
