@@ -17,7 +17,7 @@ from ..serializers import (
     GraphSerializer,
     RootSerializer,
 )
-from .mixins import ManagerMixin
+from .mixins import ContainerManagementMixin
 from .shortcuts import get_node_or_404
 
 
@@ -169,7 +169,7 @@ class RootFragmentDetailView(APIView):
         return SuccessResponse()
 
 
-class RootFragmentGraphView(ManagerMixin, APIView):
+class RootFragmentGraphView(ContainerManagementMixin, APIView):
     """Retrieve, replace or delete graph content of this root's fragment."""
 
     http_method_names = ["get", "put", "delete"]

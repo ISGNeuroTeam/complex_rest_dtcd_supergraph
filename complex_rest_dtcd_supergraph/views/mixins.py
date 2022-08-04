@@ -5,7 +5,7 @@ from .shortcuts import to_content_or_400, replace_or_400
 logger = logging.getLogger("supergraph")
 
 
-class ManagerMixin:
+class ContainerManagementMixin:
     converter = None
     manager = None
 

@@ -14,11 +14,11 @@ from ..serializers import (
     ContentSerializer,
     GraphSerializer,
 )
-from .mixins import ManagerMixin
+from .mixins import ContainerManagementMixin
 from .shortcuts import get_node_or_404
 
 
-class GraphView(ManagerMixin, APIView):
+class GraphView(ContainerManagementMixin, APIView):
     """Retrieve, replace or delete graph content of a container."""
 
     http_method_names = ["get", "put", "delete"]
@@ -31,7 +31,7 @@ class GraphView(ManagerMixin, APIView):
         """Read graph content of a container with the given id."""
 
         container = get_node_or_404(Container.nodes, uid=pk.hex)
-        payload = payload = self.read(container)
+        payload = self.read(container)
         serializer = ContentSerializer(instance=payload)
 
         return SuccessResponse(data={"graph": serializer.data})
