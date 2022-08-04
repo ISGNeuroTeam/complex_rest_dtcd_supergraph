@@ -148,6 +148,8 @@ class _Deprecator:
             params={"list": list(map(list, deprecated_uids))},
         )
 
+        return deprecated_uids
+
     def delete_difference(
         self, container: models.Container, content: structures.Content
     ):
