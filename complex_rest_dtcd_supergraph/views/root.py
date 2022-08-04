@@ -109,7 +109,7 @@ class RootFragmentListView(APIView):
         """Read a list of root's fragments."""
 
         root = get_node_or_404(Root.nodes, uid=pk.hex)
-        fragments = list(root.fragments.all())
+        fragments = root.fragments.all()
         serializer = self.serializer_class(fragments, many=True)
 
         return SuccessResponse({"fragments": serializer.data})
