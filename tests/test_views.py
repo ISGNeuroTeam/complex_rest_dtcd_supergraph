@@ -170,6 +170,88 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
         self._test_delete()
 
 
+class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
+    name = "parent"
+
+    def setUp(self) -> None:
+        # create default root to work with
+        TestRootDetailView.setUp(self)
+        self.url = reverse("supergraph:root-fragments", args=(self.pk,))
+
+    def test_post(self):
+        name = "child"
+        response = self.post(data={"name": name})
+        obj = response.data["fragment"]
+        self.assertIn("id", obj)
+        self.assertEqual(obj["name"], name)
+
+    def test_get(self):
+        names = {"hr", "marketing", "sales"}
+        for name in names:
+            self.post(data={"name": name})
+        response = self.get()
+        data = response.data
+        objects = data["fragments"]
+        self.assertEqual({item["name"] for item in objects}, names)
+
+
+class TestRootFragmentDetailView(
+    Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
+):
+    name = "parent"  # root name
+    fragment_name = "child"
+
+    def setUp(self) -> None:
+        """Create a root, then fragment inside it to work.
+
+        Creates a root object and saves it to `self.root`. Root ID is
+        available on `self.root_pk`.
+
+        Then creates a fragment for this root and saves it to
+        `self.fragment`. Fragment ID is available on `self.fragment_pk`,
+        and a full URL is at `self.url`.
+        """
+
+        # create the default root
+        TestRootFragmentListView.setUp(self)
+        self.root_pk = self.pk
+        endpoint = self.url  # URL: roots/<id>/fragments
+        self.pk = self.url = None  # reset
+
+        # create a fragment for this root
+        response = self.client.post(  # note explicit request
+            endpoint,
+            data={"name": self.fragment_name},
+            format="json",
+        )
+        self.fragment = response.data["fragment"]
+        self.fragment_pk = self.fragment["id"]
+
+        self.pk = (self.root_pk, self.fragment_pk)
+        self.url = reverse(
+            "supergraph:root-fragment-detail", args=(self.root_pk, self.fragment_pk)
+        )
+
+    def test_get(self):
+        print(self.url)
+        response = self.get()
+        obj = response.data["fragment"]
+        self.assertEqual(obj["id"], self.fragment_pk)
+        self.assertEqual(obj["name"], self.fragment_name)
+
+    def test_put(self):
+        data = {"name": "marketing"}
+        response = self.put(data=data)
+        # get detail back with the same pk
+        response = self.get()
+        obj = response.data["fragment"]
+        self.assertEqual(obj["name"], "marketing")
+
+    def test_delete(self):
+        self._test_delete()
+
+
+@unittest.skip("deprecated")
 @tag("neo4j")
 class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
     url = reverse("supergraph:fragments")
@@ -191,6 +273,7 @@ class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
         self.assertEqual({f["name"] for f in fragments}, names)
 
 
+@unittest.skip("deprecated")
 @tag("neo4j")
 class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
     def setUp(self) -> None:
