@@ -254,20 +254,20 @@ class GraphEndpointTestCaseMixin:
         sort_payload(data)
         return data
 
-    def assert_merge_retrieve_eq(self, graph: dict):
+    def assert_merge_retrieve_eq(self, data: dict):
         """Merge given graph data at `self.url`, then get the result
         back and and assert both of those are equal.
         """
 
-        sort_payload(graph)
-        self.merge(graph)
+        sort_payload(data)
+        self.merge(data)
         fromdb = self.retrieve()
 
         try:
-            self.assertEqual(fromdb, graph)
+            self.assertEqual(fromdb, data)
         except Exception:
             # log the difference
-            diff = dictdiffer.diff(graph, fromdb)  # TODO sort it?
+            diff = dictdiffer.diff(data, fromdb)  # TODO sort it?
             diff = list(diff)
             msg = pformat(diff, depth=4, compact=True)
             msg = "Graphs do not match. Difference:\n" + msg
@@ -286,8 +286,6 @@ class GraphEndpointTestCaseMixin:
         self.assert_merge_retrieve_eq(data)
 
 
-# TODO re-writing the same root
-# TODO 2 fragments ops
 # TODO merge
 # TODO root interaction
 @tag("neo4j")
@@ -377,6 +375,59 @@ class TestRootGraphView(
     def test_n50_e25(self):
         path = DATA_DIR / "n50_e25.json"
         self.assert_merge_retrieve_eq_from_json(path)
+
+    def test_replace_vertex_with_another(self):
+        # merge graph, then merge the same graph again
+        # prepare original graph
+        path = DATA_DIR / "vertex.json"
+        data = load_data(path)
+        self.merge(data)
+
+        # merge same data
+        self.assert_merge_retrieve_eq(data)
+
+    def test_replace_port_with_another(self):
+        # merge vertex with port, then replace this port with a new one
+        # prepare original graph
+        path = DATA_DIR / "vertex-port.json"
+        data = load_data(path)
+        self.merge(data)
+
+        new = load_data(path)
+        new["nodes"][0] = {
+            "primitiveID": "amy",
+            # merge one, create one
+            "initPorts": [{"primitiveID": "mobile"}, {"primitiveID": "laptop"}],
+        }
+        # make sure a vertex with one port are merged, the other port is created
+        self.assert_merge_retrieve_eq(new)
+
+    def test_replace_edge_with_none(self):
+        # merge 2 vertices with an edge, then remove an edge
+        # prepare original graph
+        path = DATA_DIR / "2v-1e.json"
+        data = load_data(path)
+        self.merge(data)
+
+        new = load_data(path)
+        new["edges"] = []  # same vertices, no edges
+        # make sure 2 vertices with ports are merged, the edge is removed
+        self.assert_merge_retrieve_eq(new)
+
+    def test_replace_edge_with_another(self):
+        # merge 2 vertices with an edge, then remove an edge
+        # prepare original graph
+        path = DATA_DIR / "2v-1e.json"
+        data = load_data(path)
+        self.merge(data)
+
+        new = load_data(path)
+        new["edges"][0]["meta"] = {
+            "new-field": {"string": "ham", "age": 167, "online": False}
+        }
+
+        # make sure 2 vertices with ports are merged, the edge is removed
+        self.assert_merge_retrieve_eq(new)
 
     @tag("slow")
     def test_n25_then_n50(self):
