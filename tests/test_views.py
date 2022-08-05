@@ -256,6 +256,7 @@ class TestRootFragmentDetailView(
 
 
 @unittest.skip("deprecated")
+@unittest.expectedFailure  # POST is forbidden
 @tag("neo4j")
 class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
     url = reverse("supergraph:fragments")
@@ -278,6 +279,7 @@ class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
 
 
 @unittest.skip("deprecated")
+@unittest.expectedFailure  # cannot create standalone fragment - POST is forbidden
 @tag("neo4j")
 class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
     def setUp(self) -> None:

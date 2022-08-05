@@ -18,7 +18,7 @@ from .shortcuts import get_node_or_404
 class FragmentListView(APIView):
     """List existing fragments or create a new one."""
 
-    http_method_names = ["get", "post"]
+    http_method_names = ["get"]
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
