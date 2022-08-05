@@ -44,6 +44,67 @@ class Neo4jTestCaseMixin:
 
 
 @tag("neo4j")
+class TestRootListView(Neo4jTestCaseMixin, APISimpleTestCase):
+    url = reverse("supergraph:roots")
+
+    def test_post(self):
+        name = "sales"
+        response = self.client.post(self.url, data={"name": name}, format="json")
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        obj = response.data["root"]
+        self.assertIn("id", obj)
+        self.assertEqual(obj["name"], name)
+
+    def test_get(self):
+        names = {"hr", "marketing", "sales"}
+        for name in names:
+            self.client.post(self.url, data={"name": name}, format="json")
+        response = self.client.get(self.url)
+        data = response.data
+        objects = data["roots"]
+        self.assertEqual({item["name"] for item in objects}, names)
+
+
+@tag("neo4j")
+class TestRootDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
+    name = "sales"
+
+    def setUp(self) -> None:
+        # default root
+        response = self.client.post(
+            TestRootListView.url,
+            data={"name": self.name},
+            format="json",
+        )
+        self.root = response.data["root"]
+        self.pk = self.root["id"]
+        self.url = reverse("supergraph:root-detail", args=(self.pk,))
+
+    def test_get(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = response.data["root"]
+        self.assertEqual(obj["id"], self.pk)
+        self.assertEqual(obj["name"], self.name)
+
+    def test_put(self):
+        data = {"name": "marketing"}
+        response = self.client.put(self.url, data=data, format="json")
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        # get detail back with the same pk
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        obj = response.data["root"]
+        self.assertEqual(obj["name"], "marketing")
+
+    def test_delete(self):
+        response = self.client.delete(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+
+
+@tag("neo4j")
 class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
     url = reverse("supergraph:fragments")
 
