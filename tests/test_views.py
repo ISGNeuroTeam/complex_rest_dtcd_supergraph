@@ -148,7 +148,6 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
             format="json",
         )
         self.root = response.data["root"]
-        # self.root = TestRootListView.create({"name": self.name})  # TODO?
         self.pk = self.root["id"]
         self.url = reverse("supergraph:root-detail", args=(self.pk,))
 
@@ -205,20 +204,26 @@ class TestRootFragmentDetailView(
         """Create a root, then fragment inside it to work.
 
         Creates a root object and saves it to `self.root`. Root ID is
-        available on `self.root_pk`.
+        available on `self.root_pk` and the URL is at `self.root_url`.
 
         Then creates a fragment for this root and saves it to
         `self.fragment`. Fragment ID is available on `self.fragment_pk`,
-        and a full URL is at `self.url`.
+        and a full URL is at `self.fragment_url`.
+
+        The `self.url` attribute points to `self.fragment_url` since we
+        work with it in this suite of tests.
         """
 
         # create the default root
-        TestRootFragmentListView.setUp(self)
+        TestRootDetailView.setUp(self)
         self.root_pk = self.pk
-        endpoint = self.url  # URL: roots/<id>/fragments
+        self.root_url = self.url  # URL: roots/<id>
         self.pk = self.url = None  # reset
 
         # create a fragment for this root
+        endpoint = reverse(
+            "supergraph:root-fragments", args=(self.root_pk,)
+        )  # URL: roots/<id>/fragments
         response = self.client.post(  # note explicit request
             endpoint,
             data={"name": self.fragment_name},
@@ -227,13 +232,12 @@ class TestRootFragmentDetailView(
         self.fragment = response.data["fragment"]
         self.fragment_pk = self.fragment["id"]
 
-        self.pk = (self.root_pk, self.fragment_pk)
-        self.url = reverse(
+        self.fragment_url = reverse(
             "supergraph:root-fragment-detail", args=(self.root_pk, self.fragment_pk)
         )
+        self.url = self.fragment_url
 
     def test_get(self):
-        print(self.url)
         response = self.get()
         obj = response.data["fragment"]
         self.assertEqual(obj["id"], self.fragment_pk)
@@ -369,8 +373,6 @@ class GraphEndpointTestCaseMixin:
         self.assert_merge_retrieve_eq(data)
 
 
-# TODO merge
-# TODO root interaction
 @tag("neo4j")
 class TestRootGraphView(
     GraphEndpointTestCaseMixin,
@@ -385,33 +387,12 @@ class TestRootGraphView(
         TestRootDetailView.setUp(self)
         self.url = reverse("supergraph:root-graph", args=(self.pk,))
 
-    @unittest.expectedFailure  # return format is a bit different
     def test_get_empty(self):
         fromdb = self.retrieve()
-        self.assertEqual(fromdb, {"nodes": [], "edges": []})
+        self.assertEqual(fromdb, {"nodes": [], "edges": [], "groups": []})
 
     def test_basic(self):
         path = DATA_DIR / "basic.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @unittest.expectedFailure  # missing ports in json file
-    def test_basic_attributes(self):
-        path = DATA_DIR / "basic-attributes.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @unittest.expectedFailure  # missing ports in json file
-    def test_basic_nested_attributes(self):
-        path = DATA_DIR / "basic-nested-attributes.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @unittest.expectedFailure  # missing ports in json file
-    def test_basic_edges(self):
-        path = DATA_DIR / "basic-edges.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @unittest.expectedFailure  # missing ports in json file
-    def test_basic_nested_edges(self):
-        path = DATA_DIR / "basic-nested-edges.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
     def test_basic_ports(self):
@@ -420,11 +401,6 @@ class TestRootGraphView(
 
     def test_basic_nested_ports(self):
         path = DATA_DIR / "basic-nested-ports.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @unittest.expectedFailure  # missing ports in json file
-    def test_basic_groups(self):
-        path = DATA_DIR / "basic-groups.json"
         self.assert_merge_retrieve_eq_from_json(path)
 
     def test_sample(self):
@@ -523,106 +499,10 @@ class TestRootGraphView(
         self.assert_merge_retrieve_eq_from_json(new_path)
 
 
-@unittest.skip("deprecated")
-class TestFragmentGraphView(
-    GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
-):
-    def setUp(self):
-        super().setUp()
-
-        # default fragment
-        response = self.client.post(
-            TestFragmentListView.url,
-            data={"name": "sales"},
-            format="json",
-        )
-        self.fragment = response.data["fragment"]
-        self.pk = self.fragment["id"]
-        self.url = reverse("supergraph:fragment-graph", args=(self.pk,))
-
-    def test_vertex(self):
-        path = DATA_DIR / "vertex.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    def test_vertex_port(self):
-        path = DATA_DIR / "vertex-port.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    def test_2vertices_1edge(self):
-        path = DATA_DIR / "2v-1e.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    def test_2vertices_2groups(self):
-        path = DATA_DIR / "2v-2g.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    def test_basic(self):
-        path = DATA_DIR / "basic.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    def test_sample(self):
-        path = DATA_DIR / "sample.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @tag("slow")
-    def test_n25_e25(self):
-        path = DATA_DIR / "n25_e25.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @tag("slow")
-    def test_n50_e25(self):
-        path = DATA_DIR / "n50_e25.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-    @tag("slow")
-    def test_n25_then_n50(self):
-        old = load_data(DATA_DIR / "n25_e25.json")
-        self.merge(old)
-        new_path = DATA_DIR / "n50_e25.json"
-        self.assert_merge_retrieve_eq_from_json(new_path)
-
-    @unittest.skip("not implemented")
-    def test_basic_groups(self):
-        path = DATA_DIR / "basic-groups.json"
-        self.assert_merge_retrieve_eq_from_json(path)
-
-
-# TODO combined tests
-# @unittest.skip("not implemented")
-# class TestFragmentGroupInteraction(
-#     GraphEndpointTestCaseMixin, Neo4jTestCaseMixin, APISimpleTestCase
-# ):
-#     def setUp(self):
-#         super().setUp()
-
-#         # create a fragment
-#         r = self.client.post(
-#             TestFragmentListView.url, data={"name": "marketing"}, format="json"
-#         )
-#         id_ = r.data["fragment"]["id"]
-#         self.url = reverse("supergraph:fragment-graph", args=(id_,))
-
-#     @unittest.expectedFailure
-#     def test_root_merge_overwrite(self):
-#         # merge fragment with some data
-#         old = load_data(DATA_DIR / "basic.json")
-#         self.merge(old)
-
-#         # merge root with other data
-#         new = {"nodes": [{"primitiveID": "cloe"}], "edges": []}
-#         self.merge(new)  # FIXME this sends req to fragment URL, not root URL
-
-#         # make sure fragment is empty
-#         fragment = self.retrieve()
-#         self.assertEqual(fragment, {"nodes": [], "edges": []})
-
-# TODO interaction tests
-# merge
-# fragment, then root
-# root management over-writes fragments data
-# merge f1, f2, get root = combination
-# merge of existing nodes preserves frontier connections
-# merge fragment, then root with same vertices / edges
+@tag("neo4j")
+class TestRootFragmentGraphView:
+    # TODO
+    pass
 
 
 if __name__ == "__main__":
