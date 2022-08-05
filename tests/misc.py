@@ -9,7 +9,10 @@ from complex_rest_dtcd_supergraph.settings import KEYS
 
 
 def sort_payload(data: dict) -> None:
-    """Sort payload dict according to spec in-place."""
+    """Sort payload dict according to spec in-place.
+
+    See docs or `serializers.py` for more info about the format.
+    """
 
     nodes = data[KEYS.nodes]
 
@@ -35,7 +38,7 @@ def sort_payload(data: dict) -> None:
 
 
 def load_data(path) -> dict:
-    """Load and sort graph data."""
+    """Load from JSON and return sorted graph data."""
 
     with open(path) as f:
         data = json.load(f)

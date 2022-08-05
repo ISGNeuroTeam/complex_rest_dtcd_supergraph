@@ -4,22 +4,45 @@
             "primitiveID": "amy",
             "field-meta": "Amy Rock",
             "properties": {
-                "meta&value-num": {
+                "integer & meta": {
                     "type": "cm",
                     "value": 167
                 },
-                "value-string": {
+                "string & no-meta": {
                     "value": "spam"
                 },
-                "empty-value": {
-                    "type": "ham"
+                "integer-array & meta": {
+                    "type": "cm",
+                    "value": [
+                        1,
+                        2,
+                        3
+                    ]
                 },
-                "bad-value": {
-                    "expression": "ml.recommendations (bob)",
+                "meta-only": {
+                    "type": "ham",
+                    "expression": "get type(n);"
+                },
+                "non-savable-value-list-of-dicts & meta": {
+                    "expression": "ml.recommendations (amy)",
                     "value": [
                         {
                             "id": 1
+                        },
+                        {
+                            "id": 2
+                        },
+                        {
+                            "id": 3
                         }
+                    ]
+                },
+                "non-savable-value-non-homogeneous-list & meta": {
+                    "expression": "connected (amy)",
+                    "value": [
+                        42,
+                        "string",
+                        true
                     ]
                 }
             }

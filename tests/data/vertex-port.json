@@ -1,38 +1,58 @@
 {
-	"nodes": [
-		{
-			"primitiveID": "amy",
-			"initPorts": [
-				{
-					"primitiveID": "mobile",
-					"field-meta": "out",
-					"properties": {
-						"value-array-of-strings": {
-							"status": "online",
-							"value": [
-								"arock@corp.org",
-								"amy.rock@mail.com"
-							]
-						},
-						"bad-value0": {
-							"value": [
-								{
-									"id": 1
-								}
-							]
-						},
-						"bad-value1": {
-							"value": [
-								42,
-								"string",
-								true
-							]
-						}
-					}
-				}
-			]
-		}
-	],
-	"edges": [],
-	"groups": []
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "initPorts": [
+                {
+                    "primitiveID": "mobile",
+                    "field-meta": "out",
+                    "properties": {
+                        "integer & meta": {
+                            "type": "cm",
+                            "value": 167
+                        },
+                        "string & no-meta": {
+                            "value": "spam"
+                        },
+                        "integer-array & meta": {
+                            "type": "cm",
+                            "value": [
+                                1,
+                                2,
+                                3
+                            ]
+                        },
+                        "meta-only": {
+                            "type": "ham",
+                            "expression": "get type(n);"
+                        },
+                        "non-savable-value-list-of-dicts & meta": {
+                            "expression": "ml.recommendations (amy)",
+                            "value": [
+                                {
+                                    "id": 1
+                                },
+                                {
+                                    "id": 2
+                                },
+                                {
+                                    "id": 3
+                                }
+                            ]
+                        },
+                        "non-savable-value-non-homogeneous-list & meta": {
+                            "expression": "connected (amy)",
+                            "value": [
+                                42,
+                                "string",
+                                true
+                            ]
+                        }
+                    }
+                }
+            ]
+        }
+    ],
+    "edges": [],
+    "groups": []
 }
