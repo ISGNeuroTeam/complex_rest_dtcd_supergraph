@@ -32,7 +32,8 @@ For this plugin, you can get the latest build from Nexus.
 
 1. Download archive with the latest build from Nexus.
 2. Unpack archive into `complex_rest/plugins` directory.
-3. Run complex rest server.
+3. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
+4. Run complex rest server.
 
 ### Deploy via Make
 
@@ -45,7 +46,8 @@ For this plugin, you can get the latest build from Nexus.
     make pack
     ```
 3. Unpack archive into `complex_rest/plugins` directory.
-4. Run complex rest server.
+4. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
+5. Run complex rest server.
 
 ### Deploy manually
 
@@ -62,13 +64,23 @@ For this plugin, you can get the latest build from Nexus.
     ```sh
     python -m venv venv
     ```
-4. Activate virtual environment and install the requirements (you should have access to *Nexus*):
+4. Activate virtual environment and install the requirements:
     ```sh
     source venv/bin/activate
     pip install -r requirements/production.txt
     ```
 5. Make a **symlink** for `./complex_rest_dtcd_supergraph/complex_rest_dtcd_supergraph` in `complex_rest/plugins` directory.
-6. Run complex rest server.
+6. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
+7. Run complex rest server.
+
+### Re-installing constraints and indexes
+
+Neo4j provides support for applying [indexes](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-indexes) and [constraints](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-constraints). To apply these, you need to run `reinstall_labels.py` script inside the plugin's source code directory. Activate virtual environment, navigate to script's parent directory and run it:
+
+```bash
+source venv/bin/activate
+python reinstall_labels.py
+```
 
 ## Built With
 
