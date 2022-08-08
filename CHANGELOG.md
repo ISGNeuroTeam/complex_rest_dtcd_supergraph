@@ -6,23 +6,26 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
-
-## [0.2.0] - 2022-07-22
 ### Added
-- Support for *groups* in graph data.
-- Serializer with validation for incoming payloads with graph content (IDs & integrity checks).
 - Support for *root* management.
 
 ### Changed
-- Logger name changed to `supergraph`.
-- Support for Neo4j v3.5.
 - Switched to `neomodel` and `neo4j-driver`.
 - Architecture rework.
 - Endpoints for fragment management.
 
 ### Removed
 - `py2neo` dependency.
-- Support for recursive serialization of nested structures.
+- Deprecated support for recursive serialization of nested structures.
+
+## [0.2.0] - 2022-07-22
+### Added
+- Support for *groups* in graph data.
+- Serializer with validation for incoming payloads with graph content (IDs & integrity checks).
+
+### Changed
+- Logger name changed to `supergraph`.
+- Support for Neo4j v3.5.
 
 ## [0.1.3] - 2022-07-01
 ### Changed
