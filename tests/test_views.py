@@ -27,7 +27,11 @@ def reset_db():
 
 
 class APITestCaseMixin:
-    """Some common attributes and methods for API tests."""
+    """Some common attributes and methods for API tests.
+
+    The idea: send an HTTP requests to a URL endpoint, get the response
+    and check the status.
+    """
 
     expected_status = SimpleNamespace(
         get=status.HTTP_200_OK,
@@ -35,7 +39,7 @@ class APITestCaseMixin:
         put=status.HTTP_200_OK,  # or 204; 201 if created
         delete=status.HTTP_200_OK,  # 202 on queue, 204 on no content
     )
-    url = None
+    url = None  # the URL endpoint to check
 
     def get(self):
         """Send `GET` request to `self.url`, validate status and return
@@ -127,27 +131,27 @@ class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
         objects = data["roots"]
         self.assertEqual({item["name"] for item in objects}, names)
 
-    # TODO create(data) -> dict method on a class?
+    @classmethod
+    def create(cls, data: dict) -> dict:
+        """Send `POST` request to create a root and return it."""
+
+        response = CLIENT.post(cls.url, data=data, format="json")
+        return response.data["root"]
 
 
 @tag("neo4j")
 class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
-    name = "sales"
+    root_name = "sales"
 
     def setUp(self) -> None:
-        """Create a root object to work with.
+        """Create a root object to work with using the given name.
 
         Creates a root object and saves it to `self.root`. Root ID is
         available on `self.pk`, and URL to this object at `self.url`.
         """
 
         # default root
-        response = self.client.post(  # note explicit request
-            TestRootListView.url,
-            data={"name": self.name},
-            format="json",
-        )
-        self.root = response.data["root"]
+        self.root = TestRootListView.create({"name": self.root_name})
         self.pk = self.root["id"]
         self.url = reverse("supergraph:root-detail", args=(self.pk,))
 
@@ -155,7 +159,7 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
         response = self.get()
         obj = response.data["root"]
         self.assertEqual(obj["id"], self.pk)
-        self.assertEqual(obj["name"], self.name)
+        self.assertEqual(obj["name"], self.root_name)
 
     def test_put(self):
         data = {"name": "marketing"}
@@ -170,9 +174,15 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
 
 
 class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
-    name = "parent"
+    root_name = "parent"
 
     def setUp(self) -> None:
+        """Create a root object to work with.
+
+        Sets `self.url` to `/roots/<pk>/fragments`. For the rest of the
+        attributes see `TestRootDetailView.setUp()`.
+        """
+
         # create default root to work with
         TestRootDetailView.setUp(self)
         self.url = reverse("supergraph:root-fragments", args=(self.pk,))
@@ -197,16 +207,16 @@ class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTe
 class TestRootFragmentDetailView(
     Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
 ):
-    name = "parent"  # root name
+    root_name = "parent"
     fragment_name = "child"
 
     def setUp(self) -> None:
-        """Create a root, then fragment inside it to work.
+        """Create a root and a fragment for it using given names.
 
-        Creates a root object and saves it to `self.root`. Root ID is
+        The root is at `self.root`. Root ID is
         available on `self.root_pk` and the URL is at `self.root_url`.
 
-        Then creates a fragment for this root and saves it to
+        The fragment for this root is at
         `self.fragment`. Fragment ID is available on `self.fragment_pk`,
         and a full URL is at `self.fragment_url`.
 
@@ -321,42 +331,21 @@ class GraphEndpointTestCaseMixin:
     """Common functionality for testing graph management endpoints.
 
     See docs or `GraphSerializer` for data input/output format.
-    Add this to something with `APITestCaseMixin`.
     """
 
-    def merge(self, data: dict):
-        """Merge new graph data at the `self.url` endpoint."""
+    def assert_graph_eq(self, new: dict, original: dict):
+        """Assert that new graph data is equal to original one.
 
-        data = {"graph": data}
-        return self.put(data=data)
-        # return self.client.put(self.url, data=data, format="json")
-
-    def retrieve(self) -> dict:
-        """Retrieve existing graph data from the `self.url` endpoint.
-
-        The data is sorted.
+        Calls `.assertEqual(new, original)`.
+        Graph data must be sorted.
+        Logs the difference in a debug file.
         """
-
-        r = self.get()
-        # r = self.client.get(self.url)
-        data = r.data["graph"]
-        sort_payload(data)
-        return data
-
-    def assert_merge_retrieve_eq(self, data: dict):
-        """Merge given graph data at `self.url`, then get the result
-        back and and assert both of those are equal.
-        """
-
-        sort_payload(data)
-        self.merge(data)
-        fromdb = self.retrieve()
 
         try:
-            self.assertEqual(fromdb, data)
+            self.assertEqual(new, original)
         except Exception:
             # log the difference
-            diff = dictdiffer.diff(data, fromdb)  # TODO sort it?
+            diff = dictdiffer.diff(original, new)  # TODO sort it?
             diff = list(diff)
             msg = pformat(diff, depth=4, compact=True)
             msg = "Graphs do not match. Difference:\n" + msg
@@ -366,13 +355,41 @@ class GraphEndpointTestCaseMixin:
 
             raise
 
-    def assert_merge_retrieve_eq_from_json(self, path):
+    def merge(self, data: dict, url):
+        """Merge new graph data at the given endpoint."""
+
+        data = {"graph": data}
+        return self.client.put(url, data=data, format="json")
+
+    def retrieve(self, url) -> dict:
+        """Retrieve existing graph data from the given endpoint.
+
+        The data is sorted.
+        """
+
+        r = self.client.get(url)
+        data = r.data["graph"]
+        sort_payload(data)
+
+        return data
+
+    def assert_merge_retrieve_eq(self, data: dict, url):
+        """Merge given graph data at the given URL, then get the result
+        back and and assert both of those are equal.
+        """
+
+        sort_payload(data)
+        self.merge(data, url)
+        fromdb = self.retrieve(url)
+        self.assert_graph_eq(fromdb, data)
+
+    def assert_merge_retrieve_eq_from_json(self, path, url):
         """Load graph data from given path (JSON), merge it, get back
         the result and assert both of those are equal.
         """
 
         data = load_data(path)
-        self.assert_merge_retrieve_eq(data)
+        self.assert_merge_retrieve_eq(data, url)
 
 
 @tag("neo4j")
@@ -382,15 +399,23 @@ class TestRootGraphView(
     APITestCaseMixin,
     APISimpleTestCase,
 ):
-    name = "sales"
+    root_name = "sales"
 
     def setUp(self) -> None:
+        """Create a root object to work with.
+
+        Sets `self.url` to `roots/<pk>/graph`.
+        """
+
         # create default root to work with
         TestRootDetailView.setUp(self)
         self.url = reverse("supergraph:root-graph", args=(self.pk,))
 
+    def assert_merge_retrieve_eq_from_json(self, path):
+        return super().assert_merge_retrieve_eq_from_json(path, self.url)
+
     def test_get_empty(self):
-        fromdb = self.retrieve()
+        fromdb = self.retrieve(self.url)
         self.assertEqual(fromdb, {"nodes": [], "edges": [], "groups": []})
 
     def test_basic(self):
@@ -442,17 +467,17 @@ class TestRootGraphView(
         # prepare original graph
         path = DATA_DIR / "vertex.json"
         data = load_data(path)
-        self.merge(data)
+        self.merge(data, self.url)
 
         # merge same data
-        self.assert_merge_retrieve_eq(data)
+        self.assert_merge_retrieve_eq(data, self.url)
 
     def test_replace_port_with_another(self):
         # merge vertex with port, then replace this port with a new one
         # prepare original graph
         path = DATA_DIR / "vertex-port.json"
         data = load_data(path)
-        self.merge(data)
+        self.merge(data, self.url)
 
         new = load_data(path)
         new["nodes"][0] = {
@@ -461,26 +486,26 @@ class TestRootGraphView(
             "initPorts": [{"primitiveID": "mobile"}, {"primitiveID": "laptop"}],
         }
         # make sure a vertex with one port are merged, the other port is created
-        self.assert_merge_retrieve_eq(new)
+        self.assert_merge_retrieve_eq(new, self.url)
 
     def test_replace_edge_with_none(self):
         # merge 2 vertices with an edge, then remove an edge
         # prepare original graph
         path = DATA_DIR / "2v-1e.json"
         data = load_data(path)
-        self.merge(data)
+        self.merge(data, self.url)
 
         new = load_data(path)
         new["edges"] = []  # same vertices, no edges
         # make sure 2 vertices with ports are merged, the edge is removed
-        self.assert_merge_retrieve_eq(new)
+        self.assert_merge_retrieve_eq(new, self.url)
 
     def test_replace_edge_with_another(self):
         # merge 2 vertices with an edge, then remove an edge
         # prepare original graph
         path = DATA_DIR / "2v-1e.json"
         data = load_data(path)
-        self.merge(data)
+        self.merge(data, self.url)
 
         new = load_data(path)
         new["edges"][0]["meta"] = {
@@ -488,13 +513,13 @@ class TestRootGraphView(
         }
 
         # make sure 2 vertices with ports are merged, the edge is removed
-        self.assert_merge_retrieve_eq(new)
+        self.assert_merge_retrieve_eq(new, self.url)
 
     @tag("slow")
     def test_n25_then_n50(self):
         # first merge
         old = load_data(DATA_DIR / "n25_e25.json")
-        self.merge(old)
+        self.merge(old, self.url)
 
         # over-write
         new_path = DATA_DIR / "n50_e25.json"
@@ -502,9 +527,57 @@ class TestRootGraphView(
 
 
 @tag("neo4j")
-class TestRootFragmentGraphView:
-    # TODO
-    pass
+class TestRootFragmentGraphView(
+    GraphEndpointTestCaseMixin,
+    Neo4jTestCaseMixin,
+    APISimpleTestCase,
+):
+    root_name = "parent"
+    fragment_name = "child"
+
+    def setUp(self) -> None:
+        """Create graph endpoints for root and its fragment.
+
+        Root graph endpoint URL is at `self.root_url`.
+        Fragment graph endpoint URL is at `self.fragment_url`.
+        """
+
+        TestRootFragmentDetailView.setUp(self)
+        # re-wire root_url and fragment_url to point at corresp. graph endpoints
+        # URL: roots/<root_pk>/graph
+        self.root_url = reverse("supergraph:root-graph", args=(self.root_pk,))
+        # URL: roots/<root_pk>/fragments/<fragment_pk>/graph
+        self.fragment_url = reverse(
+            "supergraph:root-fragment-graph", args=(self.root_pk, self.fragment_pk)
+        )
+        self.url = None  # we do not use self.url in this suite of tests
+
+    def test_fragment_creates_root_sees(self):
+        # fragment creates shared graph, root sees it
+        data = load_data(DATA_DIR / "basic.json")
+        self.merge(data, self.fragment_url)  # as fragment
+        # root must see the same graph
+        fromdb_as_root = self.retrieve(self.root_url)
+        self.assert_graph_eq(fromdb_as_root, data)
+
+    def test_root_merges_fragment_sees(self):
+        # root changes shared graph, fragment sees it
+        # initial data on fragment
+        old = load_data(DATA_DIR / "basic.json")
+        self.merge(old, self.fragment_url)  # as fragment
+        # root merges shared data
+        new = load_data(DATA_DIR / "vertex.json")  # same node ID
+        self.merge(new, self.root_url)  # as root
+        # fragment must see changes in shared data
+        fromdb_as_fragment = self.retrieve(self.fragment_url)
+        self.assert_graph_eq(fromdb_as_fragment, new)
+
+    def test_root_creates_fragment_does_not_see(self):
+        # root creates something, fragment does not see it
+        data = load_data(DATA_DIR / "basic.json")
+        self.merge(data, self.root_url)  # as root
+        fromdb_as_fragment = self.retrieve(self.fragment_url)
+        self.assertNotEqual(fromdb_as_fragment, data)
 
 
 if __name__ == "__main__":
