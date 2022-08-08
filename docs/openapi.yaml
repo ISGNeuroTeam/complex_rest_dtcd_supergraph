@@ -4,8 +4,7 @@ info:
   title: REST API for supergraph plugin
   description: |
     This API allows interaction with Neo4j graph database.
-  # TODO better version handling?
-  version: 0.2.0
+  version: 0.3.0
   contact:
     name: Aleksei Tsysin
     email: atsysin@isgneuro.com
@@ -16,8 +15,9 @@ info:
 components:
   schemas:
     id:
-      type: integer
-      minimum: 0
+      type: string
+      format: uuid
+      readOnly: true
     fragment:
       type: object
       properties:
@@ -25,6 +25,18 @@ components:
           $ref: "#/components/schemas/id"
         name:
           type: string
+    root:
+      type: object
+      properties:
+        id:
+          $ref: "#/components/schemas/id"
+        name:
+          type: string
+        fragments:
+          type: array
+          items:
+            $ref: "#/components/schemas/fragment"
+          readOnly: true
     node:
       # TODO better schema
       type: object
@@ -45,6 +57,8 @@ components:
           type: string
         targetPort:
           type: string
+    group:
+      $ref: "#/components/schemas/node"
     graph:
       # TODO better schema
       type: object
@@ -57,6 +71,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/edge"
+        groups:
+          type: array
+          items:
+            $ref: "#/components/schemas/group"
     # TODO schema for errors and status in responses?
 
   parameters:
@@ -66,9 +84,53 @@ components:
       required: true
       schema:
         $ref: "#/components/schemas/id"
+    root_id:
+      name: root_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/id"
+    fragment_id:
+      name: fragment_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/id"
+
+  responses:
+    root:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              root:
+                $ref: "#/components/schemas/root"
+    roots:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              roots:
+                type: array
+                items:
+                  $ref: "#/components/schemas/root"
+    graph:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              graph:
+                $ref: "#/components/schemas/graph"
 
 # TODO responses?
 
+# TODO re-do tags
 tags:
   - name: list
   - name: detail
@@ -77,6 +139,303 @@ tags:
   - name: admin
 
 paths:
+  /roots:
+    summary: Root list
+    get:
+      summary: Get all roots
+      description: Retrieves an array of all existing roots.
+      tags:
+        - list
+      responses:
+        "200": 
+          $ref: "#/components/responses/roots"
+    post:
+      summary: Create a new root
+      description: Create a new root with a given name.
+      tags:
+        - list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/root"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  root:
+                    $ref: "#/components/schemas/root"
+
+  /roots/{id}:
+    summary: Root details
+    description: Operations on a single root.
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      summary: Get root detail
+      tags:
+        - detail
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  root:
+                    $ref: "#/components/schemas/root"
+        "404":
+          description: Not found
+    put:
+      summary: Update the root
+      tags:
+        - detail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/root"
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  root:
+                    $ref: "#/components/schemas/root"
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+        "404":
+          description: Not found
+    delete:
+      summary: Delete the root and its content
+      tags:
+        - detail
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not found
+
+  /roots/{id}/graph:
+    summary: Graph content of the root
+    description: Operations on roots's graph.
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      summary: Get root's graph
+      tags:
+        - graph
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  graph:
+                    $ref: "#/components/schemas/graph"
+        "404":
+          description: Not found
+    put:
+      summary: Update the graph of this root
+      description: |
+        We update the graph by *merging* on vertex and edge IDs.
+      tags:
+        - graph
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graph:
+                  $ref: "#/components/schemas/graph"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+          # TODO problems with graph loading
+        "404":
+          description: Not found
+    delete:
+      summary: Delete a graph of this root
+      tags:
+        - graph
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not found
+
+  /roots/{id}/fragments:
+    summary: List of root fragments
+    description: Operations on fragments of this root.
+    parameters:
+      - $ref: "#/components/parameters/id"
+    get:
+      summary: Get a list of this root's fragments
+      tags:
+        - list
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragments:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/fragment"
+        "404":
+          description: Not found
+    post:
+      summary: Create a new fragment inside this root
+      description: Create a new fragment inside this root with a given name.
+      tags:
+        - list
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/fragment"
+      responses:
+        "201":
+          description: Created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragment:
+                    $ref: "#/components/schemas/fragment"
+        "404":
+          description: Not found
+
+  /roots/{root_id}/fragments/{fragment_id}:
+    summary: Details of this root's fragment
+    description: Operations on a particular fragment of this root.
+    parameters:
+      - $ref: "#/components/parameters/root_id"
+      - $ref: "#/components/parameters/fragment_id"
+    get:
+      summary: Get fragment detail
+      tags:
+        - detail
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragment:
+                    $ref: "#/components/schemas/fragment"
+        "404":
+          description: Not found
+    put:
+      summary: Update a fragment
+      tags:
+        - detail
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  fragment:
+                    $ref: "#/components/schemas/fragment"
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+        "404":
+          description: Not found
+    delete:
+      summary: Delete a fragment and its content
+      tags:
+        - detail
+      responses:
+        "200":
+          description: OK
+        "404":
+          description: Not found
+
+  /roots/{root_id}/fragments/{fragment_id}/graph:
+    summary: Graph content of the fragment
+    description: Operations on the graph of a particular fragment of this root.
+    parameters:
+      - $ref: "#/components/parameters/root_id"
+      - $ref: "#/components/parameters/fragment_id"
+    get:
+      summary: Get fragment's graph
+      tags:
+        - graph
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  graph:
+                    $ref: "#/components/schemas/graph"
+        "404":
+          description: Not found
+    put:
+      summary: Update a graph of this fragment
+      description: |
+        We update the graph by *merging* on vertex and edge IDs.
+      tags:
+        - graph
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                graph:
+                  $ref: "#/components/schemas/graph"
+      responses:
+        "200":
+          description: OK
+        "400":
+          description: Errors in the request body
+          # TODO possible details?
+          # TODO problems with graph loading
+        "404":
+          description: Not found
+
   /fragments:
     summary: Fragment list
     get:
@@ -234,53 +593,6 @@ paths:
           description: OK
         "404":
           description: Not found
-
-  /fragments/root/graph:
-    summary: Full graph content
-    description: Operations on full graph content.
-    get:
-      summary: Get full content graph
-      tags:
-        - root
-      responses:
-        "200":
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  graph:
-                    $ref: "#/components/schemas/graph"
-    put:
-      summary: Update a content's graph
-      description: |
-        We update the graph by *merging* on vertex and edge IDs.
-      tags:
-        - root
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                graph:
-                  $ref: "#/components/schemas/graph"
-      responses:
-        "200":
-          description: OK
-        "400":
-          description: Errors in the request body
-          # TODO possible details?
-          # TODO problems with graph loading
-    delete:
-      summary: Delete graph content
-      tags:
-        - root
-      responses:
-        "200":
-          description: OK
 
   /reset:
     post:
