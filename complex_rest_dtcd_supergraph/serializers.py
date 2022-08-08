@@ -9,27 +9,43 @@ from types import SimpleNamespace
 from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
-from .fields import EdgeField, GroupField, VertexField
-from .models import Fragment
-from .settings import SCHEMA
+from .fields import CustomUUIDFIeld, EdgeField, GroupField, VertexField
+from .models import Container, Fragment, Root
+from .settings import KEYS
 
 
-class FragmentSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True, source="__primaryvalue__")
+class ContainerSerializer(serializers.Serializer):
+    id = CustomUUIDFIeld(read_only=True, source="uid")
     name = serializers.CharField(max_length=255)  # TODO value in settings
 
-    def create(self, validated_data) -> Fragment:
-        """Construct local fragment instance."""
-        return Fragment(**validated_data)
+    container_class = Container
 
-    def update(self, instance, validated_data):
-        """Update local fragment instance."""
+    def create(self, validated_data):
+        """Construct an instance and save it to the database."""
+
+        return self.container_class(**validated_data).save()
+
+    def update(self, instance: container_class, validated_data: dict):
+        """Update the instance in the database."""
+
         instance.name = validated_data["name"]
-        return instance
 
-    def save(self, **kwargs) -> Fragment:
-        """Create or update local fragment instance."""
+        return instance.save()
+
+    def save(self, **kwargs) -> container_class:
+        """Create or update an instance in the database."""
+
         return super().save(**kwargs)
+
+
+class FragmentSerializer(ContainerSerializer):
+    container_class = Fragment
+
+
+class RootSerializer(ContainerSerializer):
+    container_class = Root
+
+    fragments = FragmentSerializer(read_only=True, source="fragments.all", many=True)
 
 
 class ContentSerializer(serializers.Serializer):
@@ -40,73 +56,87 @@ class ContentSerializer(serializers.Serializer):
     }
 
     keys = SimpleNamespace(
-        id=SCHEMA["keys"]["yfiles_id"],
-        src_node=SCHEMA["keys"]["source_node"],
-        tgt_node=SCHEMA["keys"]["target_node"],
-        src_port=SCHEMA["keys"]["source_port"],
-        tgt_port=SCHEMA["keys"]["target_port"],
-        parent_id=SCHEMA["keys"]["parent_id"],
+        id=KEYS.yfiles_id,
+        src_node=KEYS.source_node,
+        tgt_node=KEYS.target_node,
+        src_port=KEYS.source_port,
+        tgt_port=KEYS.target_port,
+        parent_id=KEYS.parent_id,
+        init_ports=KEYS.init_ports,
     )
 
     nodes = serializers.ListField(child=VertexField(), allow_empty=False)
     edges = serializers.ListField(child=EdgeField())
     groups = serializers.ListField(required=False, child=GroupField())
 
-    def validate_nodes(self, value):
-        groups = value
-        ids = set(map(itemgetter(self.keys.id), groups))
+    # TODO validate uniqueness of all IDs
 
-        if len(ids) != len(groups):
+    def validate_nodes(self, value):
+        ids = set(map(itemgetter(self.keys.id), value))
+
+        if len(ids) != len(value):
             self.fail("not_unique")
 
-        return groups
+        # TODO validate ports
+
+        return value
 
     def validate_edges(self, value):
-        edges = value
         keys = (
             self.keys.src_node,
             self.keys.tgt_node,
             self.keys.src_port,
             self.keys.tgt_port,
         )
-        ids = set(map(itemgetter(*keys), edges))
+        ids = set(map(itemgetter(*keys), value))
 
-        if len(ids) != len(edges):
+        if len(ids) != len(value):
             self.fail("not_unique")
 
-        return edges
+        return value
 
     def validate_groups(self, value):
-        groups = value
-
         # unique IDs
-        groups = self.validate_nodes(groups)
+        value = self.validate_nodes(value)
 
         # no self-reference
-        for obj in groups:
+        for obj in value:
             id_ = obj[self.keys.id]
             parent_id = obj.get(self.keys.parent_id)
 
             if parent_id == id_:
                 self.fail("self_reference", value=id_)
 
-        return groups
+        return value
 
     def validate(self, data: dict):
         self._validate_references(data)
         self._validate_parent_groups_exist(data)
+
         return data
 
     def _validate_references(self, data: dict):
-        # for each edge, make sure referred nodes really exist
         nodes = data["nodes"]
-        node_ids = set(map(itemgetter(self.keys.id), nodes))
         edges = data["edges"]
 
+        # for each edge, make sure referred nodes really exist
+        node_ids = set(map(itemgetter(self.keys.id), nodes))
         for id_ in chain.from_iterable(
             map(itemgetter(self.keys.src_node, self.keys.tgt_node), edges)
         ):
             if id_ not in node_ids:
+                self.fail("does_not_exist", value=id_)
+
+        # for each edge, make sure referred ports really exist
+        port_ids = set()
+        for node in nodes:
+            for port in node.get(self.keys.init_ports, []):
+                port_ids.add(port.get(self.keys.id))
+
+        for id_ in chain.from_iterable(
+            map(itemgetter(self.keys.src_port, self.keys.tgt_port), edges)
+        ):
+            if id_ not in port_ids:
                 self.fail("does_not_exist", value=id_)
 
     def _validate_parent_groups_exist(self, data: dict):

@@ -1,87 +1,112 @@
 """
-This module provides custom utility functions for working with Cypher.
+This module provides custom utility functions.
 """
 
-from typing import Generator
+import uuid
+from typing import Sequence
 
-from py2neo import Node, Relationship, Subgraph, Transaction
-from py2neo.cypher import Cursor, cypher_join
-
-from . import clauses
-
-
-def filter_nodes(subgraph: Subgraph, label: str) -> Generator[Node, None, None]:
-    """Construct an iterator over subgraph nodes with the given label."""
-    return (x for x in subgraph.nodes if x.has_label(label))
+import neomodel
+from neomodel import contrib
 
 
-def match_nodes(tx: Transaction, match_clause: str, **params) -> Cursor:
-    """Run Cypher query and return a cursor over node records.
+# allowed property types in neo4j
+# see https://neo4j.com/docs/cypher-manual/current/syntax/values/#property-types
+PROPERTY_TYPES = (int, float, str, bool)
 
-    Uses provided match clause to construct a query. The clause itself
-    must have a `p` pattern variable representing a path with nodes &
-    relationships we are interested in.
+
+# custom Django path converters
+# https://docs.djangoproject.com/en/4.0/topics/http/urls/#registering-custom-path-converters
+class HexUUIDConverter:
+    """Matches/converts a UUID from/to a string of 32 hexadecimal digits."""
+
+    regex = "[0-9a-f]{32}"
+
+    def to_python(self, value: str):
+        return uuid.UUID(value)
+
+    def to_url(self, value: str):
+        return str(value)
+
+
+def free_properties(node: contrib.SemiStructuredNode):
+    """Return a dictionary with ad-hoc properties for a given node.
+
+    Ad-hoc properties are those not specified at node's definition.
     """
 
-    # match clause must have 'p' pattern variable representing a path with
-    # nodes & relationships we are interested in
-    q, params = cypher_join(match_clause, clauses.RETURN_NODES, **params)
-    return tx.run(q, params)
+    # see SemiStructuredNode.inflate, NodeMeta and PropertyManager
+    defined: dict = node.defined_properties(aliases=False, rels=False)
+    existing: dict = node.__properties__
+    free = set(existing) - set(defined) - {"id"}
+
+    return {key: existing[key] for key in free}
 
 
-def match_relationships(tx: Transaction, match_clause: str, **params) -> Cursor:
-    """Run Cypher query and return a cursor over relationship records.
+def save_properties(properties: dict, node: contrib.SemiStructuredNode):
+    """Save properties dictionary on a given node."""
 
-    Uses provided match clause to construct a query. The clause itself
-    must have a `p` pattern variable representing a path with nodes &
-    relationships we are interested in.
+    for key, val in properties.items():
+        setattr(node, key, val)
 
-    The records have the following keys:
-    - `start_id`
-    - `end_id`
-    - `type`
-    - `properties`
+    return node
+
+
+def connect_if_not_connected(
+    manager: neomodel.RelationshipManager,
+    node: neomodel.StructuredNode,
+    properties: dict = None,
+) -> neomodel.StructuredRel:
+    """Use the relationship manager to connect a node.
+
+    If the connection exists, return it. Otherwise, create new relation
+    with the given properties and return it.
     """
 
-    q, params = cypher_join(match_clause, clauses.RETURN_RELATIONSHIPS, **params)
-    return tx.run(q, params)
+    if not manager.is_connected(node):
+        return manager.connect(node, properties)
+    else:
+        return manager.relationship(node)
 
 
-def subgraph(nodes_cursor: Cursor, relationships_cursor: Cursor) -> Subgraph:
-    """Return bound subgraph from cursors.
-
-    Relationship records must reference nodes from node cursor.
+def valid_property(value) -> bool:
+    """
+    Return `True` if the value is a valid Neo4j property, `False` otherwise.
     """
 
-    # nodes
-    nodes = set(record[0] for record in nodes_cursor)
-    id2node = {node.identity: node for node in nodes}
-
-    # relationships
-    # workaround: py2neo sucks at efficient conversion of rels to Subgraph
-    # manually construct Relationships
-    relationships = []
-
-    for record in relationships_cursor:
-        start_node = id2node[record["start_id"]]
-        end_node = id2node[record["end_id"]]
-        type_ = record["type"]
-        properties = record.get("properties", {})
-        relationships.append(Relationship(start_node, type_, end_node, **properties))
-
-    return Subgraph(id2node.values(), relationships)
+    return isinstance(value, PROPERTY_TYPES)
 
 
-def subgraph_from_match_clause(
-    tx: Transaction, match_clause: str, **params
-) -> Subgraph:
-    """Run Cypher query using the provided clause and return a subgraph.
+def homogeneous(seq: Sequence) -> bool:
+    """Return `True` if all items in a sequence have the same type,
+    `False` otherwise."""
 
-    Uses provided match clause to construct a query for nodes &
-    relationships. The clause itself must have a `p` pattern variable
-    representing a path with nodes & relationships we are interested in.
+    if len(seq) == 0:
+        return True
+
+    t = type(seq[0])
+
+    return all(type(item) is t for item in seq)
+
+
+def savable_as_property(value) -> bool:
+    """Return `True` if the value can be stored as Neo4j property,
+    `False` otherwise.
+
+    See https://neo4j.com/docs/cypher-manual/current/syntax/values/ for
+    more information on property types.
     """
 
-    nodes_cursor = match_nodes(tx, match_clause, **params)
-    rels_cursor = match_relationships(tx, match_clause, **params)
-    return subgraph(nodes_cursor, rels_cursor)
+    # valid property
+    if valid_property(value):
+        return True
+
+    # homogeneous lists of valid properties
+    if (
+        isinstance(value, list)
+        and all(map(valid_property, value))
+        and homogeneous(value)
+    ):
+        return True
+
+    # anything else is invalid
+    return False

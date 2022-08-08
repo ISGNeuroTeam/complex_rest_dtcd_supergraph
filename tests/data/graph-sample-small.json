@@ -64,5 +64,6 @@
             "targetNode": "n2",
             "targetPort": "p3"
         }
-    ]
+    ],
+    "groups": []
 }

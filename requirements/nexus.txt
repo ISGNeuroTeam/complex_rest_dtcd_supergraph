@@ -1,7 +1,0 @@
-# add isgneuro archive
-# see https://pip.pypa.io/en/latest/reference/requirements-file-format/#global-options
---extra-index-url http://s.dev.isgneuro.com/repository/ot.platform/simple
---trusted-host s.dev.isgneuro.com
-
-# packages from isgneuro nexus
-neo-tools==0.2.*

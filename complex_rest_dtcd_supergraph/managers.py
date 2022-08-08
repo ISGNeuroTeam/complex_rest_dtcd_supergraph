@@ -5,313 +5,268 @@ These help us abstract management operations for graphs, fragments, etc.
 and isolate details and complexity.
 """
 
+from collections import defaultdict
+from dataclasses import dataclass
 from itertools import chain
-from typing import List, Set, Tuple, Union
+from typing import Iterable, List, Mapping, Sequence
 
-from py2neo import Graph, Node, Relationship, Subgraph, Transaction
-from py2neo import ogm
-from py2neo.cypher import cypher_join
+import neomodel
 
-from . import clauses
-from .exceptions import (
-    FragmentDoesNotBelongToGraph,
-    FragmentIsNotBound,
-)
-from .models import Fragment
-from .settings import SCHEMA
-from .utils import filter_nodes, match_nodes, subgraph_from_match_clause
+from . import models
+from . import structures
+from .models.relations import RELATION_TYPES
+from .utils import connect_if_not_connected, free_properties
 
 
-# TODO custom type aliases
-FragmentID = int
+def reconnect_to_container(
+    container: models.Container,
+    vertices: Iterable[models.Vertex],
+    groups: Iterable[models.Group],
+):
+    """Reconnect merged entities to parent container."""
 
-KEYS = SCHEMA["keys"]
-LABELS = SCHEMA["labels"]
-TYPES = SCHEMA["types"]
+    for vertex in vertices:
+        connect_if_not_connected(container.vertices, vertex)
 
-
-class Neo4jGraphManager:
-    """Interface to Neo4j operations."""
-
-    def __init__(self, profile: str, name: str = None, **settings):
-        self._graph = Graph(profile, name, **settings)
-        # TODO make sure graph is available
-        self._fragment_manager = FragmentManager(self._graph)
-
-    def clear(self):
-        """Remove all nodes and relationships from managed graph."""
-
-        self._graph.delete_all()
-
-    @property
-    def fragments(self):
-        """Fragment manager for this graph."""
-
-        return self._fragment_manager
+    for group in groups:
+        connect_if_not_connected(container.groups, group)
 
 
-class FragmentManager:
-    """ADT for fragment and content management."""
+class _Reader:
+    """Read operations on a container."""
 
-    def __init__(self, graph: Graph):
-        self._graph = graph
-        self._repo = ogm.Repository.wrap(self._graph)  # ogm management
-        # content manager works on the same graph
-        self._content_manager = ContentManager(self._graph)
+    def __init__(self) -> None:
+        self._foreign_key_mapping = defaultdict(set)  # parent:children uid pairs
 
-    def all(self) -> List[Fragment]:
-        """Return a list of all fragments."""
-        return Fragment.match(self._repo).all()
+    def _query_ports(self, vertices: Iterable[models.Vertex]):
+        ports: List[models.Port] = []
 
-    def get(self, fragment_id: int) -> Union[Fragment, None]:
-        """Return a fragment with given id if it exists, None otherwise."""
-        return self._repo.get(Fragment, fragment_id)
+        for vertex in vertices:
+            for port in vertex.ports.all():
+                ports.append(port)
+                self._foreign_key_mapping[vertex.uid].add(port.uid)
 
-    def save(self, *fragments: Fragment):
-        """Save local fragments into the repository.
-
-        Creates or updates fragments depending on if they exist in the
-        database.
-        """
-        self._repo.save(*fragments)
-
-    def remove(self, fragment: Fragment):
-        """Remove fragment and its content."""
-
-        # TODO separate txs
-        self.content.remove(fragment)
-        self._repo.delete(fragment)
-
-    # TODO clear method
-
-    @property
-    def content(self):
-        """Content manager for this graph."""
-        return self._content_manager
-
-
-class ContentManager:
-    """ADT for management of fragment's content."""
-
-    def __init__(self, graph: Graph):
-        self._graph = graph
-
-    def _validate(self, fragment: Fragment):
-        """Validate the given fragment.
-
-        - Raise `FragmentIsNotBound` exception if a fragment is not bound.
-        - Raise `FragmentDoesNotBelongToGraph` if fragment's graph is
-            different from this one.
-        """
-
-        if fragment.__primaryvalue__ is None:
-            raise FragmentIsNotBound
-        if fragment.__node__.graph != self._graph:
-            raise FragmentDoesNotBelongToGraph
+        return ports
 
     @staticmethod
-    def _match_entity_trees_clause(fragment_id: int = None) -> Tuple[str, dict]:
-        """Prepare Cypher clause and params to match graph's content.
+    def _to_primitive(node, subclass):
+        uid = node.uid
+        properties = free_properties(node)
+        meta = node.meta_
 
-        If `fragment_id` is provided, then match entities, their trees
-        and relationships between them from a given fragment. Otherwise,
-        match all content.
-        """
+        return subclass(uid=uid, properties=properties, meta=meta)
 
-        # TODO does not match (entity) --> (entity) relationships
-        # case 1: match all entities
-        if fragment_id is None:
-            label = LABELS["entity"]
-            return cypher_join(
-                f"MATCH (entity:{label})",
-                clauses.MATCH_DATA,
-            )
-        # case 2: match entities of a given fragment
-        else:
-            return cypher_join(
-                clauses.MATCH_FRAGMENT,
-                clauses.MATCH_ENTITIES,
-                clauses.MATCH_DATA,
-                id=fragment_id,
-            )
+    def _to_vertex(self, node: models.Vertex):
+        vertex = self._to_primitive(node, subclass=structures.Vertex)
 
-    def _nodes(self, tx: Transaction, fragment_id: int = None) -> Set[Node]:
-        """
-        Return a set of content nodes.
+        # populate ports mappings
+        for child_id in self._foreign_key_mapping.get(vertex.uid, []):
+            vertex.ports.add(child_id)
 
-        If `fragment_id` is provided, then match nodes from a given
-        fragment. Otherwise, match all content nodes.
-        """
+        return vertex
 
-        match_clause, params = self._match_entity_trees_clause(fragment_id)
-        cursor = match_nodes(tx, match_clause, **params)
-        return set(record[0] for record in cursor)
+    def read(self, container: models.Container) -> structures.Content:
+        self._foreign_key_mapping.clear()
 
-    def _all(self, tx: Transaction) -> Subgraph:
-        """Return bound subgraph with content."""
+        # step 1 - get the insides
+        vertices = container.vertices.all()
+        ports = self._query_ports(vertices)
+        edges = container.edges
+        groups = container.groups.all()
 
-        match_clause, params = self._match_entity_trees_clause()
-        return subgraph_from_match_clause(tx, match_clause, **params)
+        # step 2 - map to content
+        vertices = [self._to_vertex(node) for node in vertices]
+        ports = [self._to_primitive(node, structures.Port) for node in ports]
+        edges = [
+            structures.Edge(start=start.uid, end=end.uid, meta=edge.meta_)
+            for (start, edge, end) in edges
+        ]
+        groups = [self._to_primitive(node, structures.Group) for node in groups]
 
-    def _get(self, tx: Transaction, fragment: Fragment) -> Subgraph:
-        """Return bound subgraph with content of a given fragment."""
-
-        self._validate(fragment)
-        fragment_id = fragment.__primaryvalue__
-        match_clause, params = self._match_entity_trees_clause(fragment_id)
-        return subgraph_from_match_clause(tx, match_clause, **params)
-
-    def read(self, fragment: Fragment = None) -> Subgraph:
-        """Return a bound subgraph with content.
-
-        If a fragment is given, then content belongs to the given fragment.
-        Otherwise, returns full content.
-        """
-
-        tx = self._graph.begin(readonly=True)
-
-        if fragment is None:
-            subgraph = self._all(tx)
-        else:
-            subgraph = self._get(tx, fragment)
-
-        self._graph.commit(tx)
-
-        return subgraph
-
-    @staticmethod
-    def _merge_vertices(tx: Transaction, subgraph: Subgraph) -> Set[Node]:
-        """Merge Vertex nodes from subgraph, return a set of merged nodes."""
-
-        # merge vertex roots on (label, yfiles_id)
-        label = LABELS["node"]
-        vertices = filter_nodes(subgraph, label)  # O(n)
-        key = KEYS["yfiles_id"]
-        subgraph = Subgraph(vertices)  # TODO better way to return merged nodes?
-        tx.merge(subgraph, label, key)
-
-        return set(subgraph.nodes)
-
-    @staticmethod
-    def _merge_edges(tx: Transaction, subgraph: Subgraph) -> Set[Node]:
-        """Merge Edge nodes from subgraph, return a set of merged nodes."""
-        label = LABELS["edge"]
-        edges = filter_nodes(subgraph, label)  # O(n)
-        keys = tuple(
-            KEYS[key]
-            for key in ("source_node", "source_port", "target_node", "target_port")
+        return structures.Content(
+            vertices=vertices,
+            ports=ports,
+            edges=edges,
+            groups=groups,
         )
-        subgraph = Subgraph(edges)  # TODO better way to return merged nodes?
-        tx.merge(subgraph, label, keys)
 
-        return set(subgraph.nodes)
+
+class _Deprecator:
+    """Deletes deprecated content of a container."""
 
     @staticmethod
-    def _merge_groups(tx: Transaction, subgraph: Subgraph) -> Set[Node]:
-        """Merge Group nodes from subgraph, return a set of merged nodes."""
+    def _delete_deprecated_vertices_groups_ports(
+        container: models.Container, content: structures.Content
+    ):
+        """Delete vertices, groups and ports from the container not in the content."""
 
-        label = LABELS["group"]
-        groups = filter_nodes(subgraph, label)  # O(n)
-        key = KEYS["yfiles_id"]
-        subgraph = Subgraph(groups)
-        tx.merge(subgraph, label, key)
+        # query uids of primitive nodes (vertices, groups, ports) in the container
+        uid2node = {}
 
-        return set(subgraph.nodes)
+        for vertex in container.vertices.all():
+            uid2node[vertex.uid] = vertex
 
-    def _merge(self, tx: Transaction, subgraph: Subgraph, fragment: Fragment = None):
-        """Merge given subgraph into the fragment.
+            for port in vertex.ports.all():
+                uid2node[port.uid] = port
 
-        We want to preserve connections (edges and frontier vertices)
-        between fragments. The merge is made as follows:
+        for group in container.groups.all():
+            uid2node[group.uid] = group
 
-        1. Merge roots of the following entity trees:
-            1. vertices
-            2. edges
-            3. groups
-        2. Remove old nodes & relationships.
-        3. Re-link fragment with new entities to be created.
-        4. Merge the rest and fragment-entity links.
-        """
-
-        # FIXME this procedure fails when adding existing entities
-        # outside current fragment
-        # merge tree roots = preserve relationships
-        vertices = self._merge_vertices(tx, subgraph)
-        edges = self._merge_edges(tx, subgraph)
-        groups = self._merge_groups(tx, subgraph)
-
-        # delete outdated nodes
-        if fragment is not None:
-            current = self._nodes(tx, fragment.__primaryvalue__)
-        else:
-            current = self._nodes(tx)
-        old = current - vertices - edges - groups
-        tx.delete(Subgraph(old))
-
-        # re-link fragment to subgraph entities (roots of their trees)
-        if fragment is not None:
-            root = fragment.__node__
-            type_ = TYPES["contains_entity"]
-            links = set(
-                Relationship(root, type_, entity)
-                for entity in chain(vertices, edges, groups)
+        new_uids = set(
+            item.uid
+            for item in chain(
+                content.vertices,
+                content.ports,
+                content.groups,
             )
-        else:
-            links = []
-
-        # create the rest of the subgraph & fragment-entity links
-        # skips existing nodes & relationships
-        tx.create(subgraph | Subgraph(relationships=links))
-
-    def replace(self, subgraph: Subgraph, fragment: Fragment = None):
-        """Replace old content of a fragment with a new one.
-
-        Merges existing and deletes old nodes, binds subgraph nodes on
-        success.
-        If `fragment` is provided, then replace content from a given
-        fragment. Otherwise, replace the whole content.
-        """
-
-        # TODO error handling? (non-bound fragment, empty, bad format / input)
-        if fragment is not None:
-            self._validate(fragment)
-
-        tx = self._graph.begin()
-        self._merge(tx, subgraph, fragment)
-        self._graph.commit(tx)
-
-    def remove(self, fragment: Fragment):
-        """Remove content of a given fragment.
-
-        Does not remove fragment root node.
-        """
-
-        self._validate(fragment)
-        fragment_id = fragment.__primaryvalue__
-        match_clause, params = self._match_entity_trees_clause(fragment_id)
-        q, params = cypher_join(
-            match_clause,
-            clauses.DELETE_NODES,
-            **params,
         )
-        self._graph.update(q, params)
+        deprecated_uids = set(uid2node) - new_uids
 
-    def clear(self):
-        """Remove all content from this graph."""
+        for uid in deprecated_uids:
+            uid2node[uid].delete()
 
-        match_content, _ = self._match_entity_trees_clause()
-        q, _ = cypher_join(
-            match_content,
-            clauses.DELETE_NODES,
+        return deprecated_uids
+
+    @staticmethod
+    def _delete_deprecated_edges(
+        container: models.Container, content: structures.Content
+    ):
+        """Delete edges from the container not in the content."""
+
+        current_uids = set((op.uid, ip.uid) for op, _, ip in container.edges)
+        new_uids = set(edge.uid for edge in content.edges)
+        deprecated_uids = current_uids - new_uids
+
+        neomodel.db.cypher_query(
+            query=(
+                "UNWIND $list AS pair "
+                "MATCH ({uid: pair[0]}) "
+                f" -[r:{RELATION_TYPES.edge}]-> "
+                "({uid: pair[1]}) "
+                "DELETE r"
+            ),
+            params={"list": list(map(list, deprecated_uids))},
         )
-        self._graph.update(q)
 
-    def empty(self, fragment: Fragment) -> bool:
-        """Return True if fragment's content is empty, False otherwise."""
+        return deprecated_uids
 
-        self._validate(fragment)
-        # empty if there are no links to entities
-        n = fragment.__node__
-        link = self._graph.match_one((n,), r_type=TYPES["contains_entity"])
+    def delete_difference(
+        self, container: models.Container, content: structures.Content
+    ):
+        """Delete entities from the container that are not in the content."""
 
-        return link is None
+        self._delete_deprecated_vertices_groups_ports(container, content)
+        self._delete_deprecated_edges(container, content)
+
+
+class _Merger:
+    """Merges content entities."""
+
+    @dataclass(frozen=True)
+    class MergedResult:
+        """Lightweight container for merged entities."""
+
+        __slots__ = ["vertices", "ports", "edges", "groups"]
+        vertices: Sequence[models.Vertex]
+        ports: Sequence[models.Port]
+        edges: Sequence[models.EdgeRel]
+        groups: Sequence[models.Group]
+
+    @staticmethod
+    def _merge_ports(ports: Iterable[structures.Port]):
+        # FIXME possible clash between user-defined property name and uid/meta_ key
+        data = [
+            dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
+        ]
+
+        return models.Port.create_or_update(*data)
+
+    @staticmethod
+    def _merge_edges(
+        edges: Iterable[structures.Edge],
+        uid2port: Mapping[structures.ID, models.Port],
+    ) -> List[models.EdgeRel]:
+        relations = []
+
+        for edge in edges:
+            output_port = uid2port[edge.start]
+            input_port = uid2port[edge.end]
+            rel = connect_if_not_connected(output_port.neighbor, input_port)
+            rel.meta_ = edge.meta  # over-write metadata
+            rel.save()
+            relations.append(rel)
+
+        return relations
+
+    @staticmethod
+    def _merge_vertices(
+        vertices: Iterable[structures.Vertex],
+        uid2port: Mapping[structures.ID, models.Port],
+    ) -> List[models.Vertex]:
+        nodes = []
+
+        for vertex in vertices:
+            # FIXME possible clash between user-defined property name and uid/meta_ key
+            node = models.Vertex.create_or_update(
+                dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
+                lazy=True,
+            )[0]
+            nodes.append(node)
+
+            # connect this vertex to ports
+            for uid in vertex.ports:
+                port = uid2port[uid]
+                connect_if_not_connected(node.ports, port)
+
+        return nodes
+
+    @staticmethod
+    def _merge_groups(groups: Iterable[structures.Group]):
+        data = [dict(uid=group.uid, meta_=group.meta) for group in groups]
+
+        return models.Group.create_or_update(*data, lazy=True)
+
+    def merge(self, content: structures.Content):
+        """Merge content entities."""
+
+        ports = self._merge_ports(content.ports)
+        uid2port = {port.uid: port for port in ports}
+        edges = self._merge_edges(content.edges, uid2port)
+        vertices = self._merge_vertices(content.vertices, uid2port)
+        groups = self._merge_groups(content.groups)
+
+        return self.MergedResult(
+            vertices=vertices,
+            ports=ports,
+            edges=edges,
+            groups=groups,
+        )
+
+
+class Manager:
+    """Handles read and write operations on the container's content."""
+
+    def __init__(self) -> None:
+        self._reader = _Reader()
+        self._deprecator = _Deprecator()
+        self._merger = _Merger()
+
+    def read(self, container: models.Container):
+        """Return the content of a given container."""
+
+        return self._reader.read(container)
+
+    def replace(self, container: models.Container, content: structures.Content):
+        """Replace the content of a given container."""
+
+        # content pre-conditions (referential integrity within the content):
+        # - for each edge, start (output) & end (input) ports exist in content
+        # - for each vertex, all ports exist in content
+        self._deprecator.delete_difference(container, content)
+        result = self._merger.merge(content)  # TODO does not replace old properties
+        reconnect_to_container(container, result.vertices, result.groups)
+
+    def reconnect(self, parent: models.Container, child: models.Container):
+        """Reconnect the content of a child container to parent."""
+
+        reconnect_to_container(parent, child.vertices, child.groups)
