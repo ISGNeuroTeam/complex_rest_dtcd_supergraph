@@ -1,12 +1,16 @@
-from .root import (
+from .fragments import (
     DefaultRootFragmentDetailView,
-    DefaultRootFragmentGraphView,
     DefaultRootFragmentListView,
-    RootDetailView,
     RootFragmentDetailView,
-    RootFragmentGraphView,
     RootFragmentListView,
+)
+from .graphs import (
+    DefaultRootFragmentGraphView,
+    RootFragmentGraphView,
     RootGraphView,
+)
+from .roots import (
+    RootDetailView,
     RootListView,
 )
 from .service import ResetNeo4jView
