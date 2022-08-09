@@ -131,12 +131,12 @@ components:
 # TODO responses?
 
 # TODO re-do tags
-tags:
-  - name: list
-  - name: detail
-  - name: graph
-  - name: root
-  - name: admin
+# tags:
+#   - name: list
+#   - name: detail
+#   - name: graph
+#   - name: root
+#   - name: admin
 
 paths:
   /roots:
@@ -144,16 +144,12 @@ paths:
     get:
       summary: Get all roots
       description: Retrieves an array of all existing roots.
-      tags:
-        - list
       responses:
-        "200": 
+        "200":
           $ref: "#/components/responses/roots"
     post:
       summary: Create a new root
       description: Create a new root with a given name.
-      tags:
-        - list
       requestBody:
         required: true
         content:
@@ -178,8 +174,6 @@ paths:
       - $ref: "#/components/parameters/id"
     get:
       summary: Get root detail
-      tags:
-        - detail
       responses:
         "200":
           description: OK
@@ -194,8 +188,6 @@ paths:
           description: Not found
     put:
       summary: Update the root
-      tags:
-        - detail
       requestBody:
         required: true
         content:
@@ -219,8 +211,6 @@ paths:
           description: Not found
     delete:
       summary: Delete the root and its content
-      tags:
-        - detail
       responses:
         "200":
           description: OK
@@ -234,8 +224,6 @@ paths:
       - $ref: "#/components/parameters/id"
     get:
       summary: Get root's graph
-      tags:
-        - graph
       responses:
         "200":
           description: OK
@@ -252,8 +240,6 @@ paths:
       summary: Update the graph of this root
       description: |
         We update the graph by *merging* on vertex and edge IDs.
-      tags:
-        - graph
       requestBody:
         required: true
         content:
@@ -274,8 +260,6 @@ paths:
           description: Not found
     delete:
       summary: Delete a graph of this root
-      tags:
-        - graph
       responses:
         "200":
           description: OK
@@ -289,8 +273,6 @@ paths:
       - $ref: "#/components/parameters/id"
     get:
       summary: Get a list of this root's fragments
-      tags:
-        - list
       responses:
         "200":
           description: OK
@@ -308,8 +290,6 @@ paths:
     post:
       summary: Create a new fragment inside this root
       description: Create a new fragment inside this root with a given name.
-      tags:
-        - list
       requestBody:
         required: true
         content:
@@ -337,8 +317,6 @@ paths:
       - $ref: "#/components/parameters/fragment_id"
     get:
       summary: Get fragment detail
-      tags:
-        - detail
       responses:
         "200":
           description: OK
@@ -353,17 +331,12 @@ paths:
           description: Not found
     put:
       summary: Update a fragment
-      tags:
-        - detail
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
+              $ref: "#/components/schemas/fragment"
       responses:
         "200":
           description: OK
@@ -381,8 +354,6 @@ paths:
           description: Not found
     delete:
       summary: Delete a fragment and its content
-      tags:
-        - detail
       responses:
         "200":
           description: OK
@@ -397,8 +368,6 @@ paths:
       - $ref: "#/components/parameters/fragment_id"
     get:
       summary: Get fragment's graph
-      tags:
-        - graph
       responses:
         "200":
           description: OK
@@ -415,8 +384,6 @@ paths:
       summary: Update a graph of this fragment
       description: |
         We update the graph by *merging* on vertex and edge IDs.
-      tags:
-        - graph
       requestBody:
         required: true
         content:
@@ -437,12 +404,10 @@ paths:
           description: Not found
 
   /fragments:
-    summary: Fragment list
+    summary: List of default root fragments
     get:
-      summary: Get all fragments
-      description: Retrieves an array of all existing fragments.
-      tags:
-        - list
+      summary: Get a list of default root's fragments
+      description: Retrieves an array of all fragments from the default root.
       responses:
         "200":
           description: OK
@@ -455,20 +420,17 @@ paths:
                     type: array
                     items:
                       $ref: "#/components/schemas/fragment"
+        "404":
+          description: Default fragment not found
     post:
-      summary: Create a new fragment
-      description: Create a new fragment with a given name.
-      tags:
-        - list
+      summary: Create a new fragment inside the default root
+      description: Create a new fragment inside the default root.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
+              $ref: "#/components/schemas/fragment"
       responses:
         "201":
           description: Created
@@ -479,16 +441,16 @@ paths:
                 properties:
                   fragment:
                     $ref: "#/components/schemas/fragment"
+        "404":
+          description: Default fragment not found
 
   /fragments/{id}:
-    summary: Fragment details
-    description: Operations on a single fragment.
+    summary: Details of a default root's fragment
+    description: Operations on a particular fragment of a default root.
     parameters:
       - $ref: "#/components/parameters/id"
     get:
       summary: Get fragment detail
-      tags:
-        - detail
       responses:
         "200":
           description: OK
@@ -503,17 +465,12 @@ paths:
           description: Not found
     put:
       summary: Update a fragment
-      tags:
-        - detail
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                name:
-                  type: string
+              $ref: "#/components/schemas/fragment"
       responses:
         "200":
           description: OK
@@ -540,8 +497,8 @@ paths:
           description: Not found
 
   /fragments/{id}/graph:
-    summary: Graph content of a fragment
-    description: Operations on fragment's graph.
+    summary: Graph content of a default root's fragment
+    description: Operations on a graph of a default root's fragment.
     parameters:
       - $ref: "#/components/parameters/id"
     get:
@@ -598,8 +555,6 @@ paths:
     post:
       summary: Reset Neo4j database
       description: Delete all nodes and relationships from Neo4j database.
-      tags:
-        - admin
       responses:
         "200":
           description: Database reset
