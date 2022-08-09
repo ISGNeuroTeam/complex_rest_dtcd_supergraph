@@ -62,4 +62,10 @@ assert path.exists(), (
 # TODO users can delete default root node, so uid in text file becomes old
 # TODO during the testing we reset the database after each test
 with open(path) as f:
-    DEFAULT_ROOT_UUID = uuid.UUID(hex=f.read())
+    try:
+        DEFAULT_ROOT_UUID = uuid.UUID(f.read())
+    except ValueError:
+        raise ValueError(
+            "Cannot convert Root uid to UUID. "
+            f"Please make sure ID in '{filename}' is a correct UUID."
+        )
