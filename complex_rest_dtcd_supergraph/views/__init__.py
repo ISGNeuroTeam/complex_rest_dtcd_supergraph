@@ -8,6 +8,7 @@ from .root import (
     RootFragmentDetailView,
     RootFragmentGraphView,
     RootFragmentListView,
+    RootGraphView,
     RootListView,
 )
 from .service import ResetNeo4jView

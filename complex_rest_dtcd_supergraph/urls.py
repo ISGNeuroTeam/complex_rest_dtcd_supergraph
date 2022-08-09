@@ -9,6 +9,7 @@ from .views import (
     RootFragmentDetailView,
     RootFragmentGraphView,
     RootFragmentListView,
+    RootGraphView,
     RootListView,
 )
 
@@ -18,7 +19,7 @@ urlpatterns = [
     # root management
     path("roots", RootListView.as_view(), name="roots"),
     path("roots/<uuid:pk>", RootDetailView.as_view(), name="root-detail"),
-    path("roots/<uuid:pk>/graph", GraphView.as_view(), name="root-graph"),
+    path("roots/<uuid:pk>/graph", RootGraphView.as_view(), name="root-graph"),
     # root fragments
     path(
         "roots/<uuid:pk>/fragments",
@@ -36,6 +37,7 @@ urlpatterns = [
         name="root-fragment-graph",
     ),
     # fragment management
+    # TODO make this work with default fragment
     path("fragments", FragmentListView.as_view(), name="fragments"),
     path("fragments/<uuid:pk>", FragmentDetailView.as_view(), name="fragment-detail"),
     path("fragments/<uuid:pk>/graph", GraphView.as_view(), name="fragment-graph"),

@@ -30,7 +30,7 @@ class ContainerManagementMixin:
         """Replace container's content with new one.
 
         1. Uses `converter` to convert incoming data to `Content`.
-        2. Uses `manager` maps from `Content` to Neo4j database entities.
+        2. Uses `manager` that maps from `Content` to Neo4j database entities.
         """
 
         new_content = to_content_or_400(self.converter, data)
