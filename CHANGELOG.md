@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Support for *root* management.
+- Default root initialization to keep backward compatibility with older API.
 
 ### Changed
 - Switched to `neomodel` and `neo4j-driver`.
@@ -15,7 +16,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Endpoints for fragment management.
 
 ### Removed
-- `py2neo` dependency.
+- `py2neo` dependency and supporting scripts.
 - Deprecated support for recursive serialization of nested structures.
 
 ## [0.2.0] - 2022-07-22
