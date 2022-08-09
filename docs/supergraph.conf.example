@@ -7,3 +7,6 @@ address = localhost
 port = 7687
 user = neo4j
 password = password
+
+[schema]
+default_root_name = ROOT
