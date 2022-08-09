@@ -488,8 +488,6 @@ paths:
           description: Not found
     delete:
       summary: Delete a fragment and its content
-      tags:
-        - detail
       responses:
         "200":
           description: OK
@@ -503,8 +501,6 @@ paths:
       - $ref: "#/components/parameters/id"
     get:
       summary: Get fragment's graph
-      tags:
-        - graph
       responses:
         "200":
           description: OK
@@ -521,8 +517,6 @@ paths:
       summary: Update a graph of this fragment
       description: |
         We update the graph by *merging* on vertex and edge IDs.
-      tags:
-        - graph
       requestBody:
         required: true
         content:
@@ -543,8 +537,6 @@ paths:
           description: Not found
     delete:
       summary: Delete a graph of this fragment
-      tags:
-        - graph
       responses:
         "200":
           description: OK
