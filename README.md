@@ -6,14 +6,14 @@ For an introduction check out the [User guide](docs/user-guide.md).
 
 ## Installation
 
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
+These instructions will get you a copy of the plugin up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the plugin on a live system.
 
 ### Prerequisites
 
-1. Deploy [complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop).
-2. Install [Neo4j](https://neo4j.com/docs/operations-manual/current/installation/) graph database. We recommend latest patch of version `4.4`, although we support versions `3.5, <=4.4`.
+1. Deploy [complex rest](https://github.com/ISGNeuroTeam/complex_rest).
+2. Install [Neo4j](https://neo4j.com/docs/operations-manual/current/installation/) graph database.
     1. Follow installation instructions [ [Linux](https://neo4j.com/docs/operations-manual/current/installation/linux/) | [Windows](https://neo4j.com/docs/operations-manual/current/installation/windows/) | [Mac](https://neo4j.com/docs/operations-manual/current/installation/osx/) ]. Pay attention to the [required Java version](https://neo4j.com/docs/operations-manual/current/installation/requirements/#deployment-requirements-java); you may need to change system defaults.
-    2. Run the service, make sure it is as available at port `7687`.
+    2. Run the service, make sure it is as available on port `7687`.
         ```sh
         systemctl start neo4j
         ```
@@ -26,52 +26,65 @@ These instructions will get you a copy of the project up and running on your loc
         cypher-shell -a neo4j://localhost:7687 -u neo4j -p password
         ```
 
-### Deploy from Nexus
+### Deploy from GitHub or Nexus
 
-For this plugin, you can get the latest build from Nexus.
+For this plugin, you can get the latest build from either [GitHub release](https://github.com/ISGNeuroTeam/complex_rest_dtcd_supergraph/releases) or Nexus (archives are identical).
 
-1. Download archive with the latest build from Nexus.
-2. Unpack archive into `complex_rest/plugins` directory.
+1. Download an archive with the latest build.
+2. Unpack the archive into `complex_rest/plugins` directory.
 3. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
-4. Run complex rest server.
 
 ### Deploy via Make
 
-1. Clone the Git repository
+If you don't have an access to Nexus, you can build this plugin locally.
+
+1. Clone the Git repository:
     ```sh
     git clone https://github.com/ISGNeuroTeam/complex_rest_dtcd_supergraph.git
     ```
-2. Run the following from inside the repository root (you'll get the same archive as in Nexus):
+2. Use `Makefile` to build an archive (you'll get the same one as in GitHub/Nexus):
     ```sh
     make pack
     ```
-3. Unpack archive into `complex_rest/plugins` directory.
+3. Unpack the archive into `complex_rest/plugins` directory.
 4. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
-5. Run complex rest server.
 
 ### Deploy manually
 
-1. Clone the Git repository
+If you are a developer, then follow this section.
+
+1. Clone the Git repository:
     ```sh
-    git clone https://github.com/ISGNeuroTeam/complex_rest_dtcd_supergraph.git
+    git clone git@github.com:ISGNeuroTeam/complex_rest.git
     ```
-2. Enter the folder, copy configuration files from `docs/` to `complex_rest_dtcd_supergraph/` with the following command:
+2. Enter the folder, copy or symlink configuration files from `docs/` to `complex_rest_dtcd_supergraph/` with the following command:
     ```sh
     cd complex_rest_dtcd_supergraph
     cp docs/supergraph.conf.example  complex_rest_dtcd_supergraph/supergraph.conf
     ```
-3. Create virtual environment
+3. Create a virtual environment:
     ```sh
-    python -m venv venv
+    python3 -m venv venv
     ```
-4. Activate virtual environment and install the requirements:
+4. Activate the virtual environment and install the requirements:
     ```sh
     source venv/bin/activate
-    pip install -r requirements/production.txt
+    pip install -r requirements/local.txt
     ```
 5. Make a **symlink** for `./complex_rest_dtcd_supergraph/complex_rest_dtcd_supergraph` in `complex_rest/plugins` directory.
 6. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
-7. Run complex rest server.
+
+## Deployment
+
+For deployment we need to get a build archive (see the previous section). Then:
+
+1. Stop `complex_rest`.
+2. Unpack the archive into `complex_rest/plugins` directory.
+3. [Re-install constraints and indexes](#re-installing-constraints-and-indexes).
+4. **TODO** Backup / re-set / migrate the database.
+5. Start `complex_rest`.
+
+## Notes
 
 ### Re-installing constraints and indexes
 
@@ -88,7 +101,7 @@ python reinstall_labels.py
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags). 
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/ISGNeuroTeam/complex_rest/tags). 
 
 ## Authors
 
