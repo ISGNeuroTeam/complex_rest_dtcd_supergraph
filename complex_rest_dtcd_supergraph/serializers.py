@@ -65,9 +65,9 @@ class ContentSerializer(serializers.Serializer):
         init_ports=KEYS.init_ports,
     )
 
-    nodes = serializers.ListField(child=VertexField(), allow_empty=False)
+    nodes = serializers.ListField(child=VertexField())
     edges = serializers.ListField(child=EdgeField())
-    groups = serializers.ListField(required=False, child=GroupField())
+    groups = serializers.ListField(child=GroupField())
 
     # TODO validate uniqueness of all IDs
 
