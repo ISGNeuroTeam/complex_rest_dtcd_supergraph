@@ -1,4 +1,5 @@
 import configparser
+import uuid
 from pathlib import Path
 from types import SimpleNamespace
 
@@ -41,7 +42,6 @@ KEYS.target_port = "targetPort"
 KEYS.value = "value"
 KEYS.yfiles_id = "primitiveID"
 
-
 # neomodel
 # https://neomodel.readthedocs.io/en/latest/configuration.html
 protocol = ini_config["neo4j"]["protocol"]
@@ -50,3 +50,16 @@ port = ini_config["neo4j"]["port"]
 user = ini_config["neo4j"]["user"]
 password = ini_config["neo4j"]["password"]
 neomodel.config.DATABASE_URL = f"{protocol}://{user}:{password}@{address}:{port}"
+
+# DB schema
+filename = "default_root_uid.txt"
+path = PROJECT_DIR / filename
+assert path.exists(), (
+    f"Cannot find '{filename}' in this plugin's directory. "
+    "Have you forgot to initialize the database with initialize.py?"
+)
+
+# TODO users can delete default root node, so uid in text file becomes old
+# TODO during the testing we reset the database after each test
+with open(path) as f:
+    DEFAULT_ROOT_UUID = uuid.UUID(hex=f.read())

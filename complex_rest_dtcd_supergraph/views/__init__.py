@@ -1,9 +1,7 @@
-from .fragment import (
-    FragmentDetailView,
-    FragmentListView,
-)
-from .graph import GraphView
 from .root import (
+    DefaultRootFragmentDetailView,
+    DefaultRootFragmentGraphView,
+    DefaultRootFragmentListView,
     RootDetailView,
     RootFragmentDetailView,
     RootFragmentGraphView,

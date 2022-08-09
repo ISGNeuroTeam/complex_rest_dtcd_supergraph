@@ -1,9 +1,9 @@
 from django.urls import path
 
 from .views import (
-    FragmentDetailView,
-    FragmentListView,
-    GraphView,
+    DefaultRootFragmentDetailView,
+    DefaultRootFragmentGraphView,
+    DefaultRootFragmentListView,
     ResetNeo4jView,
     RootDetailView,
     RootFragmentDetailView,
@@ -36,11 +36,22 @@ urlpatterns = [
         RootFragmentGraphView.as_view(),
         name="root-fragment-graph",
     ),
-    # fragment management
-    # TODO make this work with default fragment
-    path("fragments", FragmentListView.as_view(), name="fragments"),
-    path("fragments/<uuid:pk>", FragmentDetailView.as_view(), name="fragment-detail"),
-    path("fragments/<uuid:pk>/graph", GraphView.as_view(), name="fragment-graph"),
+    # backward API compatibility: fragment management for default root
+    path(
+        "fragments",
+        DefaultRootFragmentListView.as_view(),
+        name="default-root-fragments",
+    ),
+    path(
+        "fragments/<uuid:pk>",
+        DefaultRootFragmentDetailView.as_view(),
+        name="default-root-fragment-detail",
+    ),
+    path(
+        "fragments/<uuid:pk>/graph",
+        DefaultRootFragmentGraphView.as_view(),
+        name="default-root-fragment-graph",
+    ),
     # services
     path("reset", ResetNeo4jView.as_view(), name="reset"),
 ]

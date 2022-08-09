@@ -8,6 +8,7 @@ from rest.permissions import AllowAny
 from rest.response import SuccessResponse
 from rest.views import APIView
 
+from .. import settings
 from ..converters import GraphDataConverter
 from ..managers import Manager
 from ..models import Fragment, Root
@@ -171,6 +172,22 @@ class RootFragmentListView(APIView):
         )
 
 
+class DefaultRootFragmentListView(RootFragmentListView):
+    """List existing fragments of the default root or create a new one."""
+
+    pk = settings.DEFAULT_ROOT_UUID
+
+    def get(self, request: Request):
+        """Read a list of default root's fragments."""
+
+        return super().get(request, self.pk)
+
+    def post(self, request: Request):
+        """Create a new fragment for the default root."""
+
+        return super().post(request, self.pk)
+
+
 class RootFragmentDetailView(APIView):
     """Retrieve, update or delete this root's fragment."""
 
@@ -206,6 +223,24 @@ class RootFragmentDetailView(APIView):
         fragment.delete()
 
         return SuccessResponse()
+
+
+class DefaultRootFragmentDetailView(RootFragmentDetailView):
+    """Retrieve, update or delete default root's fragment."""
+
+    root_pk = settings.DEFAULT_ROOT_UUID
+
+    def get(self, request: Request, pk: uuid.UUID):
+        fragment_pk = pk
+        return super().get(request, self.root_pk, fragment_pk)
+
+    def put(self, request: Request, pk: uuid.UUID):
+        fragment_pk = pk
+        return super().put(request, self.root_pk, fragment_pk)
+
+    def delete(self, request: Request, pk: uuid.UUID):
+        fragment_pk = pk
+        return super().delete(request, self.root_pk, fragment_pk)
 
 
 class RootFragmentGraphView(ContainerManagementMixin, APIView):
@@ -251,3 +286,21 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
         fragment.clear()
 
         return SuccessResponse()
+
+
+class DefaultRootFragmentGraphView(RootFragmentGraphView):
+    """Retrieve, replace or delete graph content of default root's fragment."""
+
+    root_pk = settings.DEFAULT_ROOT_UUID
+
+    def get(self, request: Request, pk: uuid.UUID):
+        fragment_pk = pk
+        return super().get(request, self.root_pk, fragment_pk)
+
+    def put(self, request: Request, pk: uuid.UUID):
+        fragment_pk = pk
+        return super().put(request, self.root_pk, fragment_pk)
+
+    def delete(self, request: Request, pk: uuid.UUID):
+        fragment_pk = pk
+        return super().delete(request, self.root_pk, fragment_pk)

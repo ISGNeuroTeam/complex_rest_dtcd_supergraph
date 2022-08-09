@@ -266,10 +266,10 @@ class TestRootFragmentDetailView(
 
 
 @unittest.skip("deprecated")
-@unittest.expectedFailure  # POST is forbidden
+@unittest.expectedFailure  # DB reset deletes default root
 @tag("neo4j")
 class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
-    url = reverse("supergraph:fragments")
+    url = reverse("supergraph:default-root-fragments")
 
     def test_post(self):
         response = self.client.post(self.url, data={"name": "sales"}, format="json")
@@ -289,7 +289,7 @@ class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
 
 
 @unittest.skip("deprecated")
-@unittest.expectedFailure  # cannot create standalone fragment - POST is forbidden
+@unittest.expectedFailure  # DB reset deletes default root
 @tag("neo4j")
 class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
     def setUp(self) -> None:
@@ -301,7 +301,7 @@ class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
         )
         self.fragment = response.data["fragment"]
         self.pk = self.fragment["id"]
-        self.url = reverse("supergraph:fragment-detail", args=(self.pk,))
+        self.url = reverse("supergraph:default-root-fragment-detail", args=(self.pk,))
 
     def test_get(self):
         response = self.client.get(self.url)
