@@ -3,8 +3,8 @@ from pathlib import Path
 
 from django.test import SimpleTestCase, tag
 
-# TODO import here causes a strange error; something with the way neomodel
-# builds up the registry & django runs the tests maybe?
+# TODO import here causes a strange error: RelationshipClassRedefined
+# something with how neomodel builds up the registry & django runs the tests?
 # from complex_rest_dtcd_supergraph.managers import Manager
 
 
