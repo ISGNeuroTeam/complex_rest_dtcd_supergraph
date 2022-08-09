@@ -14,6 +14,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Switched to `neomodel` and `neo4j-driver`.
 - Architecture rework.
 - Endpoints for fragment management.
+- Now we keep suffix `complex_rest_dtcd_` from plugin folder when making final archive, again.
 
 ### Removed
 - `py2neo` dependency and supporting scripts.
