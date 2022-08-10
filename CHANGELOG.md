@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+## [0.3.0] - 2022-08-10
 ### Added
 - Support for *root* management.
 - Default root initialization to keep backward compatibility with older API.
@@ -15,6 +17,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Architecture rework.
 - Endpoints for fragment management.
 - Now we keep suffix `complex_rest_dtcd_` from plugin folder when making final archive, again.
+
+### Deprecated
+- User guide is no longer up-to-date. Will update in a future release.
 
 ### Removed
 - `py2neo` dependency and supporting scripts.
