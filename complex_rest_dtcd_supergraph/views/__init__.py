@@ -6,6 +6,7 @@ from .fragments import (
 )
 from .graphs import (
     DefaultRootFragmentGraphView,
+    DefaultRootGraphView,
     RootFragmentGraphView,
     RootGraphView,
 )

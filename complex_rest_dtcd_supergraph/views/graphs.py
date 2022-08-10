@@ -60,6 +60,21 @@ class RootGraphView(ContainerManagementMixin, APIView):
         return SuccessResponse()
 
 
+class DefaultRootGraphView(RootGraphView):
+    """Retrieve, replace or delete graph content of the default root."""
+
+    pk = settings.DEFAULT_ROOT_UUID
+
+    def get(self, request: Request):
+        return super().get(request, self.pk)
+
+    def put(self, request: Request):
+        return super().put(request, self.pk)
+
+    def delete(self, request: Request):
+        return super().delete(request, self.pk)
+
+
 class RootFragmentGraphView(ContainerManagementMixin, APIView):
     """Retrieve, replace or delete graph content of this root's fragment."""
 
