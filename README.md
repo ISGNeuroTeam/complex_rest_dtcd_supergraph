@@ -105,8 +105,6 @@ neomodel_install_labels models --db $address
 
 For password and port use values from `supergraph.conf`.
 
-[](#initializing-the-default-root)
-
 ### Initializing the default Root
 
 We need to create the default root node in order to keep backwards compatibility with the API v0.2.0. There is a script just for that!
