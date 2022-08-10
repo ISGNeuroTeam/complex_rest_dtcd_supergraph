@@ -27,17 +27,17 @@ class TestEdgeField(SimpleTestCase):
             field.to_internal_value(data)
 
         # missing: end vertex, start/end ports
-        data[KEYS["source_node"]] = "n1"
+        data[KEYS.source_node] = "n1"
         with self.assertRaises(ValidationError):
             field.to_internal_value(data)
 
         # missing: start/end ports
-        data[KEYS["target_node"]] = "n2"
+        data[KEYS.target_node] = "n2"
         with self.assertRaises(ValidationError):
             field.to_internal_value(data)
 
         # missing: end port
-        data[KEYS["source_port"]] = "p1"
+        data[KEYS.source_port] = "p1"
         with self.assertRaises(ValidationError):
             field.to_internal_value(data)
 

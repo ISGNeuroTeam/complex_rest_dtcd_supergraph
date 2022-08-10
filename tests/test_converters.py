@@ -2,175 +2,55 @@ import json
 import unittest
 from pathlib import Path
 
-from django.test import SimpleTestCase, tag
+from django.test import SimpleTestCase
 
-from complex_rest_dtcd_supergraph.converters import Converter, Dumper, Loader
+from complex_rest_dtcd_supergraph.converters import GraphDataConverter
 
-from .misc import generate_data, sort_payload
-from .misc import KEYS, LABELS, TYPES, SCHEMA
+from .misc import load_data, sort_payload
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
-N = 30  # deprecated
 
 
-class TestLoader(SimpleTestCase):
-    loader = Loader(SCHEMA)
+class TestGraphDataConverter(SimpleTestCase):
+    converter = GraphDataConverter()
 
-    def test_load_data(self):
-        data = {
-            "name": "amy",
-            "online": True,
-            "address": ["bob", "dan"],
-            "layout": {"x": 0, "y": 0},
-        }
-
-        tree = self.loader._load_data(data)
-        self.assertEqual(len(tree.subgraph.nodes), 2)
-        self.assertEqual(len(tree.subgraph.relationships), 1)
-        self.assertTrue(tree.root.has_label(LABELS["data"]))
-
-    def test_entity(self):
-        data = {
-            "name": "amy",
-            "online": True,
-            "address": ["bob", "dan"],
-            "layout": {"x": 0, "y": 0},
-        }
-        tree = self.loader._entity(data)
-        self.assertEqual(len(tree.subgraph.nodes), 3)
-        self.assertEqual(len(tree.subgraph.relationships), 2)
-        self.assertTrue(tree.root.has_label(LABELS["entity"]))
-        self.assertIn(TYPES["has_data"], tree.subgraph.types())
-
-    def test_vertex(self):
-        data = {
-            "name": "amy",
-            "primitiveID": "abc",
-            "online": True,
-            "address": ["bob", "dan"],
-            "layout": {"x": 0, "y": 0},
-        }
-        tree = self.loader._vertex(data)
-        self.assertEqual(len(tree.subgraph.nodes), 3)
-        self.assertEqual(len(tree.subgraph.relationships), 2)
-        self.assertTrue(tree.root.has_label(LABELS["node"]))
-        key = KEYS["yfiles_id"]
-        self.assertIn(key, tree.root)
-        self.assertEqual(tree.root[key], "abc")
-
-    def test_edge(self):
-        data = {
-            "sourceNode": "amy",
-            "sourcePort": "o1",
-            "targetNode": "bob",
-            "targetPort": "i1",
-        }
-        tree = self.loader._edge(data)
-        self.assertEqual(len(tree.subgraph.nodes), 2)
-        self.assertEqual(len(tree.subgraph.relationships), 1)
-        self.assertTrue(tree.root.has_label(LABELS["edge"]))
-        # TODO replace hard-coded stuff
-        self.assertIn("sourceNode", tree.root)
-        self.assertIn("sourcePort", tree.root)
-        self.assertIn("targetNode", tree.root)
-        self.assertIn("targetPort", tree.root)
-        self.assertEqual(tree.root["sourceNode"], "amy")
-        self.assertEqual(tree.root["sourcePort"], "o1")
-        self.assertEqual(tree.root["targetNode"], "bob")
-        self.assertEqual(tree.root["targetPort"], "i1")
-
-    def test_load(self):
-        data = generate_data()["data"]
-        subgraph = self.loader.load(data)
-        self.assertEqual(len(subgraph.nodes), 17)
-        self.assertEqual(len(subgraph.relationships), 16)
-
-    def test_from_json(self):
-        with open(DATA_DIR / "graph-sample-small.json") as f:
-            data = json.load(f)
-
-        subgraph = self.loader.load(data)
-        self.assertEqual(len(subgraph.nodes), 19)
-        self.assertEqual(len(subgraph.relationships), 18)
-
-
-class TestDumper:
-    def test_dump(self):
-        d = generate_data()
-        data = d["data"]
+    def _check_to_content_to_data(self, data):
         sort_payload(data)
-        subgraph = d["subgraph"]
-        dumper = Dumper(SCHEMA)
-        exported = dumper.dump(subgraph)
+        content = self.converter.to_content(data)
+        exported = self.converter.to_data(content)
         sort_payload(exported)
         self.assertEqual(exported, data)
 
+    def test_to_content(self):
+        data = load_data(DATA_DIR / "basic.json")
+        content = self.converter.to_content(data)
 
-class TestConverter(SimpleTestCase):
-    def _check_load_dump(self, data):
-        sort_payload(data)
-        converter = Converter()
-        subgraph = converter.load(data)
-        exported = converter.dump(subgraph)
-        sort_payload(exported)
-        # TODO log difference like in api test suite
-        self.assertEqual(exported, data)
+        self.assertEqual(len(content.vertices), 2)
+        self.assertEqual(len(content.ports), 2)
+        self.assertEqual(len(content.edges), 1)
+        self.assertEqual(len(content.groups), 0)
 
-    def _check_load_dump_from_json(self, path):
+    def test_to_data(self):
+        # TODO
+        pass
+
+    def _check_to_content_to_data_from_json(self, path):
         with open(path) as f:
             data = json.load(f)
-        self._check_load_dump(data)
+        self._check_to_content_to_data(data)
 
-    def test_load_dump_small(self):
-        self._check_load_dump_from_json(DATA_DIR / "graph-sample-small.json")
+    def test_to_content_to_data_small(self):
+        self._check_to_content_to_data_from_json(DATA_DIR / "graph-sample-small.json")
 
-    def test_load_dump_n25_e25(self):
-        self._check_load_dump_from_json(DATA_DIR / "n25_e25.json")
+    def test_to_content_to_data_n25_e25(self):
+        self._check_to_content_to_data_from_json(DATA_DIR / "n25_e25.json")
 
-    def test_load_dump_n50_e25(self):
-        self._check_load_dump_from_json(DATA_DIR / "n50_e25.json")
+    def test_to_content_to_data_n50_e25(self):
+        self._check_to_content_to_data_from_json(DATA_DIR / "n50_e25.json")
 
-    @unittest.skip("py2neo bug")
-    @tag("slow")
-    def test_load_dump_many_times(self):
-        with open(DATA_DIR / "graph-sample-small.json") as f:
-            data = json.load(f)
-        sort_payload(data)
-
-        ok = True
-
-        # TODO settings for number of iterations
-        for _ in range(N):
-            converter = Converter()
-            subgraph = converter.load(data)
-            converter = Converter()
-            exported = converter.dump(subgraph)
-            sort_payload(exported)
-            if data != exported:
-                ok = False
-                break
-
-        self.assertTrue(ok)
-
-    def test_load_dump_large(self):
-        self._check_load_dump_from_json(DATA_DIR / "graph-sample-large.json")
-
-    @unittest.skip("py2neo bug")
-    @tag("slow")
-    def test_load_dump_large_many_times(self):
-        with open(DATA_DIR / "graph-sample-large.json") as f:
-            data = json.load(f)
-        sort_payload(data)
-
-        for i in range(N):
-            converter = Converter()
-            subgraph = converter.load(data)
-            exported = converter.dump(subgraph)
-            sort_payload(exported)
-            self.assertEqual(data, exported, msg=f"Lap {i}")
-
-    # TODO add tests through DB: duplicated edges
+    def test_to_content_to_data_large(self):
+        self._check_to_content_to_data_from_json(DATA_DIR / "graph-sample-large.json")
 
 
 if __name__ == "__main__":

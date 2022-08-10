@@ -1,0 +1,53 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "field-meta": "Amy Rock",
+            "properties": {
+                "integer & meta": {
+                    "type": "cm",
+                    "value": 167
+                },
+                "string & no-meta": {
+                    "value": "spam"
+                },
+                "integer-array & meta": {
+                    "type": "cm",
+                    "value": [
+                        1,
+                        2,
+                        3
+                    ]
+                },
+                "meta-only": {
+                    "type": "ham",
+                    "expression": "get type(n);"
+                },
+                "non-savable-value-list-of-dicts & meta": {
+                    "expression": "ml.recommendations (amy)",
+                    "value": [
+                        {
+                            "id": 1
+                        },
+                        {
+                            "id": 2
+                        },
+                        {
+                            "id": 3
+                        }
+                    ]
+                },
+                "non-savable-value-non-homogeneous-list & meta": {
+                    "expression": "connected (amy)",
+                    "value": [
+                        42,
+                        "string",
+                        true
+                    ]
+                }
+            }
+        }
+    ],
+    "edges": [],
+    "groups": []
+}

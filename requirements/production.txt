@@ -1,2 +1,1 @@
--r pypi.txt
--r nexus.txt
+-r base.txt

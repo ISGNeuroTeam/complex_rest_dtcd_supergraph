@@ -1,0 +1,35 @@
+{
+    "nodes": [
+        {
+            "primitiveID": "amy",
+            "initPorts": [
+                {
+                    "primitiveID": "mobile"
+                }
+            ]
+        },
+        {
+            "primitiveID": "bob",
+            "initPorts": [
+                {
+                    "primitiveID": "laptop"
+                }
+            ]
+        }
+    ],
+    "edges": [
+        {
+            "sourceNode": "amy",
+            "sourcePort": "mobile",
+            "targetNode": "bob",
+            "targetPort": "laptop",
+            "meta": {
+                "field": {
+                    "key": "spam",
+                    "value": 167
+                }
+            }
+        }
+    ],
+    "groups": []
+}

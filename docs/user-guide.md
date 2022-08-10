@@ -1,4 +1,6 @@
-# User guide
+# UNDER CONSTRUCTION: User guide
+
+> The information here is deprecated.
 
 In this guide you'll find examples of core operations provided by this plugin.
 

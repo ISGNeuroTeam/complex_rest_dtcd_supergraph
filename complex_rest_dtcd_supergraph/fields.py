@@ -2,66 +2,77 @@
 Custom fields.
 """
 
+import uuid
+
 from django.utils.translation import gettext_lazy as _
-from rest_framework.serializers import DictField
+from rest_framework.serializers import DictField, UUIDField
 
-from .settings import SCHEMA
+from .settings import KEYS
 
 
-class VertexField(DictField):
+class ContainsOrFailMixin:
+    default_error_messages = {
+        "key_error": _("Key '{value}' is missing."),
+    }
+
+    def _contains_or_fail(self, data: dict, key):
+        if key not in data:
+            self.fail("key_error", value=key)
+
+
+class CustomUUIDFIeld(UUIDField):
+    """A field that ensures the input is a valid UUID string.
+
+    Overloads `to_representation` to work with UUIDs in hex string format.
+    """
+
+    def to_representation(self, value):
+        # if string, try to convert to UUID first
+        if isinstance(value, str):
+            try:
+                value = uuid.UUID(hex=value)
+            except:
+                self.fail("invalid", value=value)
+
+        return super().to_representation(value)
+
+
+class VertexField(ContainsOrFailMixin, DictField):
     """A vertex dictionary representation.
 
     Validates the vertex to have an ID field.
     """
 
-    default_error_messages = {
-        "key_error": _("Key '{value}' is missing."),
-    }
-
-    id_key = SCHEMA["keys"]["yfiles_id"]
+    id_key = KEYS.yfiles_id
 
     def to_internal_value(self, data: dict):
         data = super().to_internal_value(data)
-
-        if self.id_key not in data:
-            self.fail("key_error", value=self.id_key)
+        self._contains_or_fail(data, self.id_key)
 
         return data
 
 
 class GroupField(VertexField):
-    """A group dictionary representation.
-
-    For now, groups are implemented as vertices.
-    """
+    """A group representation."""
 
 
-class EdgeField(DictField):
+class EdgeField(ContainsOrFailMixin, DictField):
     """An edge dictionary representation.
 
     Validates the edge to have start and end vertices and ports.
     """
 
-    default_error_messages = {
-        "key_error": _("Key '{value}' is missing."),
-    }
-
-    src_node_key = SCHEMA["keys"]["source_node"]
-    tgt_node_key = SCHEMA["keys"]["target_node"]
-    src_port_key = SCHEMA["keys"]["source_port"]
-    tgt_port_key = SCHEMA["keys"]["target_port"]
     keys = (
-        src_node_key,
-        tgt_node_key,
-        src_port_key,
-        tgt_port_key,
+        KEYS.source_node,
+        KEYS.target_node,
+        KEYS.source_port,
+        KEYS.target_port,
     )
 
-    def to_internal_value(self, data: dict):
+    def to_internal_value(self, data):
         data = super().to_internal_value(data)
 
         for key in self.keys:
-            if key not in data:
-                self.fail("key_error", value=key)
+            self._contains_or_fail(data, key)
 
         return data

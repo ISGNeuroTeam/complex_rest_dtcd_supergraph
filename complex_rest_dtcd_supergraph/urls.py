@@ -1,20 +1,57 @@
 from django.urls import path
 
 from .views import (
-    FragmentDetailView,
-    FragmentGraphView,
-    FragmentListView,
-    ResetNeo4j,
+    DefaultRootFragmentDetailView,
+    DefaultRootFragmentGraphView,
+    DefaultRootFragmentListView,
+    ResetNeo4jView,
+    RootDetailView,
+    RootFragmentDetailView,
+    RootFragmentGraphView,
+    RootFragmentListView,
     RootGraphView,
+    RootListView,
 )
+
 
 app_name = "supergraph"
 urlpatterns = [
-    path("fragments", FragmentListView.as_view(), name="fragments"),
-    path("fragments/<int:pk>", FragmentDetailView.as_view(), name="fragment-detail"),
+    # root management
+    path("roots", RootListView.as_view(), name="roots"),
+    path("roots/<uuid:pk>", RootDetailView.as_view(), name="root-detail"),
+    path("roots/<uuid:pk>/graph", RootGraphView.as_view(), name="root-graph"),
+    # root fragments
     path(
-        "fragments/<int:pk>/graph", FragmentGraphView.as_view(), name="fragment-graph"
+        "roots/<uuid:pk>/fragments",
+        RootFragmentListView.as_view(),
+        name="root-fragments",
     ),
-    path("fragments/root/graph", RootGraphView.as_view(), name="root-graph"),
-    path("reset", ResetNeo4j.as_view(), name="reset"),
+    path(
+        "roots/<uuid:root_pk>/fragments/<uuid:fragment_pk>",
+        RootFragmentDetailView.as_view(),
+        name="root-fragment-detail",
+    ),
+    path(
+        "roots/<uuid:root_pk>/fragments/<uuid:fragment_pk>/graph",
+        RootFragmentGraphView.as_view(),
+        name="root-fragment-graph",
+    ),
+    # backward API compatibility: fragment management for default root
+    path(
+        "fragments",
+        DefaultRootFragmentListView.as_view(),
+        name="default-root-fragments",
+    ),
+    path(
+        "fragments/<uuid:pk>",
+        DefaultRootFragmentDetailView.as_view(),
+        name="default-root-fragment-detail",
+    ),
+    path(
+        "fragments/<uuid:pk>/graph",
+        DefaultRootFragmentGraphView.as_view(),
+        name="default-root-fragment-graph",
+    ),
+    # services
+    path("reset", ResetNeo4jView.as_view(), name="reset"),
 ]
