@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+## [0.3.1] - 2022-08-10
 ### Fixed
 - Add an endpoint for default root graph management.
 - Fix bug with content deletion in root graph view `delete()` method. Now it correctly leaves fragments intact.
