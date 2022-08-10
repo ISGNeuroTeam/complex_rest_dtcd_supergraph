@@ -93,15 +93,17 @@ For deployment we need to get a build archive - see the previous section on how 
 
 ### Re-installing constraints and indexes
 
-Neo4j provides support for applying [indexes](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-indexes) and [constraints](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-constraints). To do this, you need to run `reinstall_labels.py` script inside the plugin's source code directory.
+Neo4j provides support for applying [indexes](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-indexes) and [constraints](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-constraints).
 
-Activate virtual environment, navigate to script's parent directory and run:
+To do this, activate virtual environment, navigate to script's parent directory and run:
 
 ```sh
-python reinstall_labels.py
+address="bolt://neo4j:password@localhost:7687"
+neomodel_remove_labels --db $address
+neomodel_install_labels models --db $address
 ```
 
-First it deletes old indexes and constraints, then it uses current models to install the new ones.
+For password and port use values from `supergraph.conf`.
 
 [](#initializing-the-default-root)
 

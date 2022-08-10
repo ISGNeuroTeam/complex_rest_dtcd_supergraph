@@ -45,13 +45,16 @@ if __name__ == "__main__":
 
     # TODO leave as is? migrate?
     # re-set the database
+    print("Resetting te database...")
     neomodel.clear_neo4j_database(neomodel.db)
+    print("Done.")
 
     # create default Root and save its UID
     # FIXME same directory? /var/opt/complex_rest/plugins/supergraph?
     filename = "default_root_uid.txt"
 
-    create_default_root_and_save_uid(
+    root = create_default_root_and_save_uid(
         data={"name": ini_config["schema"]["default_root_name"]},
         path=PROJECT_DIR / filename,
     )
+    print(f"Created {root} and saved its uid to {filename}.")
