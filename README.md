@@ -121,6 +121,7 @@ It will delete all nodes and relations in Neo4j database, create a single `Root`
 
 ## TODO
 
+- Update [User guide](docs/user-guide.md).
 - Resolve `RelationshipClassRedefined` error when trying to test `neomodel` models directly (see `test_managers.py`).
 - User-defined properties that were saved before *stay on the node after merge* even if they are missing in new structure and should be deleted (see how `create_or_update` works). We handle it in converter, but this is not nice.
 - Some database queries are inefficient (`n+1` problems).
