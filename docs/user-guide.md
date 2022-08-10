@@ -1,5 +1,7 @@
 # UNDER CONSTRUCTION: User guide
 
+> The information here is deprecated.
+
 In this guide you'll find examples of core operations provided by this plugin.
 
 Check out check out the [Format](Format.md) and `neo-tools` library for details on why and how we represent nested structures in the database and [OpenAPI schema](./openapi.yaml) to get a general idea for the plugin.
