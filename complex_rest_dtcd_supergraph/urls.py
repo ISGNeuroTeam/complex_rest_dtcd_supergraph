@@ -4,6 +4,7 @@ from .views import (
     DefaultRootFragmentDetailView,
     DefaultRootFragmentGraphView,
     DefaultRootFragmentListView,
+    DefaultRootGraphView,
     ResetNeo4jView,
     RootDetailView,
     RootFragmentDetailView,
@@ -36,7 +37,13 @@ urlpatterns = [
         RootFragmentGraphView.as_view(),
         name="root-fragment-graph",
     ),
-    # backward API compatibility: fragment management for default root
+    # services
+    path("reset", ResetNeo4jView.as_view(), name="reset"),
+]
+
+# backward API compatibility: fragment management for default root
+# this will be deprecated soon
+urlpatterns += [
     path(
         "fragments",
         DefaultRootFragmentListView.as_view(),
@@ -52,6 +59,9 @@ urlpatterns = [
         DefaultRootFragmentGraphView.as_view(),
         name="default-root-fragment-graph",
     ),
-    # services
-    path("reset", ResetNeo4jView.as_view(), name="reset"),
+    path(
+        "fragments/root/graph",
+        DefaultRootGraphView.as_view(),
+        name="default-root-graph",
+    ),
 ]

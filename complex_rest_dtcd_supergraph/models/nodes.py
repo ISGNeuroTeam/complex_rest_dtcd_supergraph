@@ -160,10 +160,17 @@ class Root(Container):
 
         return super().delete(cascade=False)
 
-    def clear(self):
-        """Delete all related fragments, vertices and groups in a cascading fashion."""
+    def clear(self, content_only=False):
+        """Delete all related fragments, vertices and groups in a cascading fashion.
+        
+        If `content_only` is True, then only delete the content:
+        vertices and groups.
+        """
 
         super().clear()
+
+        if content_only:
+            return
 
         for fragment in self.fragments.all():
             fragment.delete(cascade=False)  # already cleared related content

@@ -55,9 +55,24 @@ class RootGraphView(ContainerManagementMixin, APIView):
         """Delete graph content of a root."""
 
         root = get_node_or_404(Root.nodes, uid=pk.hex)
-        root.clear()
+        root.clear(content_only=True)
 
         return SuccessResponse()
+
+
+class DefaultRootGraphView(RootGraphView):
+    """Retrieve, replace or delete graph content of the default root."""
+
+    pk = settings.DEFAULT_ROOT_UUID
+
+    def get(self, request: Request):
+        return super().get(request, self.pk)
+
+    def put(self, request: Request):
+        return super().put(request, self.pk)
+
+    def delete(self, request: Request):
+        return super().delete(request, self.pk)
 
 
 class RootFragmentGraphView(ContainerManagementMixin, APIView):
