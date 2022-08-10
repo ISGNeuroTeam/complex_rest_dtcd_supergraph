@@ -45,7 +45,7 @@ if __name__ == "__main__":
 
     # TODO leave as is? migrate?
     # re-set the database
-    print("Resetting te database...")
+    print("Resetting the database...")
     neomodel.clear_neo4j_database(neomodel.db)
     print("Done.")
 
