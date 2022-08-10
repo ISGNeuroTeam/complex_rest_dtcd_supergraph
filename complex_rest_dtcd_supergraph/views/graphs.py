@@ -55,7 +55,7 @@ class RootGraphView(ContainerManagementMixin, APIView):
         """Delete graph content of a root."""
 
         root = get_node_or_404(Root.nodes, uid=pk.hex)
-        root.clear()
+        root.clear(content_only=True)
 
         return SuccessResponse()
 
