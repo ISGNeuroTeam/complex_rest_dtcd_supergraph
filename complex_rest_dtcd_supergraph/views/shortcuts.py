@@ -54,7 +54,7 @@ def replace_or_400(manager, container, new_content):
     """Try to use the manager to replace the content of a container with new one.
 
     Calls `manager.replace(container, content)` and returns the result.
-    Raises `Manager` on exception and logs it.
+    Raises `ManagerError` on exception and logs it.
     """
 
     # FIXME too broad of an exception
