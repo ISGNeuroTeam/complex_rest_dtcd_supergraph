@@ -162,7 +162,7 @@ class Root(Container):
 
     def clear(self, content_only=False):
         """Delete all related fragments, vertices and groups in a cascading fashion.
-        
+
         If `content_only` is True, then only delete the content:
         vertices and groups.
         """

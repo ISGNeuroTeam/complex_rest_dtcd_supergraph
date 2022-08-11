@@ -2,7 +2,7 @@ import logging
 
 from .shortcuts import to_content_or_400, replace_or_400
 
-logger = logging.getLogger("supergraph")
+logger = logging.getLogger("complex_rest_dtcd_supergraph")
 
 
 class ContainerManagementMixin:

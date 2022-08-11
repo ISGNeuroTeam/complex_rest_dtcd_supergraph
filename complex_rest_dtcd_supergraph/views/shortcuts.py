@@ -7,7 +7,7 @@ from rest_framework.exceptions import NotFound
 from ..exceptions import LoadingError, ManagerError
 
 
-logger = logging.getLogger("supergraph")
+logger = logging.getLogger("complex_rest_dtcd_supergraph")
 
 
 # shortcuts for working with Neomodel
