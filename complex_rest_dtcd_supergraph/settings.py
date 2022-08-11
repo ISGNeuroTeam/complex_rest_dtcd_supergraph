@@ -8,6 +8,7 @@ import neomodel
 from core.settings.ini_config import merge_ini_config_with_defaults
 
 
+PLUGIN_NAME = "complex_rest_dtcd_supergraph"
 PROJECT_DIR = Path(__file__).parent
 
 default_ini_config = {

@@ -1,8 +1,9 @@
 import logging
 
+from ..settings import PLUGIN_NAME
 from .shortcuts import to_content_or_400, replace_or_400
 
-logger = logging.getLogger("complex_rest_dtcd_supergraph")
+logger = logging.getLogger(PLUGIN_NAME)
 
 
 class ContainerManagementMixin:
