@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.2] - 2022-08-16
+### Added
+- Startup initialization script: automatic re-installation of constraints & indexes, default Root initialization.
+
+### Fixed
+- Error when removing non-existent labels in `neomodel_remove_labels`.
+
 ## [0.3.1] - 2022-08-10
 ### Fixed
 - Add an endpoint for default root graph management.

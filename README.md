@@ -32,7 +32,7 @@ You can get the latest build from either [GitHub releases](https://github.com/IS
 
 1. Download an archive with the latest build.
 2. Unpack the archive into `complex_rest/plugins` directory.
-3. [Re-install constraints and indexes](#re-installing-constraints-and-indexes), [initialize the default `Root` node](#initializing-the-default-root).
+3. Run the [initialization script](#initialization-script) to prepare the database.
 
 ### Deploy via Make
 
@@ -48,7 +48,7 @@ If you want to have an access to feature branch version, you can build this plug
     make pack
     ```
 3. Unpack the archive into `complex_rest/plugins` directory.
-4. [Re-install constraints and indexes](#re-installing-constraints-and-indexes), [initialize the default `Root` node](#initializing-the-default-root).
+4. Run the [initialization script](#initialization-script) to prepare the database.
 
 ### Deploy manually
 
@@ -85,7 +85,7 @@ For deployment we need to get a build archive - see the previous section on how 
 
 1. Stop `complex_rest`.
 2. Unpack the archive into `complex_rest/plugins` directory.
-3. [Re-install constraints and indexes](#re-installing-constraints-and-indexes), [initialize the default `Root` node](#initializing-the-default-root).
+3. Run the [initialization script](#initialization-script) to prepare the database.
 4. **TODO** Backup / reset / migrate the database.
 5. Start `complex_rest`.
 
@@ -95,7 +95,7 @@ For deployment we need to get a build archive - see the previous section on how 
 
 Neo4j provides support for applying [indexes](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-indexes) and [constraints](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-constraints).
 
-To do this, activate virtual environment, navigate to script's parent directory and run:
+To do this, activate plugin's virtual environment and run:
 
 ```sh
 address="bolt://neo4j:password@localhost:7687"
@@ -109,13 +109,23 @@ For password and port use values from `supergraph.conf`.
 
 We need to create the default root node in order to keep backwards compatibility with the API v0.2.0. There is a script just for that!
 
-Activate virtual environment, navigate to script's parent directory and run:
+Activate plugin's virtual environment, navigate to script's parent directory and run:
 
 ```sh
-python initialize.py
+python create_default_root.py
 ```
 
-It will delete all nodes and relations in Neo4j database, create a single `Root` node and save its `uid` attribute in the file `default_root_uid.txt` inside source code directory.
+It will create a single `Root` node and save its `uid` attribute in the file `default_root_uid.txt` inside source code directory.
+
+### Initialization script
+
+There is a helper script `initialize.sh` that prepares the plugin for work when deploying *from build archive*. It combines activation of correct virtual environment, [re-installation of constraints and indexes](#re-installing-constraints-and-indexes) with [default Root creation](#initializing-the-default-root) in one place.
+
+You can run it from anywhere you like:
+
+```sh
+./initialize.sh
+```
 
 ## TODO
 
