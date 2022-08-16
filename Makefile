@@ -39,6 +39,8 @@ $(build_dir): venv.tar.gz
 	cp -u docs/supergraph.conf.example $(target_dir)/supergraph.conf
 	cp -u *.md $(target_dir)
 	cp -u *.py $(target_dir)
+	cp -u docs/scripts/*.sh $(target_dir)
+	chmod o+x $(target_dir)/*.sh
 #   virtual environment
 	mkdir $(target_dir)/venv
 	tar -xzf ./venv.tar.gz -C $(target_dir)/venv
