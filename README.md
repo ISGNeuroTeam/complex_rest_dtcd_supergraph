@@ -48,7 +48,7 @@ If you want to have an access to feature branch version, you can build this plug
     make pack
     ```
 3. Unpack the archive into `complex_rest/plugins` directory.
-4. Run the [initialization script](#initialization-script) to prepare the database..
+4. Run the [initialization script](#initialization-script) to prepare the database.
 
 ### Deploy manually
 
@@ -85,7 +85,7 @@ For deployment we need to get a build archive - see the previous section on how 
 
 1. Stop `complex_rest`.
 2. Unpack the archive into `complex_rest/plugins` directory.
-3. [Re-install constraints and indexes](#re-installing-constraints-and-indexes), [initialize the default `Root` node](#initializing-the-default-root).
+3. Run the [initialization script](#initialization-script) to prepare the database.
 4. **TODO** Backup / reset / migrate the database.
 5. Start `complex_rest`.
 
