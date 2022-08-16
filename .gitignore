@@ -182,6 +182,8 @@ start.sh
 stop.sh
 test.sh
 scripts/
+# track scripts inside the docs/ folder
+!docs/scripts
 
 # symlinks to config files in plugin directory
 complex_rest_dtcd_supergraph/*.conf

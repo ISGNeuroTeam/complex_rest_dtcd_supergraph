@@ -1,9 +1,6 @@
 """
-Helper script to initialize Neo4j database for work with this plugin.
-
-Does the following:
-1. Reset the database.
-2. Create initial Root node and save its UID into separate file.
+Helper script creates the initial Root node and saves its UID into a 
+file "default_root_uid.txt".
 """
 
 
@@ -41,13 +38,11 @@ if __name__ == "__main__":
     port = ini_config["neo4j"]["port"]
     user = ini_config["neo4j"]["user"]
     password = ini_config["neo4j"]["password"]
-    neomodel.config.DATABASE_URL = f"{protocol}://{user}:{password}@{address}:{port}"
+    bolt_url = f"{protocol}://{user}:{password}@{address}:{port}"
 
-    # TODO leave as is? migrate?
-    # re-set the database
-    print("Resetting the database...")
-    neomodel.clear_neo4j_database(neomodel.db)
-    print("Done.")
+    # Connect after to override any code in the module that may set the connection
+    print("Connecting to {}\n".format(bolt_url))
+    neomodel.db.set_connection(bolt_url)
 
     # create default Root and save its UID
     # FIXME same directory? /var/opt/complex_rest/plugins/supergraph?
