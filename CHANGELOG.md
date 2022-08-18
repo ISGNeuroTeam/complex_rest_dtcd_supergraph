@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.3.3] - 2022-08-18
+### Changed
+- Rename startup initialization script to `database_init.sh`.
+
+### Fixed
+- Correct order of installation instructions for Neo4j.
+
 ## [0.3.2] - 2022-08-16
 ### Added
 - Startup initialization script: automatic re-installation of constraints & indexes, default Root initialization.

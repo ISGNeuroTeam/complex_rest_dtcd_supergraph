@@ -13,13 +13,14 @@ These instructions will get you a copy of the plugin up and running on your loca
 1. Deploy [complex rest](https://github.com/ISGNeuroTeam/complex_rest).
 2. Install [Neo4j](https://neo4j.com/docs/operations-manual/current/installation/) graph database.
     1. Follow installation instructions for your OS [ [Linux](https://neo4j.com/docs/operations-manual/current/installation/linux/) | [Windows](https://neo4j.com/docs/operations-manual/current/installation/windows/) | [Mac](https://neo4j.com/docs/operations-manual/current/installation/osx/) ]. Pay attention to the [required Java version](https://neo4j.com/docs/operations-manual/current/installation/requirements/#deployment-requirements-java); you may need to change system defaults.
-    2. Run the service, make sure it is available on port `7687`:
-        ```sh
-        systemctl start neo4j
-        ```
-    3. Set initial password to `password` with the following command:
+    2. [Set initial password](https://neo4j.com/docs/operations-manual/current/configuration/set-initial-password/) to `password` with the following command:
         ```sh
         neo4j-admin set-initial-password password
+        ```
+        > This must be performed before starting up the database for the first time.
+    3. Run the service, make sure it is available on port `7687`:
+        ```sh
+        systemctl start neo4j
         ```
     4. (optional) If you installed *Cypher shell*, you can try to connect to Neo4j to make sure everything is ok:
         ```sh
@@ -119,12 +120,12 @@ It will create a single `Root` node and save its `uid` attribute in the file `de
 
 ### Initialization script
 
-There is a helper script `initialize.sh` that prepares the plugin for work when deploying *from build archive*. It combines activation of correct virtual environment, [re-installation of constraints and indexes](#re-installing-constraints-and-indexes) with [default Root creation](#initializing-the-default-root) in one place.
+There is a helper script `database_init.sh` that prepares the plugin for work when deploying *from build archive*. It combines activation of correct virtual environment, [re-installation of constraints and indexes](#re-installing-constraints-and-indexes) with [default Root creation](#initializing-the-default-root) in one place.
 
 You can run it from anywhere you like:
 
 ```sh
-./initialize.sh
+./database_init.sh
 ```
 
 ## TODO
