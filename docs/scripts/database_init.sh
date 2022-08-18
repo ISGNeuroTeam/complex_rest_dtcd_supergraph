@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Creates the initial Root node and saves its UID 
+# into a text file "default_root_uid.txt" in plugin's directory.
+
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 cd $SCRIPT_DIR
 
