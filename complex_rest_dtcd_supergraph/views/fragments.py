@@ -67,6 +67,7 @@ class RootFragmentListView(APIView):
 class DefaultRootFragmentListView(RootFragmentListView):
     """List existing fragments of the default root or create a new one."""
 
+    # TODO deprecate when front-end moves to explicit root management
     pk = settings.DEFAULT_ROOT_UUID
 
     def get(self, request: Request):
@@ -120,6 +121,7 @@ class RootFragmentDetailView(APIView):
 class DefaultRootFragmentDetailView(RootFragmentDetailView):
     """Retrieve, update or delete default root's fragment."""
 
+    # TODO deprecate when front-end moves to explicit root management
     root_pk = settings.DEFAULT_ROOT_UUID
 
     def get(self, request: Request, pk: uuid.UUID):

@@ -11,6 +11,7 @@ from neomodel import contrib
 
 # allowed property types in neo4j
 # see https://neo4j.com/docs/cypher-manual/current/syntax/values/#property-types
+# TODO date, time, datetime, point, etc.
 PROPERTY_TYPES = (int, float, str, bool)
 
 

@@ -63,6 +63,7 @@ class RootGraphView(ContainerManagementMixin, APIView):
 class DefaultRootGraphView(RootGraphView):
     """Retrieve, replace or delete graph content of the default root."""
 
+    # TODO deprecate when front-end moves to explicit root management
     pk = settings.DEFAULT_ROOT_UUID
 
     def get(self, request: Request):
@@ -123,6 +124,7 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
 class DefaultRootFragmentGraphView(RootFragmentGraphView):
     """Retrieve, replace or delete graph content of default root's fragment."""
 
+    # TODO deprecate when front-end moves to explicit root management
     root_pk = settings.DEFAULT_ROOT_UUID
 
     def get(self, request: Request, pk: uuid.UUID):

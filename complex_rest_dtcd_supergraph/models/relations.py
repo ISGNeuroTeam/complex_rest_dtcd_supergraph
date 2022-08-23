@@ -1,5 +1,5 @@
 """
-Relationship classes for neomodel.
+Relationship classes from neomodel.
 """
 
 from types import SimpleNamespace

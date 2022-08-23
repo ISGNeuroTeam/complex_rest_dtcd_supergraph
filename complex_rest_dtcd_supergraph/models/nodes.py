@@ -1,7 +1,5 @@
 """
-Node classes for neomodel.
-
-The models here closely mirror classes from `structures` module.
+Node classes from neomodel.
 """
 
 from typing import List, Tuple
@@ -21,7 +19,8 @@ from .relations import EdgeRel, RELATION_TYPES
 
 
 # type aliases
-CustomUniqueIdProperty = StringProperty  # TODO better validation for IDs
+# this depends on front-end team and what they use as IDs
+CustomUniqueIdProperty = StringProperty  # TODO better validation for IDs?
 
 
 class AbstractPrimitive(SemiStructuredNode):
@@ -36,6 +35,7 @@ class AbstractPrimitive(SemiStructuredNode):
 
     __abstract_node__ = True
 
+    # TODO more properties? created/modified on, owner, etc?
     uid = CustomUniqueIdProperty(unique_index=True, required=True)
     meta_ = JSONProperty()
 

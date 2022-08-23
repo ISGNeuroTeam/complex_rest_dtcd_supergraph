@@ -23,7 +23,7 @@ def reconnect_to_container(
     vertices: Iterable[models.Vertex],
     groups: Iterable[models.Group],
 ):
-    """Reconnect merged entities to parent container."""
+    """Connect vertices and groups to given container."""
 
     for vertex in vertices:
         connect_if_not_connected(container.vertices, vertex)
@@ -263,7 +263,10 @@ class Manager:
         # - for each edge, start (output) & end (input) ports exist in content
         # - for each vertex, all ports exist in content
         self._deprecator.delete_difference(container, content)
-        result = self._merger.merge(content)  # TODO does not replace old properties
+        # TODO does not replace old properties
+        # TODO possible clashes between structured and user-defined properties
+        result = self._merger.merge(content)
+        # TODO leaves existing connections to different containers
         reconnect_to_container(container, result.vertices, result.groups)
 
     def reconnect(self, parent: models.Container, child: models.Container):

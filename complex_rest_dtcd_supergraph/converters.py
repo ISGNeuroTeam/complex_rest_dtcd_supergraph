@@ -1,5 +1,8 @@
 """
 This module contains converter classes.
+
+Converters help us transform data back and forth between Python 
+primitives and objects. Check out the "format.md" document for details. 
 """
 
 from copy import deepcopy
@@ -30,7 +33,7 @@ class GraphDataConverter:
     @staticmethod
     def _restore_properties(original: dict, properties: dict):
         for name, value in properties.items():
-            if name in original:  # FIXME handle this elsewhere
+            if name in original:  # FIXME handle this elsewhere?
                 original[name][KEYS.value] = value
 
     @staticmethod
@@ -120,6 +123,7 @@ class GraphDataConverter:
         """Convert graph data in specified format to content."""
 
         # pre-condition: data is valid
+        # TODO more validation / error handling?
         nodes = data[KEYS.nodes]
         vertices = list(map(self._to_vertex, nodes))
         ports = list(map(self._to_port, self._get_ports(nodes)))

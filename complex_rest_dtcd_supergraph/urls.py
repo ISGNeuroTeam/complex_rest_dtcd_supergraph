@@ -16,6 +16,7 @@ from .views import (
 
 
 app_name = "supergraph"
+
 urlpatterns = [
     # root management
     path("roots", RootListView.as_view(), name="roots"),
@@ -42,7 +43,7 @@ urlpatterns = [
 ]
 
 # backward API compatibility: fragment management for default root
-# this will be deprecated soon
+# TODO deprecate when front-end moves to explicit root management
 urlpatterns += [
     path(
         "fragments",
