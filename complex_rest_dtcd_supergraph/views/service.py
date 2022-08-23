@@ -15,6 +15,8 @@ class ResetNeo4jView(APIView):
     def post(self, request, *args, **kwargs):
         """Delete all nodes and relationships from Neo4j database."""
 
+        # TODO deprecated
+        # TODO this also deletes teh default root
         neomodel.clear_neo4j_database(neomodel.db)
 
         return SuccessResponse()
