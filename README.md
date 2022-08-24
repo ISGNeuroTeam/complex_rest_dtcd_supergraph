@@ -2,7 +2,7 @@
 
 [Complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop) plugin for graph management.
 
-For an introduction check out the [User guide](docs/user-guide.md).
+For an introduction check out the [User Guide](docs/user-guide.md) and [Extra Notes](docs/notes.md) documents, or see the [Roadmap](docs/roadmap.md) to know what to work on.
 
 ## Installation
 
@@ -27,7 +27,7 @@ These instructions will get you a copy of the plugin up and running on your loca
         cypher-shell -a neo4j://localhost:7687 -u neo4j -p password
         ```
 
-### Deploy from GitHub or Nexus
+### Install from GitHub or Nexus
 
 You can get the latest build from either [GitHub releases](https://github.com/ISGNeuroTeam/complex_rest_dtcd_supergraph/releases) page or Nexus - the archives are identical.
 
@@ -35,7 +35,7 @@ You can get the latest build from either [GitHub releases](https://github.com/IS
 2. Unpack the archive into `complex_rest/plugins` directory.
 3. Run the [initialization script](#initialization-script) to prepare the database.
 
-### Deploy via Make
+### Install via Make
 
 If you want to have an access to feature branch version, you can build this plugin locally.
 
@@ -51,11 +51,11 @@ If you want to have an access to feature branch version, you can build this plug
 3. Unpack the archive into `complex_rest/plugins` directory.
 4. Run the [initialization script](#initialization-script) to prepare the database.
 
-### Deploy manually
+### Install manually
 
 If you are a developer, then follow this section.
 
-1. Clone the Git repository:
+1. Clone the Git repository (optionally, into `complex_rest/plugin_dev` folder):
     ```sh
     git clone git@github.com:ISGNeuroTeam/complex_rest.git repo
     ```
@@ -89,6 +89,18 @@ For deployment we need to get a build archive - see the previous section on how 
 3. Run the [initialization script](#initialization-script) to prepare the database.
 4. **TODO** Backup / reset / migrate the database.
 5. Start `complex_rest`.
+
+## Running the tests
+
+[Install this plugin manually](#install-manually), then navigate to `complex_rest` root directory, activate project's virtual environment and run:
+
+```sh
+python complex_rest/manage.py test \
+    plugin_dev/complex_rest_dtcd_supergraph/tests/ \
+    --settings="core.settings.test" \
+```
+
+> You might need to install base requirements into project's `venv` for this to work.
 
 ## Notes
 
@@ -133,7 +145,10 @@ You can run it from anywhere you like:
 - Update [User guide](docs/user-guide.md).
 - Resolve `RelationshipClassRedefined` error when trying to test `neomodel` models directly (see `test_managers.py`).
 - User-defined properties that were saved before *stay on the node after merge* even if they are missing in new structure and should be deleted (see how `create_or_update` works). We handle it in converter, but this is not nice.
-- Some database queries are inefficient (`n+1` problems).
+- Resolve possible **clashes** between explicit and user-defined properties on nodes when merging content.
+- Migration scripts (`upgrade.v0.v1.sh`) for this plugin.
+- Some database queries may be inefficient (`n+1` problems).
+- Add Django auth to views.
 
 ## Built With
 

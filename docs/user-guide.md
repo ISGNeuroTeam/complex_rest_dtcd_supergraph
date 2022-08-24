@@ -1,16 +1,101 @@
-# UNDER CONSTRUCTION: User guide
+# UNDER CONSTRUCTION
+
+- `Root` node, `Fragment` node (containers)
+- `Vertex` node, `Port` nodes, `Edge` relations (content)
+- Relations between *containers* and *content*
+- JSON from front-end, validation and conversion (awkward format) to objects
+    - format details
+    - validation details
+    - converter
+- Replacement
+    - Logical flow of replacement: no granular ops, user sends new content, we replace old one using `Manager`
+    - What happends: delete difference, merge data, re-connect to container
+- Merge gotchas
+    - old parent stays
+    - old properties
+    - clashes
+
+# User guide
+
+Здесь вы найдёте примеры основных операций, которые поддерживает плагин `supergraph`. Обратитесь к документу [Format](format.md) за подробностями о формате JSON файлов, которыми мы обмениваемся с front-end, а также к [OpenAPI schema](openapi.yaml) для обзора URLs.
+
+Для взаимодействия с Neo4j мы используем Object Graph Mapper (OGM) библиотеку [`neomodel`](https://neomodel.readthedocs.io/en/latest/index.html). Логика напоминает работу с моделями Django с поправкой на графы - за подробностями обратитесь к [секции Getting Started](https://neomodel.readthedocs.io/en/latest/getting_started.html).
+
+> Для работы с примерами вы можете использовать *Python shell*. Не забудьте добавить путь к модулю `complex_rest` в переменную `PYTHONPATH`.
+
+## Введение
+
+- для чего нужен плагин
+- импорт и прочее
+
+Для начала работы подготовим соединение с Neo4j:
+
+```python
+>>> from pprint import pp
+>>> from neomodel import clear_neo4j_database, config, db
+>>> config.DATABASE_URL = "bolt://neo4j:password@localhost:7687"
+>>> clear_neo4j_database(db)
+```
+
+## Контейнеры roots и fragments
+
+Community version, только одна БД Neo4j = one big graph. Для деления - разбиваем полотно на суб-графы (связанные между собой узлы и связи). В роли этих суб-графов выступают *корни* и *фрагменты*. Корни делят полотно на **несвязанные суб-графы**; фрагменты в свою очередь делят корневые суб-графы. Для репрезентации корней и фрагментов мы используем Neo4j nodes с лейблами `Root` и `Fragment`. Такие nodes связаны с объектами, которые входят в данный суб-граф корня / фрагмента.
+
+Начнём с одного корня и пары фрагментов:
+
+```python
+>>> from models import Root, Fragment
+>>> root = Root(name="main").save()
+>>> sales = Fragment(name="sales").save()
+>>> marketing = Fragment(name="marketing").save()
+>>>
+>>> root
+<Root: {'uid': '6e36897428954a25b5c2aa9a381a84a6', 'name': 'main', 'id': 0}>
+>>> sales
+<Fragment: {'uid': 'c98020faa5d5452c89cb6c400c9cbded', 'name': 'sales', 'id': 1}>
+>>> marketing
+<Fragment: {'uid': 'f840ab6aefbb4fd5a7d87de1a4f7f85d', 'name': 'marketing', 'id': 2}>
+>>> pp(Fragment.nodes.all())  # Query API похож на Django
+[<Fragment: {'uid': 'c98020faa5d5452c89cb6c400c9cbded', 'name': 'sales', 'id': 1}>,
+ <Fragment: {'uid': 'f840ab6aefbb4fd5a7d87de1a4f7f85d', 'name': 'marketing', 'id': 2}>]
+```
+
+Корни включают в себя набор фрагментов, а фрагменты не могут существовать сами по себе - давайте это исправим:
+
+```python
+>>> root.fragments.connect(sales)
+True
+>>> root.fragments.connect(marketing)
+True
+>>> pp(root.fragments.all())  # фрагменты, связанные с этим корнем
+[<Fragment: {'uid': 'c98020faa5d5452c89cb6c400c9cbded', 'name': 'sales', 'id': 1}>]
+```
+
+## TODO Узлы и связи Y-files
+
+## TODO Converter
+
+## TODO Manager
+
+## TODO Всё вместе
+
+- high-level overview of how these fit together
+
+
+
+# Old user guide
 
 > The information here is deprecated.
 
 In this guide you'll find examples of core operations provided by this plugin.
 
-Check out check out the [Format](Format.md) and `neo-tools` library for details on why and how we represent nested structures in the database and [OpenAPI schema](./openapi.yaml) to get a general idea for the plugin.
+Check out check out the  and `neo-tools` library for details on why and how we represent nested structures in the database and [OpenAPI schema](./openapi.yaml) to get a general idea for the plugin.
 
 > You can follow examples using Django-provided shell of `complex_rest` project.
 
 ## Vertices and edges
 
-We get vertices and edges in the form of Python dictionaries (check out the [Format](Format.md) for details). Here is a couple of simple examples.
+We get vertices and edges in the form of Python dictionaries (check out the [Format](format.md) for details). Here is a couple of simple examples.
 
 ```python
 vertex = {
@@ -58,11 +143,15 @@ graph = {
 }
 ```
 
-> We run validation on this data before we proceed further: check consistent IDs, etc. You can see more in `serializers` and `fields` modules.
+> We run validation on this data before we proceed further: check consistent IDs, etc. You can see more in `serializers.py` and `fields.py` modules.
 
 ## Representation
 
-We want to represent these as graph structures inside Neo4j. Unfortunately, Neo4j cannot store nested objects on either nodes or relationships, so we *do not* have 1:1 mappings for vertices-nodes and edges-relationships. Instead, we represent vertices & edges as *tree structures* and convert back and forth between them. Check out the [Format](./Format.md) document for more information.
+------------------------------------------------------------------------
+>>> UNDER CONSTRUCTIONS
+------------------------------------------------------------------------
+
+We want to represent these as graph structures inside Neo4j. Unfortunately, Neo4j cannot store nested objects on either nodes or relationships, so we *do not* have 1:1 mappings for vertices-nodes and edges-relationships. Instead, we represent vertices & edges as *tree structures* and convert back and forth between them. Check out the [Format](./format.md) document for more information.
 
 To support that, we use the `Converter` class:
 
