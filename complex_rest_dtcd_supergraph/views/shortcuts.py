@@ -31,7 +31,7 @@ def func_or_400(func, *args, exception=None, **kwargs):
     try:
         return func(*args, **kwargs)
     except Exception as e:
-        logger.error("Error: \n" + str(e))
+        logger.error("Error: %s", e, exc_info=True)
         raise exception
 
 
@@ -46,7 +46,7 @@ def to_content_or_400(converter, data):
     try:
         return converter.to_content(data)
     except Exception as e:
-        logger.error("Loading error: \n" + str(e))
+        logger.error("Loading error: %s", e, exc_info=True)
         raise LoadingError
 
 
@@ -61,5 +61,5 @@ def replace_or_400(manager, container, new_content):
     try:
         return manager.replace(container, new_content)
     except Exception as e:
-        logger.error("Manager error: \n" + str(e))
+        logger.error("Manager error: %s", e, exc_info=True)
         raise ManagerError

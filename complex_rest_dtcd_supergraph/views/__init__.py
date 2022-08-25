@@ -14,4 +14,4 @@ from .roots import (
     RootDetailView,
     RootListView,
 )
-from .service import ResetNeo4jView
+from .services import ResetNeo4jView

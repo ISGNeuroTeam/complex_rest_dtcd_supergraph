@@ -22,7 +22,7 @@ class ContainerManagementMixin:
         """
 
         content = self.manager.read(container)
-        logger.info("Queried content: " + content.info)
+        logger.info("Queried content: %s", content.info)
         data = self.converter.to_data(content)
 
         return data
@@ -35,5 +35,5 @@ class ContainerManagementMixin:
         """
 
         new_content = to_content_or_400(self.converter, data)
-        logger.info("Converted to content: " + new_content.info)
+        logger.info("Converted to content: %s", new_content.info)
         replace_or_400(self.manager, container, new_content)
