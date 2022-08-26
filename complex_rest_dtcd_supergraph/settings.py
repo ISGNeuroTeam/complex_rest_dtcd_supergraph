@@ -53,20 +53,7 @@ password = ini_config["neo4j"]["password"]
 neomodel.config.DATABASE_URL = f"{protocol}://{user}:{password}@{address}:{port}"
 
 # DB schema
-filename = "default_root_uid.txt"
-path = PROJECT_DIR / filename
-assert path.exists(), (
-    f"Cannot find '{filename}' in this plugin's directory. "
-    "Have you forgot to initialize the database with initialize.py?"
+DEFAULT_ROOT_UUID = uuid.UUID(int=0)
+DEFAULT_ROOT_DATA = dict(
+    name="Root",
 )
-
-# TODO users can delete default root node, so uid in text file becomes old
-# TODO during the testing we reset the database after each test
-with open(path) as f:
-    try:
-        DEFAULT_ROOT_UUID = uuid.UUID(f.read())
-    except ValueError:
-        raise ValueError(
-            "Cannot convert Root uid to UUID. "
-            f"Please make sure ID in '{filename}' is a correct UUID."
-        )
