@@ -1,5 +1,8 @@
 """
 Helper script creates the initial Root node with UID from settings.
+
+TODO Deprecate this command when fron-end team switches to explicit
+root management.
 """
 
 from django.core.management.base import BaseCommand

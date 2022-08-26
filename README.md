@@ -108,27 +108,25 @@ python complex_rest/manage.py test \
 
 Neo4j provides support for applying [indexes](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-indexes) and [constraints](https://neo4j.com/docs/getting-started/current/graphdb-concepts/#graphdb-constraints).
 
-To do this, activate plugin's virtual environment and run:
+To do this, run the `install_labels` Django command from project's root directory:
 
 ```sh
-address="bolt://neo4j:password@localhost:7687"
-neomodel_remove_labels --db $address
-neomodel_install_labels models --db $address
+python complex_rest/manage.py install_labels
 ```
 
-For password and port use values from `supergraph.conf`.
+You can use optional `--reset` flag to remove old constrains and indexes.
 
 ### Initializing the default Root
 
-We need to create the default root node in order to keep backwards compatibility with the API v0.2.0. There is a script just for that!
+We need to create the default root node in order to keep backwards compatibility with the API v0.2.0. There is a command just for that!
 
-Activate plugin's virtual environment, navigate to script's parent directory and run:
+Run the `create_default_root_node` Django command from project's root directory:
 
 ```sh
-python create_default_root.py
+python complex_rest/manage.py create_default_root_node
 ```
 
-It will create a single `Root` node and save its `uid` attribute in the file `default_root_uid.txt` inside source code directory.
+It will create a single `Root` node with `uid` attribute set to `DEFAULT_ROOT_UUID` value from settings.
 
 ### Initialization script
 

@@ -8,9 +8,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 ### Added
 - Roadmap and notes documents.
+- Custom Django commands for Neo4j: labels installation and default root initialization.
 
 ### Changed
 - User guide update.
+- Switch `database_init.sh` to use Django commands instead of explicit scripts.
 
 ## [0.3.3] - 2022-08-18
 ### Changed
