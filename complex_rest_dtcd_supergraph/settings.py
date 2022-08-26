@@ -8,8 +8,9 @@ import neomodel
 from core.settings.ini_config import merge_ini_config_with_defaults
 
 
-PLUGIN_NAME = "complex_rest_dtcd_supergraph"
 PROJECT_DIR = Path(__file__).parent
+# see how complex_rest loads the plugins
+PLUGIN_NAME = PROJECT_DIR.name
 
 default_ini_config = {
     "logging": {
