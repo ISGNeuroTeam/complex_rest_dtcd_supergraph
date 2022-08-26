@@ -189,9 +189,6 @@ scripts/
 complex_rest_dtcd_supergraph/*.conf
 complex_rest_dtcd_supergraph/*.json
 
-# variable file with default root's uid
-default_root_uid.txt
-
 # build stuff
 make_build/
 venv.tar.gz
