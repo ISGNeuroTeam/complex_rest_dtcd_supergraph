@@ -12,8 +12,6 @@ class ContainerManagementMixin:
     and converting back and forth between domain classes and Python primitives.
     """
 
-    manager = None
-
     def read(self, container: models.Container) -> dict:
         """Read container's content as Python primitives in correct format.
 
@@ -21,7 +19,6 @@ class ContainerManagementMixin:
         2. Uses `converter` to convert the `Content` into Python primitives.
         """
 
-        # content = self.manager.read(container)
         content = container.read_content()
         logger.info("Queried content: %s", content.info)
         data = content.to_dict()
@@ -37,4 +34,4 @@ class ContainerManagementMixin:
 
         new_content = to_content_or_400(data)
         logger.info("Converted to content: %s", new_content.info)
-        replace_or_400(self.manager, container, new_content)
+        replace_or_400(container, new_content)

@@ -51,16 +51,16 @@ def to_content_or_400(data: dict):
         raise LoadingError
 
 
-def replace_or_400(manager, container, new_content):
-    """Try to use the manager to replace the content of a container with new one.
+def replace_or_400(container, new_content):
+    """Try to replace the content of a container with new one.
 
-    Calls `manager.replace(container, content)` and returns the result.
+    Calls `container.replace_content(new_content)` and returns the result.
     Raises `ManagerError` on exception and logs it.
     """
 
     # FIXME too broad of an exception
     try:
-        return manager.replace(container, new_content)
+        return container.replace_content(new_content)
     except Exception as e:
         logger.error("Manager error: %s", e, exc_info=True)
         raise ManagerError
