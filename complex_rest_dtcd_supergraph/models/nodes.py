@@ -15,6 +15,7 @@ from neomodel import (
 )
 from neomodel.contrib import SemiStructuredNode
 
+from . import management
 from .relations import EdgeRel, RELATION_TYPES
 
 
@@ -130,6 +131,14 @@ class Container(StructuredNode):
         results, _ = db.cypher_query(q, resolve_objects=True)
 
         return [(r[0], r[1], r[2]) for r in results]
+
+    def read_content(self):
+        """Query and return the content of this container."""
+
+        return management.Reader.read(self)
+
+    def replace_content(self, new_content):
+        raise NotImplementedError
 
 
 class Fragment(Container):
