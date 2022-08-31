@@ -12,7 +12,6 @@ from rest.response import SuccessResponse
 from rest.views import APIView
 
 from .. import settings
-from ..converters import GraphDataConverter
 from ..managers import Manager
 from ..models import Root
 from ..serializers import ContentSerializer, GraphSerializer
@@ -26,7 +25,6 @@ class RootGraphView(ContainerManagementMixin, APIView):
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
-    converter = GraphDataConverter()
     manager = Manager()
 
     @neomodel.db.transaction
@@ -81,7 +79,6 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
-    converter = GraphDataConverter()
     manager = Manager()
 
     @neomodel.db.transaction

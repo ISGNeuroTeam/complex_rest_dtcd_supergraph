@@ -11,7 +11,6 @@ class ContainerManagementMixin:
     and converting back and forth between domain classes and Python primitives.
     """
 
-    converter = None
     manager = None
 
     def read(self, container) -> dict:
