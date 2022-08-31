@@ -6,6 +6,7 @@ from rest_framework.exceptions import NotFound
 
 from ..exceptions import LoadingError, ManagerError
 from ..settings import PLUGIN_NAME
+from ..structures import Content
 
 
 logger = logging.getLogger(PLUGIN_NAME)
@@ -35,16 +36,16 @@ def func_or_400(func, *args, exception=None, **kwargs):
         raise exception
 
 
-def to_content_or_400(converter, data):
-    """Try to use the converter to convert the data to content.
+def to_content_or_400(data: dict):
+    """Try to load content from data.
 
-    Calls `converter.to_content(data)` and returns the result. Raises
+    Calls `Content.from_dict(data)` and returns the result. Raises
     `LoadingError` on exception and logs it.
     """
 
     # FIXME too broad of an exception
     try:
-        return converter.to_content(data)
+        return Content.from_dict(data)
     except Exception as e:
         logger.error("Loading error: %s", e, exc_info=True)
         raise LoadingError

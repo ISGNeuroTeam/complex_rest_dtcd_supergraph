@@ -23,7 +23,7 @@ class ContainerManagementMixin:
 
         content = self.manager.read(container)
         logger.info("Queried content: %s", content.info)
-        data = self.converter.to_data(content)
+        data = content.to_dict()
 
         return data
 
@@ -34,6 +34,6 @@ class ContainerManagementMixin:
         2. Uses `manager` that maps from `Content` to Neo4j database entities.
         """
 
-        new_content = to_content_or_400(self.converter, data)
+        new_content = to_content_or_400(data)
         logger.info("Converted to content: %s", new_content.info)
         replace_or_400(self.manager, container, new_content)
