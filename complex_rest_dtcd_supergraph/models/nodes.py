@@ -138,7 +138,22 @@ class Container(StructuredNode):
         return management.Reader.read(self)
 
     def replace_content(self, new_content):
-        raise NotImplementedError
+        """Replace the content of this container."""
+
+        # content pre-conditions (referential integrity within the content):
+        # - for each edge, start (output) & end (input) ports exist in content
+        # - for each vertex, all ports exist in content
+        management.Deprecator.delete_difference(self, new_content)
+        # TODO does not replace old properties
+        # TODO possible clashes between structured and user-defined properties
+        result = management.Merger.merge(new_content)
+        # TODO leaves existing connections to different containers
+        management.reconnect_to_container(self, result.vertices, result.groups)
+
+    def reconnect_to_content(self, container):
+        """Reconnect to the content of a given container."""
+
+        management.reconnect_to_container(self, container.vertices, container.groups)
 
 
 class Fragment(Container):

@@ -20,18 +20,18 @@ from ..utils import connect_if_not_connected, free_properties
 from .relations import RELATION_TYPES
 
 
-# def reconnect_to_container(
-#     container: nodes.Container,
-#     vertices: Iterable[nodes.Vertex],
-#     groups: Iterable[nodes.Group],
-# ):
-#     """Connect vertices and groups to given container."""
+def reconnect_to_container(
+    container: "nodes.Container",
+    vertices: Iterable["nodes.Vertex"],
+    groups: Iterable["nodes.Group"],
+):
+    """Connect vertices and groups to a given container."""
 
-#     for vertex in vertices:
-#         connect_if_not_connected(container.vertices, vertex)
+    for vertex in vertices:
+        connect_if_not_connected(container.vertices, vertex)
 
-#     for group in groups:
-#         connect_if_not_connected(container.groups, group)
+    for group in groups:
+        connect_if_not_connected(container.groups, group)
 
 
 class Reader:
@@ -97,185 +97,155 @@ class Reader:
         )
 
 
-# class _Deprecator:
-#     """Deletes deprecated content of a container."""
+class Deprecator:
+    """Deletes deprecated content of a container."""
 
-#     @staticmethod
-#     def _delete_deprecated_vertices_groups_ports(
-#         container: nodes.Container, content: structures.Content
-#     ):
-#         """Delete vertices, groups and ports from the container not in the content."""
+    @staticmethod
+    def _delete_deprecated_vertices_groups_ports(
+        container: "nodes.Container", content: structures.Content
+    ):
+        """Delete vertices, groups and ports from the container not in the content."""
 
-#         # query uids of primitive nodes (vertices, groups, ports) in the container
-#         uid2node = {}
+        # query uids of primitive nodes (vertices, groups, ports) in the container
+        uid2node = {}
 
-#         for vertex in container.vertices.all():
-#             uid2node[vertex.uid] = vertex
+        for vertex in container.vertices.all():
+            uid2node[vertex.uid] = vertex
 
-#             for port in vertex.ports.all():
-#                 uid2node[port.uid] = port
+            for port in vertex.ports.all():
+                uid2node[port.uid] = port
 
-#         for group in container.groups.all():
-#             uid2node[group.uid] = group
+        for group in container.groups.all():
+            uid2node[group.uid] = group
 
-#         new_uids = set(
-#             item.uid
-#             for item in chain(
-#                 content.vertices,
-#                 content.ports,
-#                 content.groups,
-#             )
-#         )
-#         deprecated_uids = set(uid2node) - new_uids
+        new_uids = set(
+            item.uid
+            for item in chain(
+                content.vertices,
+                content.ports,
+                content.groups,
+            )
+        )
+        deprecated_uids = set(uid2node) - new_uids
 
-#         for uid in deprecated_uids:
-#             uid2node[uid].delete()
+        for uid in deprecated_uids:
+            uid2node[uid].delete()
 
-#         return deprecated_uids
+        return deprecated_uids
 
-#     @staticmethod
-#     def _delete_deprecated_edges(
-#         container: nodes.Container, content: structures.Content
-#     ):
-#         """Delete edges from the container not in the content."""
+    @staticmethod
+    def _delete_deprecated_edges(
+        container: "nodes.Container", content: structures.Content
+    ):
+        """Delete edges from the container not in the content."""
 
-#         current_uids = set((op.uid, ip.uid) for op, _, ip in container.edges)
-#         new_uids = set(edge.uid for edge in content.edges)
-#         deprecated_uids = current_uids - new_uids
+        current_uids = set((op.uid, ip.uid) for op, _, ip in container.edges)
+        new_uids = set(edge.uid for edge in content.edges)
+        deprecated_uids = current_uids - new_uids
 
-#         neomodel.db.cypher_query(
-#             query=(
-#                 "UNWIND $list AS pair "
-#                 "MATCH ({uid: pair[0]}) "
-#                 f" -[r:{RELATION_TYPES.edge}]-> "
-#                 "({uid: pair[1]}) "
-#                 "DELETE r"
-#             ),
-#             params={"list": list(map(list, deprecated_uids))},
-#         )
+        neomodel.db.cypher_query(
+            query=(
+                "UNWIND $list AS pair "
+                "MATCH ({uid: pair[0]}) "
+                f" -[r:{RELATION_TYPES.edge}]-> "
+                "({uid: pair[1]}) "
+                "DELETE r"
+            ),
+            params={"list": list(map(list, deprecated_uids))},
+        )
 
-#         return deprecated_uids
+        return deprecated_uids
 
-#     def delete_difference(
-#         self, container: nodes.Container, content: structures.Content
-#     ):
-#         """Delete entities from the container that are not in the content."""
+    @classmethod
+    def delete_difference(
+        cls, container: "nodes.Container", content: structures.Content
+    ):
+        """Delete entities from the container that are not in the content."""
 
-#         self._delete_deprecated_vertices_groups_ports(container, content)
-#         self._delete_deprecated_edges(container, content)
-
-
-# class _Merger:
-#     """Merges content entities."""
-
-#     @dataclass(frozen=True)
-#     class MergedResult:
-#         """Lightweight container for merged entities."""
-
-#         __slots__ = ["vertices", "ports", "edges", "groups"]
-#         vertices: Sequence[nodes.Vertex]
-#         ports: Sequence[nodes.Port]
-#         edges: Sequence[nodes.EdgeRel]
-#         groups: Sequence[nodes.Group]
-
-#     @staticmethod
-#     def _merge_ports(ports: Iterable[structures.Port]):
-#         # FIXME possible clash between user-defined property name and uid/meta_ key
-#         data = [
-#             dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
-#         ]
-
-#         return nodes.Port.create_or_update(*data)
-
-#     @staticmethod
-#     def _merge_edges(
-#         edges: Iterable[structures.Edge],
-#         uid2port: Mapping[structures.ID, nodes.Port],
-#     ) -> List[nodes.EdgeRel]:
-#         relations = []
-
-#         for edge in edges:
-#             output_port = uid2port[edge.start]
-#             input_port = uid2port[edge.end]
-#             rel = connect_if_not_connected(output_port.neighbor, input_port)
-#             rel.meta_ = edge.meta  # over-write metadata
-#             rel.save()
-#             relations.append(rel)
-
-#         return relations
-
-#     @staticmethod
-#     def _merge_vertices(
-#         vertices: Iterable[structures.Vertex],
-#         uid2port: Mapping[structures.ID, nodes.Port],
-#     ) -> List[nodes.Vertex]:
-#         nodes = []
-
-#         for vertex in vertices:
-#             # FIXME possible clash between user-defined property name and uid/meta_ key
-#             node = nodes.Vertex.create_or_update(
-#                 dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
-#                 lazy=True,
-#             )[0]
-#             nodes.append(node)
-
-#             # connect this vertex to ports
-#             for uid in vertex.ports:
-#                 port = uid2port[uid]
-#                 connect_if_not_connected(node.ports, port)
-
-#         return nodes
-
-#     @staticmethod
-#     def _merge_groups(groups: Iterable[structures.Group]):
-#         data = [dict(uid=group.uid, meta_=group.meta) for group in groups]
-
-#         return nodes.Group.create_or_update(*data, lazy=True)
-
-#     def merge(self, content: structures.Content):
-#         """Merge content entities."""
-
-#         ports = self._merge_ports(content.ports)
-#         uid2port = {port.uid: port for port in ports}
-#         edges = self._merge_edges(content.edges, uid2port)
-#         vertices = self._merge_vertices(content.vertices, uid2port)
-#         groups = self._merge_groups(content.groups)
-
-#         return self.MergedResult(
-#             vertices=vertices,
-#             ports=ports,
-#             edges=edges,
-#             groups=groups,
-#         )
+        cls._delete_deprecated_vertices_groups_ports(container, content)
+        cls._delete_deprecated_edges(container, content)
 
 
-# class Manager:
-#     """Handles read and write operations on the container's content."""
+class Merger:
+    """Merges content entities."""
 
-#     def __init__(self) -> None:
-#         self._reader = _Reader()
-#         self._deprecator = _Deprecator()
-#         self._merger = _Merger()
+    @dataclass(frozen=True)
+    class MergedResult:
+        """Lightweight container for merged entities."""
 
-#     def read(self, container: nodes.Container):
-#         """Return the content of a given container."""
+        __slots__ = ["vertices", "ports", "edges", "groups"]
+        vertices: Sequence["nodes.Vertex"]
+        ports: Sequence["nodes.Port"]
+        edges: Sequence["nodes.EdgeRel"]
+        groups: Sequence["nodes.Group"]
 
-#         return self._reader.read(container)
+    @staticmethod
+    def _merge_ports(ports: Iterable[structures.Port]):
+        # FIXME possible clash between user-defined property name and uid/meta_ key
+        data = [
+            dict(uid=port.uid, meta_=port.meta, **port.properties) for port in ports
+        ]
 
-#     def replace(self, container: nodes.Container, content: structures.Content):
-#         """Replace the content of a given container."""
+        return nodes.Port.create_or_update(*data)
 
-#         # content pre-conditions (referential integrity within the content):
-#         # - for each edge, start (output) & end (input) ports exist in content
-#         # - for each vertex, all ports exist in content
-#         self._deprecator.delete_difference(container, content)
-#         # TODO does not replace old properties
-#         # TODO possible clashes between structured and user-defined properties
-#         result = self._merger.merge(content)
-#         # TODO leaves existing connections to different containers
-#         reconnect_to_container(container, result.vertices, result.groups)
+    @staticmethod
+    def _merge_edges(
+        edges: Iterable[structures.Edge],
+        uid2port: Mapping[structures.ID, "nodes.Port"],
+    ) -> List["nodes.EdgeRel"]:
+        result = []
 
-#     def reconnect(self, parent: nodes.Container, child: nodes.Container):
-#         """Reconnect the content of a child container to parent."""
+        for edge in edges:
+            output_port = uid2port[edge.start]
+            input_port = uid2port[edge.end]
+            rel = connect_if_not_connected(output_port.neighbor, input_port)
+            rel.meta_ = edge.meta  # over-write metadata
+            rel.save()
+            result.append(rel)
 
-#         reconnect_to_container(parent, child.vertices, child.groups)
+        return result
+
+    @staticmethod
+    def _merge_vertices(
+        vertices: Iterable[structures.Vertex],
+        uid2port: Mapping[structures.ID, "nodes.Port"],
+    ) -> List["nodes.Vertex"]:
+        result = []
+
+        for vertex in vertices:
+            # FIXME possible clash between user-defined property name and uid/meta_ key
+            node = nodes.Vertex.create_or_update(
+                dict(uid=vertex.uid, meta_=vertex.meta, **vertex.properties),
+                lazy=True,
+            )[0]
+            result.append(node)
+
+            # connect this vertex to ports
+            for uid in vertex.ports:
+                port = uid2port[uid]
+                connect_if_not_connected(node.ports, port)
+
+        return result
+
+    @staticmethod
+    def _merge_groups(groups: Iterable[structures.Group]):
+        data = [dict(uid=group.uid, meta_=group.meta) for group in groups]
+
+        return nodes.Group.create_or_update(*data, lazy=True)
+
+    @classmethod
+    def merge(cls, content: structures.Content):
+        """Merge content entities."""
+
+        ports = cls._merge_ports(content.ports)
+        uid2port = {port.uid: port for port in ports}
+        edges = cls._merge_edges(content.edges, uid2port)
+        vertices = cls._merge_vertices(content.vertices, uid2port)
+        groups = cls._merge_groups(content.groups)
+
+        return cls.MergedResult(
+            vertices=vertices,
+            ports=ports,
+            edges=edges,
+            groups=groups,
+        )
