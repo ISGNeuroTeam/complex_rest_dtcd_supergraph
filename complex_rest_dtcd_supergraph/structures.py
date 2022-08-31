@@ -19,7 +19,6 @@ from typing import (
 )
 
 from .settings import KEYS
-from .structures import Content, Edge, Group, Port, Vertex
 from .utils import savable_as_property
 
 
