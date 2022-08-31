@@ -25,7 +25,6 @@ class RootGraphView(ContainerManagementMixin, APIView):
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
-    manager = Manager()
 
     @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
@@ -79,7 +78,6 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
-    manager = Manager()
 
     @neomodel.db.transaction
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
@@ -103,8 +101,8 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
         fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
         # convert to domain classes, update fragment's content
         self.replace(fragment, serializer.data["graph"])
-        # re-connect root to content
-        self.manager.reconnect(root, fragment)
+        # re-connect root to fragment's new content
+        root.reconnect_to_content(fragment)
 
         return SuccessResponse()
 
