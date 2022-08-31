@@ -74,6 +74,26 @@ class Primitive:
 
         return meta, uid, properties
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Primitive":
+        """Load primitive from dictionary."""
+
+        meta, uid, properties = cls._extract_fields(data)
+
+        return cls(uid=uid, properties=properties, meta=meta)
+
+    def to_dict(self) -> dict:
+        """Dump this primitive's data to dictionary."""
+
+        data = deepcopy(self.meta)
+        data[KEYS.yfiles_id] = self.uid
+
+        # FIXME workaround to handle stale properties on nodes; find better way
+        if KEYS.properties in data:
+            restore_properties(data[KEYS.properties], self.properties)
+
+        return data
+
 
 @dataclass
 class Port(Primitive):
@@ -86,9 +106,7 @@ class Port(Primitive):
     def from_dict(cls, data: dict) -> "Port":
         """Load port from dictionary."""
 
-        meta, uid, properties = cls._extract_fields(data)
-
-        return cls(uid=uid, properties=properties, meta=meta)
+        return super().from_dict(data)
 
 
 @dataclass
@@ -113,6 +131,21 @@ class Vertex(Primitive):
 
         return cls(uid=uid, properties=properties, meta=meta, ports=port_ids)
 
+    def to_dict(self, id2port: dict) -> dict:
+        """Dump this vertex data to dictionary.
+
+        Args:
+            id2port: mapping between IDs and ports, connected to this vertex.
+        """
+
+        data = super().to_dict()
+
+        ports = [id2port[port_id] for port_id in self.ports]
+        if ports:
+            data[KEYS.init_ports] = ports
+
+        return data
+
 
 @dataclass
 class Group(Primitive):
@@ -125,9 +158,7 @@ class Group(Primitive):
     def from_dict(cls, data: dict) -> "Group":
         """Load group from dictionary."""
 
-        meta, uid, _ = cls._extract_fields(data)
-
-        return cls(uid=uid, meta=meta)
+        return super().from_dict(data)
 
 
 @dataclass
@@ -150,6 +181,15 @@ class Edge:
         end = meta.pop(KEYS.target_port)
 
         return cls(start=start, end=end, meta=meta)
+
+    def to_dict(self) -> dict:
+        """Dump this edge data to dictionary."""
+
+        data = deepcopy(self.meta)
+        data[KEYS.source_port] = self.start
+        data[KEYS.target_port] = self.end
+
+        return data
 
 
 @dataclass
@@ -185,9 +225,27 @@ class Content:
             groups=groups,
         )
 
-    # TODO
-    def to_dict():
-        raise NotImplementedError
+    def _to_nodes(self):
+        ports = list(map(Port.to_dict, self.ports))
+        id2port = {p[KEYS.yfiles_id]: p for p in ports}
+        nodes = [vertex.to_dict(id2port) for vertex in self.vertices]
+
+        return nodes
+
+    def to_dict(self) -> dict:
+        """Dump this content data to dictionary."""
+
+        nodes = self._to_nodes()
+        edges = list(map(Edge.to_dict, self.edges))
+        groups = list(map(Group.to_dict, self.groups))
+
+        result = {
+            KEYS.nodes: nodes,
+            KEYS.edges: edges,
+            KEYS.groups: groups,
+        }
+
+        return result
 
     @property
     def info(self):
