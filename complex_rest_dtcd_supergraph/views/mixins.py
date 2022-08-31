@@ -8,16 +8,12 @@ logger = logging.getLogger(PLUGIN_NAME)
 
 
 class ContainerManagementMixin:
-    """Provides `read` and `replace` methods for working with container
-    and converting back and forth between domain classes and Python primitives.
+    """Provides methods for working with containers and converting back
+    and forth between domain classes and Python primitives.
     """
 
-    def read(self, container: models.Container) -> dict:
-        """Read container's content as Python primitives in correct format.
-
-        1. Uses `manager` to query Neo4j database and get `Content` back.
-        2. Uses `converter` to convert the `Content` into Python primitives.
-        """
+    def read_content_as_dict(self, container: models.Container) -> dict:
+        """Read container's content as Python primitives."""
 
         content = container.read_content()
         logger.info("Queried content: %s", content.info)
@@ -25,12 +21,8 @@ class ContainerManagementMixin:
 
         return data
 
-    def replace(self, container: models.Container, data: dict):
-        """Replace container's content with new one.
-
-        1. Uses `converter` to convert incoming data to `Content`.
-        2. Uses `manager` that maps from `Content` to Neo4j database entities.
-        """
+    def replace_content_from_dict(self, container: models.Container, data: dict):
+        """Replace container's content with new one from data."""
 
         new_content = to_content_or_400(data)
         logger.info("Converted to content: %s", new_content.info)

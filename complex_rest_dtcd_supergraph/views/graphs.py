@@ -12,7 +12,6 @@ from rest.response import SuccessResponse
 from rest.views import APIView
 
 from .. import settings
-from ..managers import Manager
 from ..models import Root
 from ..serializers import ContentSerializer, GraphSerializer
 from .fragments import get_fragment_from_root_or_404
@@ -31,7 +30,7 @@ class RootGraphView(ContainerManagementMixin, APIView):
         """Read graph content of a root."""
 
         root = get_node_or_404(Root.nodes, uid=pk.hex)
-        payload = self.read(root)
+        payload = self.read_content_as_dict(root)
         serializer = ContentSerializer(instance=payload)
 
         return SuccessResponse(data={"graph": serializer.data})
@@ -43,7 +42,7 @@ class RootGraphView(ContainerManagementMixin, APIView):
         root = get_node_or_404(Root.nodes, uid=pk.hex)
         serializer = GraphSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.replace(root, serializer.data["graph"])
+        self.replace_content_from_dict(root, serializer.data["graph"])
 
         return SuccessResponse()
 
@@ -84,7 +83,7 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
         """Read graph content of the given root's fragment."""
 
         fragment = get_fragment_from_root_or_404(root_pk, fragment_pk)
-        payload = self.read(fragment)
+        payload = self.read_content_as_dict(fragment)
         serializer = ContentSerializer(instance=payload)
 
         return SuccessResponse(data={"graph": serializer.data})
@@ -100,7 +99,7 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
         root = get_node_or_404(Root.nodes, uid=root_pk.hex)
         fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
         # convert to domain classes, update fragment's content
-        self.replace(fragment, serializer.data["graph"])
+        self.replace_content_from_dict(fragment, serializer.data["graph"])
         # re-connect root to fragment's new content
         root.reconnect_to_content(fragment)
 
