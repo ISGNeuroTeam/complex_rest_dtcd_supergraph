@@ -3,10 +3,17 @@ This module provides custom utility functions.
 """
 
 import uuid
-from typing import Sequence
+from typing import (
+    Dict,
+    Generator,
+    Iterable,
+    Sequence,
+)
 
 import neomodel
 from neomodel import contrib
+
+from .settings import KEYS
 
 
 # allowed property types in neo4j
@@ -111,3 +118,31 @@ def savable_as_property(value) -> bool:
 
     # anything else is invalid
     return False
+
+
+def extract_savable_properties(properties: Dict[str, dict]):
+    # TODO docs
+    result = {}
+
+    for name in properties:
+        data = properties[name]
+        value = data.get(KEYS.value)
+
+        if value is not None and savable_as_property(value):
+            result[name] = data.pop(KEYS.value)
+
+    return result
+
+
+def restore_properties(original: dict, properties: dict):
+    # TODO docs
+    for name, value in properties.items():
+        if name in original:  # FIXME handle this elsewhere?
+            original[name][KEYS.value] = value
+
+
+def get_ports(nodes: Iterable[dict]) -> Generator[dict, None, None]:
+    # TODO docs
+    for node in nodes:
+        for port in node.get(KEYS.init_ports, []):
+            yield port

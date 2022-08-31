@@ -10,46 +10,21 @@ from dataclasses import dataclass, field
 from operator import itemgetter
 from typing import (
     Any,
-    Dict,
-    Generator,
-    Iterable,
     MutableMapping,
     MutableSequence,
     MutableSet,
 )
 
 from .settings import KEYS
-from .utils import savable_as_property
+from .utils import (
+    extract_savable_properties,
+    get_ports,
+    restore_properties,
+)
 
 
 # custom types / aliases
 ID = str
-
-
-# helper functions
-def extract_savable_properties(properties: Dict[str, dict]):
-    result = {}
-
-    for name in properties:
-        data = properties[name]
-        value = data.get(KEYS.value)
-
-        if value is not None and savable_as_property(value):
-            result[name] = data.pop(KEYS.value)
-
-    return result
-
-
-def restore_properties(original: dict, properties: dict):
-    for name, value in properties.items():
-        if name in original:  # FIXME handle this elsewhere?
-            original[name][KEYS.value] = value
-
-
-def get_ports(nodes: Iterable[dict]) -> Generator[dict, None, None]:
-    for node in nodes:
-        for port in node.get(KEYS.init_ports, []):
-            yield port
 
 
 @dataclass
