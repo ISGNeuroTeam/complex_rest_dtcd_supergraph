@@ -4,27 +4,25 @@ Views for root management operations.
 
 import uuid
 
-import neomodel
 from rest_framework import status
 from rest_framework.request import Request
 
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
-from rest.views import APIView
 
 from ..models import Root
 from ..serializers import RootSerializer
+from .generics import Neo4jAPIView
 from .shortcuts import get_node_or_404
 
 
-class RootListView(APIView):
+class RootListView(Neo4jAPIView):
     """List existing roots or create a new one."""
 
     http_method_names = ["get", "post"]
     permission_classes = (AllowAny,)
     serializer_class = RootSerializer
 
-    @neomodel.db.transaction
     def get(self, request: Request):
         """Read a list of existing roots."""
 
@@ -33,7 +31,6 @@ class RootListView(APIView):
 
         return SuccessResponse({"roots": serializer.data})
 
-    @neomodel.db.transaction
     def post(self, request: Request):
         """Create a new root."""
 
@@ -47,14 +44,13 @@ class RootListView(APIView):
         )
 
 
-class RootDetailView(APIView):
+class RootDetailView(Neo4jAPIView):
     """Retrieve, update or delete a root."""
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
     serializer_class = RootSerializer
 
-    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Return a root."""
 
@@ -63,7 +59,6 @@ class RootDetailView(APIView):
 
         return SuccessResponse({"root": serializer.data})
 
-    @neomodel.db.transaction
     def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
@@ -74,7 +69,6 @@ class RootDetailView(APIView):
 
         return SuccessResponse({"root": serializer.data})
 
-    @neomodel.db.transaction
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete a fragment and its content."""
 

@@ -4,28 +4,26 @@ Views for graph management operations for roots and fragments.
 
 import uuid
 
-import neomodel
 from rest_framework.request import Request
 
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
-from rest.views import APIView
 
 from .. import settings
 from ..models import Root
 from ..serializers import ContentSerializer, GraphSerializer
 from .fragments import get_fragment_from_root_or_404
+from .generics import Neo4jAPIView
 from .mixins import ContainerManagementMixin
 from .shortcuts import get_node_or_404
 
 
-class RootGraphView(ContainerManagementMixin, APIView):
+class RootGraphView(ContainerManagementMixin, Neo4jAPIView):
     """Retrieve, replace or delete graph content of a root."""
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
 
-    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Read graph content of a root."""
 
@@ -35,7 +33,6 @@ class RootGraphView(ContainerManagementMixin, APIView):
 
         return SuccessResponse(data={"graph": serializer.data})
 
-    @neomodel.db.transaction
     def put(self, request: Request, pk: uuid.UUID):
         """Replace graph content of a root."""
 
@@ -46,7 +43,6 @@ class RootGraphView(ContainerManagementMixin, APIView):
 
         return SuccessResponse()
 
-    @neomodel.db.transaction
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete graph content of a root."""
 
@@ -72,13 +68,12 @@ class DefaultRootGraphView(RootGraphView):
         return super().delete(request, self.pk)
 
 
-class RootFragmentGraphView(ContainerManagementMixin, APIView):
+class RootFragmentGraphView(ContainerManagementMixin, Neo4jAPIView):
     """Retrieve, replace or delete graph content of this root's fragment."""
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
 
-    @neomodel.db.transaction
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Read graph content of the given root's fragment."""
 
@@ -88,7 +83,6 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
 
         return SuccessResponse(data={"graph": serializer.data})
 
-    @neomodel.db.transaction
     def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Replace graph content of this root's fragment."""
 
@@ -105,7 +99,6 @@ class RootFragmentGraphView(ContainerManagementMixin, APIView):
 
         return SuccessResponse()
 
-    @neomodel.db.transaction
     def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Delete graph content this root's fragment."""
 

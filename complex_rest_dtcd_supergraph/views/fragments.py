@@ -6,17 +6,16 @@ Fragments belong to roots.
 
 import uuid
 
-import neomodel
 from rest_framework import status
 from rest_framework.request import Request
 
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
-from rest.views import APIView
 
 from .. import settings
 from ..models import Fragment, Root
 from ..serializers import FragmentSerializer
+from .generics import Neo4jAPIView
 from .shortcuts import get_node_or_404
 
 
@@ -29,14 +28,13 @@ def get_fragment_from_root_or_404(
     return fragment
 
 
-class RootFragmentListView(APIView):
+class RootFragmentListView(Neo4jAPIView):
     """List existing fragments of a root or create a new one."""
 
     http_method_names = ["get", "post"]
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
-    @neomodel.db.transaction
     def get(self, request: Request, pk: uuid.UUID):
         """Read a list of root's fragments."""
 
@@ -46,7 +44,6 @@ class RootFragmentListView(APIView):
 
         return SuccessResponse({"fragments": serializer.data})
 
-    @neomodel.db.transaction
     def post(self, request: Request, pk: uuid.UUID):
         """Create a new fragment for this root."""
 
@@ -81,14 +78,13 @@ class DefaultRootFragmentListView(RootFragmentListView):
         return super().post(request, self.pk)
 
 
-class RootFragmentDetailView(APIView):
+class RootFragmentDetailView(Neo4jAPIView):
     """Retrieve, update or delete this root's fragment."""
 
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
-    @neomodel.db.transaction
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Return root's fragment."""
 
@@ -97,7 +93,6 @@ class RootFragmentDetailView(APIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
-    @neomodel.db.transaction
     def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Update this root's fragment."""
 
@@ -108,7 +103,6 @@ class RootFragmentDetailView(APIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
-    @neomodel.db.transaction
     def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Delete this root's fragment and its content."""
 
