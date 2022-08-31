@@ -17,6 +17,7 @@ from .utils import savable_as_property
 class GraphDataConverter:
     """Supports conversion between front-end data and internal classes."""
 
+    # TODO move these out somewhere - into utils maybe?
     @staticmethod
     def _extract_savable_properties(properties: Dict[str, dict]):
         result = {}
@@ -42,6 +43,7 @@ class GraphDataConverter:
             for port in node.get(KEYS.init_ports, []):
                 yield port
 
+    # TODO move these inside structures?
     def _to_vertex(self, data: dict):
         meta = deepcopy(data)
         uid = meta.pop(KEYS.yfiles_id)

@@ -5,12 +5,52 @@ For now, classes here represent intermediary step between presentation
 layer and database-related activities.
 """
 
+from copy import deepcopy
 from dataclasses import dataclass, field
-from typing import Any, MutableMapping, MutableSet, MutableSequence
+from operator import itemgetter
+from typing import (
+    Any,
+    Dict,
+    Generator,
+    Iterable,
+    MutableMapping,
+    MutableSequence,
+    MutableSet,
+)
+
+from .settings import KEYS
+from .structures import Content, Edge, Group, Port, Vertex
+from .utils import savable_as_property
 
 
 # custom types / aliases
 ID = str
+
+
+# helper functions
+def extract_savable_properties(properties: Dict[str, dict]):
+    result = {}
+
+    for name in properties:
+        data = properties[name]
+        value = data.get(KEYS.value)
+
+        if value is not None and savable_as_property(value):
+            result[name] = data.pop(KEYS.value)
+
+    return result
+
+
+def restore_properties(original: dict, properties: dict):
+    for name, value in properties.items():
+        if name in original:  # FIXME handle this elsewhere?
+            original[name][KEYS.value] = value
+
+
+def get_ports(nodes: Iterable[dict]) -> Generator[dict, None, None]:
+    for node in nodes:
+        for port in node.get(KEYS.init_ports, []):
+            yield port
 
 
 @dataclass
@@ -26,6 +66,14 @@ class Primitive:
     properties: MutableMapping[str, Any] = field(default_factory=dict)
     meta: MutableMapping[str, Any] = field(default_factory=dict)
 
+    @staticmethod
+    def _extract_fields(data: dict):
+        meta = deepcopy(data)
+        uid = meta.pop(KEYS.yfiles_id)
+        properties = extract_savable_properties(meta.get(KEYS.properties, {}))
+
+        return meta, uid, properties
+
 
 @dataclass
 class Port(Primitive):
@@ -33,6 +81,14 @@ class Port(Primitive):
 
     Vertices connect to one another through the ports.
     """
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Port":
+        """Load port from dictionary."""
+
+        meta, uid, properties = cls._extract_fields(data)
+
+        return cls(uid=uid, properties=properties, meta=meta)
 
 
 @dataclass
@@ -47,6 +103,16 @@ class Vertex(Primitive):
 
     ports: MutableSet[ID] = field(default_factory=set)
 
+    @classmethod
+    def from_dict(cls, data: dict) -> "Vertex":
+        """Load vertex from dictionary."""
+
+        meta, uid, properties = cls._extract_fields(data)
+        ports = meta.pop(KEYS.init_ports, [])  #  save only ids
+        port_ids = set(map(itemgetter(KEYS.yfiles_id), ports))
+
+        return cls(uid=uid, properties=properties, meta=meta, ports=port_ids)
+
 
 @dataclass
 class Group(Primitive):
@@ -54,6 +120,14 @@ class Group(Primitive):
 
     Front-end needs it to group objects. Currently it has no backend use.
     """
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Group":
+        """Load group from dictionary."""
+
+        meta, uid, _ = cls._extract_fields(data)
+
+        return cls(uid=uid, meta=meta)
 
 
 @dataclass
@@ -66,6 +140,16 @@ class Edge:
 
     def __post_init__(self):
         self.uid = (self.start, self.end)
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Edge":
+        """Load edge from dictionary."""
+
+        meta = deepcopy(data)
+        start = meta.pop(KEYS.source_port)
+        end = meta.pop(KEYS.target_port)
+
+        return cls(start=start, end=end, meta=meta)
 
 
 @dataclass
@@ -81,6 +165,29 @@ class Content:
     ports: MutableSequence[Port]
     edges: MutableSequence[Edge]
     groups: MutableSequence[Group]
+
+    @classmethod
+    def from_dict(cls, data: dict) -> "Content":
+        """Load graph data from dictionary in specified format."""
+
+        # pre-condition: data is valid
+        # TODO more validation / error handling?
+        nodes = data[KEYS.nodes]
+        vertices = list(map(Vertex.from_dict, nodes))
+        ports = list(map(Port.from_dict, get_ports(nodes)))
+        edges = list(map(Edge.from_dict, data.get(KEYS.edges, [])))
+        groups = list(map(Group.from_dict, data.get(KEYS.groups, [])))
+
+        return cls(
+            vertices=vertices,
+            ports=ports,
+            edges=edges,
+            groups=groups,
+        )
+
+    # TODO
+    def to_dict():
+        raise NotImplementedError
 
     @property
     def info(self):

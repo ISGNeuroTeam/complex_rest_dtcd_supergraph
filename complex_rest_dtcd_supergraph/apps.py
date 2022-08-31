@@ -17,7 +17,7 @@ class SupergraphConfig(AppConfig):
 
     def ready(self) -> None:
         # https://docs.djangoproject.com/en/4.0/ref/applications/#django.apps.AppConfig.ready
-        
+
         # register checks
         # https://docs.djangoproject.com/en/4.0/topics/checks/#registering-and-labeling-checks
         from . import checks
