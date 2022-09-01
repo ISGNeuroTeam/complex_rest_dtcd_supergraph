@@ -30,6 +30,37 @@ config_parser = configparser.ConfigParser(allow_no_value=True)
 config_parser.read(PROJECT_DIR / "supergraph.conf")
 ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
 
+# Role Model settings; see role model documentation for more info
+ROLE_MODEL_ACTION_NAMES = SimpleNamespace()
+# action names for graph operations
+ROLE_MODEL_ACTION_NAMES.clear = "clear"
+ROLE_MODEL_ACTION_NAMES.read = "read"
+ROLE_MODEL_ACTION_NAMES.replace = "replace"
+
+ROLE_MODEL_ACTIONS = {
+    # actions for graph operations
+    ROLE_MODEL_ACTION_NAMES.clear: {
+        "default_rule": True,  # allow or deny True or False, default True,
+        "owner_applicability": True,  # default True
+    },
+    ROLE_MODEL_ACTION_NAMES.read: {
+        "default_rule": True,
+        "owner_applicability": True,
+    },
+    ROLE_MODEL_ACTION_NAMES.replace: {
+        "default_rule": True,
+        "owner_applicability": True,
+    },
+}
+# paths to classes covered by role model management (relative to src dir)
+ROLE_MODEL_AUTH_COVERED_CLASSES = [
+    "models.Container",
+]
+ROLE_MODEL_AUTH_COVERED_CLASSES = [
+    PLUGIN_NAME + "." + item  # plugin.relpathtoclass
+    for item in ROLE_MODEL_AUTH_COVERED_CLASSES
+]
+
 KEYS = SimpleNamespace()
 KEYS.edges = "edges"
 KEYS.groups = "groups"
