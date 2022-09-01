@@ -17,16 +17,11 @@ from neomodel import (
 from neomodel.contrib import SemiStructuredNode
 
 from rest_auth.authorization import auth_covered_method
-from rest_auth.models import IAuthCovered, KeyChainModel, User
-from rest_auth.models.base_auth_covered import log as auth_logger
 
 from . import management
-from ..settings import PLUGIN_NAME
 from ..settings import ROLE_MODEL_ACTION_NAMES as ACTION_NAMES
+from .auth import RoleModelCoveredMixin
 from .relations import EdgeRel, RELATION_TYPES
-
-
-logger = logging.getLogger(PLUGIN_NAME)
 
 
 # type aliases
@@ -94,7 +89,7 @@ class Group(AbstractPrimitive):
     """
 
 
-class Container(IAuthCovered, StructuredNode):
+class Container(RoleModelCoveredMixin, StructuredNode):
     """A container for the content.
 
     May include vertices and groups.
@@ -167,53 +162,6 @@ class Container(IAuthCovered, StructuredNode):
         """Reconnect to the content of a given container."""
 
         management.reconnect_to_container(self, container.vertices, container.groups)
-
-    # ------------------------------------------------------------------
-    # Role model interface
-    # see rest_auth.models.AuthCoveredModel for info
-    # ------------------------------------------------------------------
-    @property
-    def keychain(self) -> Union[KeyChainModel, None]:
-        """Look up and return the keychain if it exists, None otherwise."""
-
-        logger.info("Keychain lookup from %s", self)
-
-        # TODO switch to normal interface
-        # if self.keychain_id is not None:
-        #     try:
-        #         return KeyChainModel.objects.get(pk=self.keychain_id)
-        #     except KeyChainModel.DoesNotExist:
-        #         # TODO better error handling?
-        #         auth_logger.error(f'Not found KeyChain with id = {self.keychain_id}')
-
-        return None
-
-    @keychain.setter
-    def keychain(self, keychain: KeyChainModel):
-        # self.keychain_id = keychain.pk
-        # self.save()
-        pass
-
-    @property
-    def owner(self) -> Union[User, None]:
-        """Look up and return the owner if it exists, None otherwise."""
-
-        logger.info("Owner lookup from %s", self)
-
-        # if self.owner_id is not None:
-        #     try:
-        #         return User.objects.get(pk=self.owner_id)
-        #     except User.DoesNotExist:
-        #         # TODO better error handling?
-        #         auth_logger.error(f'Not found owner with id = {self.owner_id}')
-
-        return None
-
-    @owner.setter
-    def owner(self, user: User):
-        # self.owner_id = user.pk
-        # self.save()
-        pass
 
 
 class Fragment(Container):

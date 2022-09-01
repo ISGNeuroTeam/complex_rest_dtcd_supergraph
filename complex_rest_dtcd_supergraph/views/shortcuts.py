@@ -9,7 +9,7 @@ from ..settings import PLUGIN_NAME
 from ..structures import Content
 
 
-logger = logging.getLogger(PLUGIN_NAME)
+log = logging.getLogger(PLUGIN_NAME)
 
 
 # shortcuts for working with Neomodel
@@ -32,7 +32,7 @@ def func_or_400(func, *args, exception=None, **kwargs):
     try:
         return func(*args, **kwargs)
     except Exception as e:
-        logger.error("Error: %s", e, exc_info=True)
+        log.error("Error: %s", e, exc_info=True)
         raise exception
 
 
@@ -47,7 +47,7 @@ def to_content_or_400(data: dict):
     try:
         return Content.from_dict(data)
     except Exception as e:
-        logger.error("Loading error: %s", e, exc_info=True)
+        log.error("Loading error: %s", e, exc_info=True)
         raise LoadingError
 
 
@@ -62,5 +62,5 @@ def replace_or_400(container, new_content):
     try:
         return container.replace_content(new_content)
     except Exception as e:
-        logger.error("Manager error: %s", e, exc_info=True)
+        log.error("Manager error: %s", e, exc_info=True)
         raise ManagerError
