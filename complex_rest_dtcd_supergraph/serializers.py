@@ -17,6 +17,12 @@ from .settings import KEYS
 class ContainerSerializer(serializers.Serializer):
     id = CustomUUIDFIeld(read_only=True, source="uid")
     name = serializers.CharField(max_length=255)  # TODO value in settings
+    # TODO these come from models.auth.RoleModelCoveredMixin; would be
+    # better to move them into, like, RMFieldsMixin; see the links
+    # https://stackoverflow.com/a/58304791
+    # https://github.com/encode/django-rest-framework/issues/4482
+    keychain_id = serializers.IntegerField(read_only=True)
+    owner_id = serializers.IntegerField(read_only=True)
 
     container_class = Container
 
