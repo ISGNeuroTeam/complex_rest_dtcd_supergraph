@@ -2,7 +2,8 @@
 Node classes from neomodel.
 """
 
-from typing import List, Tuple
+import logging
+from typing import List, Tuple, Union
 
 from neomodel import (
     db,
@@ -15,8 +16,17 @@ from neomodel import (
 )
 from neomodel.contrib import SemiStructuredNode
 
+from rest_auth.authorization import auth_covered_method
+from rest_auth.models import IAuthCovered, KeyChainModel, User
+from rest_auth.models.base_auth_covered import log as auth_logger
+
 from . import management
+from ..settings import PLUGIN_NAME
+from ..settings import ROLE_MODEL_ACTION_NAMES as ACTION_NAMES
 from .relations import EdgeRel, RELATION_TYPES
+
+
+logger = logging.getLogger(PLUGIN_NAME)
 
 
 # type aliases
@@ -84,7 +94,7 @@ class Group(AbstractPrimitive):
     """
 
 
-class Container(StructuredNode):
+class Container(IAuthCovered, StructuredNode):
     """A container for the content.
 
     May include vertices and groups.
@@ -108,6 +118,7 @@ class Container(StructuredNode):
 
         return super().delete()
 
+    @auth_covered_method(ACTION_NAMES.clear)
     def clear(self):
         """Delete all related vertices and groups in a cascading fashion."""
 
@@ -132,11 +143,13 @@ class Container(StructuredNode):
 
         return [(r[0], r[1], r[2]) for r in results]
 
+    @auth_covered_method(ACTION_NAMES.read)
     def read_content(self):
         """Query and return the content of this container."""
 
         return management.Reader.read(self)
 
+    @auth_covered_method(ACTION_NAMES.replace)
     def replace_content(self, new_content):
         """Replace the content of this container."""
 
@@ -154,6 +167,53 @@ class Container(StructuredNode):
         """Reconnect to the content of a given container."""
 
         management.reconnect_to_container(self, container.vertices, container.groups)
+
+    # ------------------------------------------------------------------
+    # Role model interface
+    # see rest_auth.models.AuthCoveredModel for info
+    # ------------------------------------------------------------------
+    @property
+    def keychain(self) -> Union[KeyChainModel, None]:
+        """Look up and return the keychain if it exists, None otherwise."""
+
+        logger.info("Keychain lookup from %s", self)
+
+        # TODO switch to normal interface
+        # if self.keychain_id is not None:
+        #     try:
+        #         return KeyChainModel.objects.get(pk=self.keychain_id)
+        #     except KeyChainModel.DoesNotExist:
+        #         # TODO better error handling?
+        #         auth_logger.error(f'Not found KeyChain with id = {self.keychain_id}')
+
+        return None
+
+    @keychain.setter
+    def keychain(self, keychain: KeyChainModel):
+        # self.keychain_id = keychain.pk
+        # self.save()
+        pass
+
+    @property
+    def owner(self) -> Union[User, None]:
+        """Look up and return the owner if it exists, None otherwise."""
+
+        logger.info("Owner lookup from %s", self)
+
+        # if self.owner_id is not None:
+        #     try:
+        #         return User.objects.get(pk=self.owner_id)
+        #     except User.DoesNotExist:
+        #         # TODO better error handling?
+        #         auth_logger.error(f'Not found owner with id = {self.owner_id}')
+
+        return None
+
+    @owner.setter
+    def owner(self, user: User):
+        # self.owner_id = user.pk
+        # self.save()
+        pass
 
 
 class Fragment(Container):
