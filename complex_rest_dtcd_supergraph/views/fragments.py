@@ -51,7 +51,7 @@ class RootFragmentListView(Neo4jAPIView):
         # create a fragment
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        fragment = serializer.save()
+        fragment = serializer.save(owner_id=request.user.id)
         # connect root to this fragment
         root.fragments.connect(fragment)
 

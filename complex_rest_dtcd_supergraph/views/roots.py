@@ -36,7 +36,7 @@ class RootListView(Neo4jAPIView):
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
+        serializer.save(owner_id=request.user.id)
 
         return SuccessResponse(
             data={"root": serializer.data},
