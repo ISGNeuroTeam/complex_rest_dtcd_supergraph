@@ -10,6 +10,7 @@ from rest_framework.request import Request
 from rest.permissions import AllowAny
 from rest.response import SuccessResponse
 
+from ..apidoc import ApiDoc
 from ..models import Root
 from ..serializers import RootSerializer
 from .generics import Neo4jAPIView
@@ -23,6 +24,7 @@ class RootListView(Neo4jAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RootSerializer
 
+    @ApiDoc.RootList.get
     def get(self, request: Request):
         """Read a list of existing roots."""
 
@@ -31,6 +33,7 @@ class RootListView(Neo4jAPIView):
 
         return SuccessResponse({"roots": serializer.data})
 
+    @ApiDoc.RootList.post
     def post(self, request: Request):
         """Create a new root."""
 
@@ -51,6 +54,7 @@ class RootDetailView(Neo4jAPIView):
     permission_classes = (AllowAny,)
     serializer_class = RootSerializer
 
+    @ApiDoc.RootDetail.get
     def get(self, request: Request, pk: uuid.UUID):
         """Return a root."""
 
@@ -59,6 +63,7 @@ class RootDetailView(Neo4jAPIView):
 
         return SuccessResponse({"root": serializer.data})
 
+    @ApiDoc.RootDetail.put
     def put(self, request: Request, pk: uuid.UUID):
         """Update a fragment."""
 
@@ -69,6 +74,7 @@ class RootDetailView(Neo4jAPIView):
 
         return SuccessResponse({"root": serializer.data})
 
+    @ApiDoc.RootDetail.delete
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete a fragment and its content."""
 
