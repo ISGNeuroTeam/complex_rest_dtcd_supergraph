@@ -5,7 +5,18 @@ Helper module for tests.
 import json
 from operator import itemgetter
 
+from rest_framework import test
+
 from complex_rest_dtcd_supergraph.settings import KEYS
+
+
+class APITestCase(test.APITestCase):
+    """Wrapper around DRF's test case for multiple DBs.
+
+    See `rest.test.TestCase` for more info.
+    """
+
+    databases = "__all__"
 
 
 def sort_payload(data: dict) -> None:

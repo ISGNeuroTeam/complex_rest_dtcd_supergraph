@@ -5,18 +5,18 @@ from types import SimpleNamespace
 
 import dictdiffer
 import neomodel
+from django.test import tag
 from django.urls import reverse
-from django.test import Client, tag
 from rest_framework import status
-from rest_framework.test import APISimpleTestCase
+from rest_framework.test import APIClient
 
-from .misc import load_data, sort_payload
+from .misc import APITestCase, load_data, sort_payload
 
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
 URL_RESET = reverse("supergraph:reset")  # post here resets the db
-CLIENT = Client()
+CLIENT = APIClient()
 
 # DEBUG
 DEBUG_FILEPATH = "debug.txt"
@@ -99,12 +99,13 @@ class Neo4jTestCaseMixin:
 
     @classmethod
     def setUpClass(cls) -> None:
+        super().setUpClass()
         # clean db on start
         reset_db()
 
     @classmethod
     def tearDownClass(cls) -> None:
-        pass
+        super().tearDownClass()
 
     def tearDown(self) -> None:
         # clean after each test
@@ -112,7 +113,7 @@ class Neo4jTestCaseMixin:
 
 
 @tag("neo4j")
-class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
+class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     url = reverse("supergraph:roots")
 
     def test_post(self):
@@ -140,7 +141,7 @@ class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
 
 
 @tag("neo4j")
-class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
+class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "sales"
 
     def setUp(self) -> None:
@@ -173,7 +174,7 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
         self._test_delete()
 
 
-class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase):
+class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "parent"
 
     def setUp(self) -> None:
@@ -204,9 +205,7 @@ class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTe
         self.assertEqual({item["name"] for item in objects}, names)
 
 
-class TestRootFragmentDetailView(
-    Neo4jTestCaseMixin, APITestCaseMixin, APISimpleTestCase
-):
+class TestRootFragmentDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "parent"
     fragment_name = "child"
 
@@ -268,7 +267,7 @@ class TestRootFragmentDetailView(
 @unittest.skip("deprecated")
 @unittest.expectedFailure  # DB reset deletes default root
 @tag("neo4j")
-class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
+class TestFragmentListView(Neo4jTestCaseMixin, APITestCase):
     url = reverse("supergraph:default-root-fragments")
 
     def test_post(self):
@@ -291,7 +290,7 @@ class TestFragmentListView(Neo4jTestCaseMixin, APISimpleTestCase):
 @unittest.skip("deprecated")
 @unittest.expectedFailure  # DB reset deletes default root
 @tag("neo4j")
-class TestFragmentDetailView(Neo4jTestCaseMixin, APISimpleTestCase):
+class TestFragmentDetailView(Neo4jTestCaseMixin, APITestCase):
     def setUp(self) -> None:
         # default fragment
         response = self.client.post(
@@ -397,7 +396,7 @@ class TestRootGraphView(
     GraphEndpointTestCaseMixin,
     Neo4jTestCaseMixin,
     APITestCaseMixin,
-    APISimpleTestCase,
+    APITestCase,
 ):
     root_name = "sales"
 
@@ -530,7 +529,7 @@ class TestRootGraphView(
 class TestRootFragmentGraphView(
     GraphEndpointTestCaseMixin,
     Neo4jTestCaseMixin,
-    APISimpleTestCase,
+    APITestCase,
 ):
     root_name = "parent"
     fragment_name = "child"
