@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Roadmap and notes documents.
 - Custom Django commands for Neo4j: labels installation and default root initialization.
 - Generic `Neo4jAPIView` with transaction control.
+- Support for Role Model management.
 
 ### Changed
 - User guide update.
@@ -67,7 +68,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - Name of the source folder with code is now `complex_rest_dtcd_supergraph`, again.
 - Now we remove suffix `complex_rest_dtcd_` from plugin folder when making final archive.
-    > We do this to simplify URL management - see how `complex_rest` uses plugin folder names. 
+    > We do this to simplify URL management - see how `complex_rest` uses plugin folder names.
 
 ## [0.1.2] - 2022-06-30
 ### Changed
