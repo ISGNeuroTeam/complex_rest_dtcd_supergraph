@@ -109,7 +109,7 @@ ApiDoc.RootGraph.get = extend_schema(
         200: GraphResponseSerializer,
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
-    summary="Get graph content",
+    summary="Get graph content of a root",
     description="",
     examples=None,
 )
@@ -120,7 +120,7 @@ ApiDoc.RootGraph.put = extend_schema(
         400: RESPONSES.HTTP_400_BAD_REQUEST,
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
-    summary="Update graph content",
+    summary="Update graph content of a root",
     description="We update the graph by *merging* on vertex, port and edge IDs.",
     examples=None,
 )
@@ -130,7 +130,7 @@ ApiDoc.RootGraph.delete = extend_schema(
         200: None,
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
-    summary="Delete graph content",
+    summary="Delete graph content of a root",
     description="",
     examples=None,
 )
@@ -188,6 +188,39 @@ ApiDoc.RootFragmentDetail.delete = extend_schema(
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
     summary="Delete the fragment and its content",
+    description="",
+    examples=None,
+)
+
+ApiDoc.RootFragmentGraph = SimpleNamespace()
+ApiDoc.RootFragmentGraph.get = extend_schema(
+    request=None,
+    responses={
+        200: GraphResponseSerializer,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Get graph content of a fragment",
+    description="",
+    examples=None,
+)
+ApiDoc.RootFragmentGraph.put = extend_schema(
+    request=GraphSerializer,
+    responses={
+        200: None,
+        400: RESPONSES.HTTP_400_BAD_REQUEST,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Update graph content of a fragment",
+    description="We update the graph by *merging* on vertex, port and edge IDs.",
+    examples=None,
+)
+ApiDoc.RootFragmentGraph.delete = extend_schema(
+    request=None,
+    responses={
+        200: None,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Delete graph content of a fragment",
     description="",
     examples=None,
 )

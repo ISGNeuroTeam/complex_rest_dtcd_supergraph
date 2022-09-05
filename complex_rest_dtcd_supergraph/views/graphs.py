@@ -78,6 +78,7 @@ class RootFragmentGraphView(ContainerManagementMixin, Neo4jAPIView):
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
 
+    @ApiDoc.RootFragmentGraph.get
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Read graph content of the given root's fragment."""
 
@@ -87,6 +88,7 @@ class RootFragmentGraphView(ContainerManagementMixin, Neo4jAPIView):
 
         return SuccessResponse(data={"graph": serializer.data})
 
+    @ApiDoc.RootFragmentGraph.put
     def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Replace graph content of this root's fragment."""
 
@@ -103,6 +105,7 @@ class RootFragmentGraphView(ContainerManagementMixin, Neo4jAPIView):
 
         return SuccessResponse()
 
+    @ApiDoc.RootFragmentGraph.delete
     def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Delete graph content this root's fragment."""
 
