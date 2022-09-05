@@ -1,3 +1,4 @@
+import logging
 import unittest
 from pathlib import Path
 from pprint import pformat
@@ -5,18 +6,25 @@ from types import SimpleNamespace
 
 import dictdiffer
 import neomodel
+from django.contrib.auth import get_user_model
 from django.test import tag
 from django.urls import reverse
 from rest_framework import status
 from rest_framework.test import APIClient
 
+from complex_rest_dtcd_supergraph.settings import PLUGIN_NAME
+
 from .misc import APITestCase, load_data, sort_payload
+
+
+log = logging.getLogger(PLUGIN_NAME)
 
 
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
 URL_RESET = reverse("supergraph:reset")  # post here resets the db
 CLIENT = APIClient()
+User = get_user_model()
 
 # DEBUG
 DEBUG_FILEPATH = "debug.txt"
@@ -117,11 +125,17 @@ class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     url = reverse("supergraph:roots")
 
     def test_post(self):
+        # create a user & authenticate to check auto ownership assignment
+        user = User.objects.create_user(username="amy", password="pass")
+        self.client.force_authenticate(user)
+
+        # create an object; owner should be associated automatically
         name = "sales"
         response = self.post(data={"name": name})
         obj = response.data["root"]
         self.assertIn("id", obj)
         self.assertEqual(obj["name"], name)
+        self.assertEqual(obj["owner_id"], user.pk)
 
     def test_get(self):
         names = {"hr", "marketing", "sales"}
@@ -189,11 +203,17 @@ class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase
         self.url = reverse("supergraph:root-fragments", args=(self.pk,))
 
     def test_post(self):
+        # create a user & authenticate to check auto ownership assignment
+        user = User.objects.create_user(username="amy", password="pass")
+        self.client.force_authenticate(user)
+
+        # create an object; owner should be associated automatically
         name = "child"
         response = self.post(data={"name": name})
         obj = response.data["fragment"]
         self.assertIn("id", obj)
         self.assertEqual(obj["name"], name)
+        self.assertEqual(obj["owner_id"], user.pk)
 
     def test_get(self):
         names = {"hr", "marketing", "sales"}
@@ -349,8 +369,9 @@ class GraphEndpointTestCaseMixin:
             msg = pformat(diff, depth=4, compact=True)
             msg = "Graphs do not match. Difference:\n" + msg
             # TODO better error logging?
-            with open(DEBUG_FILEPATH, "w") as f:
-                f.write(msg)
+            log.error(msg)
+            # with open(DEBUG_FILEPATH, "w") as f:
+            #     f.write(msg)
 
             raise
 
@@ -523,6 +544,18 @@ class TestRootGraphView(
         # over-write
         new_path = DATA_DIR / "n50_e25.json"
         self.assert_merge_retrieve_eq_from_json(new_path)
+
+    def test_delete(self):
+        # create some data
+        orig = load_data(DATA_DIR / "basic.json")
+        self.merge(orig, self.url)
+
+        # delete the data
+        self.delete()
+
+        # check content is empty
+        fromdb = self.retrieve(self.url)
+        self.assertEqual(fromdb, {"nodes": [], "edges": [], "groups": []})
 
 
 @tag("neo4j")
