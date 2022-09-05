@@ -5,7 +5,6 @@ Utilities for drf-spectacular OpenAPI scheme generation.
 from types import SimpleNamespace
 
 from drf_spectacular.utils import extend_schema, OpenApiResponse
-from rest_framework import status
 
 from rest.serializers import ResponseSerializer
 
@@ -24,6 +23,7 @@ RESPONSES.HTTP_404_NOT_FOUND = OpenApiResponse(description="Resource is missing.
 
 # ----------------------------------------------------------------------
 # Serializers for custom responses
+# TODO is there a better way to do this?
 # ----------------------------------------------------------------------
 class SingleFragmentResponseSerializer(ResponseSerializer):
     fragment = FragmentSerializer()
@@ -54,8 +54,8 @@ ApiDoc.RootList = SimpleNamespace()
 ApiDoc.RootList.get = extend_schema(
     request=None,
     responses=MultipleRootResponseSerializer,
-    summary="Retrieve a list of roots",
-    description="Retrieve a list of existing roots.",
+    summary="Get a list of roots",
+    description="",  # if None, then uses view docstring as a description
     examples=None,
 )
 ApiDoc.RootList.post = extend_schema(
@@ -65,7 +65,7 @@ ApiDoc.RootList.post = extend_schema(
         400: RESPONSES.HTTP_400_BAD_REQUEST,
     },
     summary="Create a new root",
-    description="Create a new root.",
+    description="",
     examples=None,
 )
 
@@ -76,7 +76,7 @@ ApiDoc.RootDetail.get = extend_schema(
         200: SingleRootResponseSerializer,
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
-    summary="Get root detail",
+    summary="Get root details",
     description="",
     examples=None,
 )
@@ -98,7 +98,7 @@ ApiDoc.RootDetail.delete = extend_schema(
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
     summary="Delete the root and its content",
-    description="",
+    description="Delete the root and its content: associated fragments and graph data",
     examples=None,
 )
 
@@ -166,7 +166,7 @@ ApiDoc.RootFragmentDetail.get = extend_schema(
         200: SingleFragmentResponseSerializer,
         404: RESPONSES.HTTP_404_NOT_FOUND,
     },
-    summary="Get fragment detail",
+    summary="Get fragment details",
     description="",
     examples=None,
 )
