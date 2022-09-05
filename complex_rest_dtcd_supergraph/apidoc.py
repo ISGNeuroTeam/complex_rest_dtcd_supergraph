@@ -11,6 +11,7 @@ from rest.serializers import ResponseSerializer
 
 from .serializers import (
     FragmentSerializer,
+    GraphSerializer,
     RootSerializer,
     ContentSerializer,
 )
@@ -101,6 +102,38 @@ ApiDoc.RootDetail.delete = extend_schema(
     examples=None,
 )
 
-# TODO ApiDoc.RootGraph = SimpleNamespace()
+ApiDoc.RootGraph = SimpleNamespace()
+ApiDoc.RootGraph.get = extend_schema(
+    request=None,
+    responses={
+        200: GraphResponseSerializer,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Get graph content",
+    description="",
+    examples=None,
+)
+ApiDoc.RootGraph.put = extend_schema(
+    request=GraphSerializer,
+    responses={
+        200: None,
+        400: RESPONSES.HTTP_400_BAD_REQUEST,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Update graph content",
+    description="We update the graph by *merging* on vertex, port and edge IDs.",
+    examples=None,
+)
+ApiDoc.RootGraph.delete = extend_schema(
+    request=None,
+    responses={
+        200: None,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Delete graph content",
+    description="",
+    examples=None,
+)
+
 # TODO same for root fragments
 # TODO default root fragments

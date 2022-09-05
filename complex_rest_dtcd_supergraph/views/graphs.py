@@ -10,6 +10,7 @@ from rest.permissions import AllowAny
 from rest.response import SuccessResponse
 
 from .. import settings
+from ..apidoc import ApiDoc
 from ..models import Root
 from ..serializers import ContentSerializer, GraphSerializer
 from .fragments import get_fragment_from_root_or_404
@@ -24,6 +25,7 @@ class RootGraphView(ContainerManagementMixin, Neo4jAPIView):
     http_method_names = ["get", "put", "delete"]
     permission_classes = (AllowAny,)
 
+    @ApiDoc.RootGraph.get
     def get(self, request: Request, pk: uuid.UUID):
         """Read graph content of a root."""
 
@@ -33,6 +35,7 @@ class RootGraphView(ContainerManagementMixin, Neo4jAPIView):
 
         return SuccessResponse(data={"graph": serializer.data})
 
+    @ApiDoc.RootGraph.put
     def put(self, request: Request, pk: uuid.UUID):
         """Replace graph content of a root."""
 
@@ -43,6 +46,7 @@ class RootGraphView(ContainerManagementMixin, Neo4jAPIView):
 
         return SuccessResponse()
 
+    @ApiDoc.RootGraph.delete
     def delete(self, request: Request, pk: uuid.UUID):
         """Delete graph content of a root."""
 
