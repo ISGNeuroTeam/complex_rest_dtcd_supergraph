@@ -13,6 +13,7 @@ from rest.permissions import AllowAny
 from rest.response import SuccessResponse
 
 from .. import settings
+from ..apidoc import ApiDoc
 from ..models import Fragment, Root
 from ..serializers import FragmentSerializer
 from .generics import Neo4jAPIView
@@ -35,6 +36,7 @@ class RootFragmentListView(Neo4jAPIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
+    @ApiDoc.RootFragmentList.get
     def get(self, request: Request, pk: uuid.UUID):
         """Read a list of root's fragments."""
 
@@ -44,6 +46,7 @@ class RootFragmentListView(Neo4jAPIView):
 
         return SuccessResponse({"fragments": serializer.data})
 
+    @ApiDoc.RootFragmentList.post
     def post(self, request: Request, pk: uuid.UUID):
         """Create a new fragment for this root."""
 
@@ -85,6 +88,7 @@ class RootFragmentDetailView(Neo4jAPIView):
     permission_classes = (AllowAny,)
     serializer_class = FragmentSerializer
 
+    @ApiDoc.RootFragmentDetail.get
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Return root's fragment."""
 
@@ -93,6 +97,7 @@ class RootFragmentDetailView(Neo4jAPIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
+    @ApiDoc.RootFragmentDetail.put
     def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Update this root's fragment."""
 
@@ -103,6 +108,7 @@ class RootFragmentDetailView(Neo4jAPIView):
 
         return SuccessResponse({"fragment": serializer.data})
 
+    @ApiDoc.RootFragmentDetail.delete
     def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Delete this root's fragment and its content."""
 

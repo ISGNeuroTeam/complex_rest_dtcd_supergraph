@@ -136,4 +136,60 @@ ApiDoc.RootGraph.delete = extend_schema(
 )
 
 # TODO same for root fragments
+ApiDoc.RootFragmentList = SimpleNamespace()
+ApiDoc.RootFragmentList.get = extend_schema(
+    request=None,
+    responses={
+        200: MultipleFragmentResponseSerializer,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Get a list of root's fragments",
+    description="",
+    examples=None,
+)
+ApiDoc.RootFragmentList.post = extend_schema(
+    request=FragmentSerializer,
+    responses={
+        201: SingleFragmentResponseSerializer,
+        400: RESPONSES.HTTP_400_BAD_REQUEST,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Create a new fragment for this root",
+    description="",
+    examples=None,
+)
+
+ApiDoc.RootFragmentDetail = SimpleNamespace()
+ApiDoc.RootFragmentDetail.get = extend_schema(
+    request=None,
+    responses={
+        200: SingleFragmentResponseSerializer,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Get fragment detail",
+    description="",
+    examples=None,
+)
+ApiDoc.RootFragmentDetail.put = extend_schema(
+    request=FragmentSerializer,
+    responses={
+        200: SingleFragmentResponseSerializer,
+        400: RESPONSES.HTTP_400_BAD_REQUEST,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Update the fragment",
+    description="",
+    examples=None,
+)
+ApiDoc.RootFragmentDetail.delete = extend_schema(
+    request=None,
+    responses={
+        200: None,
+        404: RESPONSES.HTTP_404_NOT_FOUND,
+    },
+    summary="Delete the fragment and its content",
+    description="",
+    examples=None,
+)
+
 # TODO default root fragments
