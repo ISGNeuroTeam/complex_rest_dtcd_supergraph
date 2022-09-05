@@ -10,12 +10,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Roadmap and notes documents.
 - Custom Django commands for Neo4j: labels installation and default root initialization.
 - Generic `Neo4jAPIView` with transaction control.
+- Automatic OpenAPI doc generation with `drf-spectacular`.
 
 ### Changed
 - User guide update.
 - Switch `database_init.sh` to use Django commands instead of explicit scripts.
 - Move management operations from `managers.py` inside model classes.
 - Move conversion between Python primitives and internal classes into `structures.py`.
+
+### Removed
+- `openapi.yaml` is no longer needed.
 
 ## [0.3.3] - 2022-08-18
 ### Changed
