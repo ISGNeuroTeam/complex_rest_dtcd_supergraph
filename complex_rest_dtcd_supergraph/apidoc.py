@@ -225,4 +225,15 @@ ApiDoc.RootFragmentGraph.delete = extend_schema(
     examples=None,
 )
 
+ApiDoc.ResetNeo4j = SimpleNamespace()
+ApiDoc.ResetNeo4j.post = extend_schema(
+    request=None,
+    responses={
+        200: None,
+    },
+    summary="Reset Neo4j database",
+    description="Delete all nodes and relationships in Neo4j database.",
+    examples=None,
+)
+
 # TODO default root fragments
