@@ -57,3 +57,34 @@ class Container(StructuredNode):
 `neomodel` предоставляет вохможность работы с [hooks](https://neomodel.readthedocs.io/en/latest/hooks.html#hooks) - функциями, которые автоматически вызываются при определённых действиях.
 
 Также доступны [Django signals](https://neomodel.readthedocs.io/en/latest/hooks.html#django-signals) (через плагин [`django_neomodel`](https://github.com/neo4j-contrib/django-neomodel)).
+
+## Ролевая модель для узлов
+
+Основной вопрос: куда добавить проверки ролевой модели для работы с узлами (операции read & merge with replacement).
+
+Варианты:
+- Как отдельную операцию в `views.mixins.ContainerManagementMixin.read_content_as_dict`, например, после прочтения графа:
+    ```python
+    content = container.read_content()
+    # >>> проверка ролевой модели <<<
+    log.info("Queried content: %s", content.info)
+    ```
+- Операция внутри `models.nodes.Container.read_content`:
+    ```python
+    def read_content(self):
+        """Query and return the content of this container."""
+
+        # return management.Reader.read(self)
+        content = management.Reader.read(self)
+        # >>> проверка ролевой модели <<<
+        return content
+    ```
+- Внутри метода `models.management.Reader.read`:
+    ```python
+    # ...
+    # step 1 - get the insides
+    vertices = container.vertices.all()
+    # >>> проверка ролевой модели <<<
+    ports = cls._query_ports(vertices)
+    # ...
+    ```
