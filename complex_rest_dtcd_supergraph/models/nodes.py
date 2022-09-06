@@ -55,7 +55,7 @@ class Port(AbstractPrimitive):
     neighbor = Relationship("Port", RELATION_TYPES.edge, model=EdgeRel)
 
 
-class Vertex(AbstractPrimitive):
+class Vertex(RoleModelCoveredMixin, AbstractPrimitive):
     """A vertex coming from Y-files.
 
     Vertices have ports, through which they connect to other vertices.

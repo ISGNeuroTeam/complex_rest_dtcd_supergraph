@@ -14,8 +14,11 @@ from typing import Iterable, List, Mapping, Sequence
 
 import neomodel
 
+from rest_auth.authorization import check_authorization
+
 from . import nodes
 from .. import structures
+from ..settings import ROLE_MODEL_ACTION_NAMES as ACTION_NAMES
 from ..utils import connect_if_not_connected, free_properties
 from .relations import RELATION_TYPES
 
@@ -73,6 +76,9 @@ class Reader:
 
         # step 1 - get the insides
         vertices = container.vertices.all()
+        # TODO role model permission check here is very bad
+        for vertex in vertices:
+            check_authorization(vertex, ACTION_NAMES.read)
         ports, vertex2ports = cls._query_ports(vertices)
         edges = container.edges
         groups = container.groups.all()
