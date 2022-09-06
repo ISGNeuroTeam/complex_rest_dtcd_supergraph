@@ -37,20 +37,20 @@ def reconnect_to_container(
 class Reader:
     """Read operations on a container."""
 
-    @classmethod
-    def _query_ports(cls, vertices: Iterable["nodes.Vertex"]):
+    @staticmethod
+    def _query_ports(vertices: Iterable["nodes.Vertex"]):
         ports: List["nodes.Port"] = []
-        cls._foreign_key_mapping = defaultdict(set)  # parent:children uid pairs
+        vertex2ports = defaultdict(set)  # parent:children uid pairs
 
         for vertex in vertices:
             for port in vertex.ports.all():
                 ports.append(port)
-                cls._foreign_key_mapping[vertex.uid].add(port.uid)
+                vertex2ports[vertex.uid].add(port.uid)
 
-        return ports
+        return ports, vertex2ports
 
     @staticmethod
-    def _to_object(node: "nodes.AbstractPrimitive", subclass):
+    def _to_primitive(node: "nodes.AbstractPrimitive", subclass):
         uid = node.uid
         properties = free_properties(node)
         meta = node.meta_
@@ -58,12 +58,12 @@ class Reader:
         return subclass(uid=uid, properties=properties, meta=meta)
 
     @classmethod
-    def _to_vertex(cls, node: "nodes.Vertex"):
-        vertex = cls._to_object(node, subclass=structures.Vertex)
+    def _to_vertex(cls, node: "nodes.Vertex", vertex2ports):
+        vertex = cls._to_primitive(node, subclass=structures.Vertex)
 
         # populate ports mappings
-        for child_id in cls._foreign_key_mapping.get(vertex.uid, []):
-            vertex.ports.add(child_id)
+        for port_id in vertex2ports.get(vertex.uid, []):
+            vertex.ports.add(port_id)
 
         return vertex
 
@@ -71,23 +71,21 @@ class Reader:
     def read(cls, container: "nodes.Container") -> structures.Content:
         """Query and return the content of a given container."""
 
-        cls._foreign_key_mapping = {}
-
         # step 1 - get the insides
         vertices = container.vertices.all()
-        ports = cls._query_ports(vertices)
+        ports, vertex2ports = cls._query_ports(vertices)
         edges = container.edges
         groups = container.groups.all()
 
         # step 2 - map to content
         # TODO move conversion to structures, leave populate_ports here?
-        vertices = [cls._to_vertex(node) for node in vertices]
-        ports = [cls._to_object(node, structures.Port) for node in ports]
+        vertices = [cls._to_vertex(node, vertex2ports) for node in vertices]
+        ports = [cls._to_primitive(node, structures.Port) for node in ports]
         edges = [
             structures.Edge(start=start.uid, end=end.uid, meta=edge.meta_)
             for (start, edge, end) in edges
         ]
-        groups = [cls._to_object(node, structures.Group) for node in groups]
+        groups = [cls._to_primitive(node, structures.Group) for node in groups]
 
         return structures.Content(
             vertices=vertices,
