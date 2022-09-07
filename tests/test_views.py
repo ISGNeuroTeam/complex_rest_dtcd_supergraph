@@ -6,9 +6,9 @@ from types import SimpleNamespace
 import dictdiffer
 import neomodel
 from django.urls import reverse
-from django.test import Client, tag
+from django.test import tag
 from rest_framework import status
-from rest_framework.test import APISimpleTestCase
+from rest_framework.test import APIClient, APISimpleTestCase
 
 from .misc import load_data, sort_payload
 
@@ -16,7 +16,7 @@ from .misc import load_data, sort_payload
 TEST_DIR = Path(__file__).resolve().parent
 DATA_DIR = TEST_DIR / "data"
 URL_RESET = reverse("supergraph:reset")  # post here resets the db
-CLIENT = Client()
+CLIENT = APIClient()
 
 # DEBUG
 DEBUG_FILEPATH = "debug.txt"
