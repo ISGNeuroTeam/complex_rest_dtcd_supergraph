@@ -16,6 +16,7 @@ from neomodel import (
 )
 from neomodel.contrib import SemiStructuredNode
 
+from core.globals import global_vars
 from rest_auth.authorization import auth_covered_method
 
 from . import management
@@ -157,6 +158,7 @@ class Container(RoleModelCoveredMixin, StructuredNode):
         result = management.Merger.merge(new_content)
         # TODO leaves existing connections to different containers
         management.reconnect_to_container(self, result.vertices, result.groups)
+        # NOTE trying to set the owner here with assignment & save throws stupid errors
 
     def reconnect_to_content(self, container):
         """Reconnect to the content of a given container."""

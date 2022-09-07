@@ -216,6 +216,7 @@ class Merger:
     ) -> List["nodes.Vertex"]:
         result = []
 
+        # NOTE we may try to set the owner here, but this is tricky
         for vertex in vertices:
             # FIXME possible clash between user-defined property name and uid/meta_ key
             node = nodes.Vertex.create_or_update(
