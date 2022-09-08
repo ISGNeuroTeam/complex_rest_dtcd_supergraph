@@ -10,7 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Roadmap and notes documents.
 - Custom Django commands for Neo4j: labels installation and default root initialization.
 - Generic `Neo4jAPIView` with transaction control.
-- Support for Role Model management.
+- Support for Role Model management: auth management for `Container` nodes (roots and fragments).
 
 ### Changed
 - User guide update.

@@ -46,7 +46,7 @@ class TestRoleModelCoveredMixin(Neo4jTestCaseMixin, APITestCase):
         owner = User.objects.create_user(username="amy", password="pass")
         node.owner = owner
         self.assertEqual(owner, node.owner)
-        
+
         # invalid owner
         node.owner_id = owner.pk + 1
         node.save()
