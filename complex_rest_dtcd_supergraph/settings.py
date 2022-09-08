@@ -16,6 +16,13 @@ default_ini_config = {
     "logging": {
         "level": "INFO",
     },
+    "db_conf": {
+        "database": PLUGIN_NAME,
+        "host": "localhost",
+        "port": "5432",
+        "user": PLUGIN_NAME,
+        "password": PLUGIN_NAME,
+    },
     "neo4j": {
         "protocol": "bolt",
         "address": "localhost",
@@ -29,6 +36,16 @@ default_ini_config = {
 config_parser = configparser.ConfigParser(allow_no_value=True)
 config_parser.read(PROJECT_DIR / "supergraph.conf")
 ini_config = merge_ini_config_with_defaults(config_parser, default_ini_config)
+
+# # Database settings
+DATABASE = {
+    "ENGINE": "django.db.backends.postgresql",
+    "NAME": ini_config["db_conf"]["database"],
+    "HOST": ini_config["db_conf"]["host"],
+    "PORT": ini_config["db_conf"]["port"],
+    "USER": ini_config["db_conf"]["user"],
+    "PASSWORD": ini_config["db_conf"]["password"],
+}
 
 # Role Model settings; see role model documentation for more info
 ROLE_MODEL_ACTION_NAMES = SimpleNamespace()
