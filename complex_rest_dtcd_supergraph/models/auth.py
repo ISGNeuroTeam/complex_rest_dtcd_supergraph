@@ -10,8 +10,14 @@ from neomodel import IntegerProperty
 from rest_auth.authorization import IAuthCovered
 from rest_auth.models import KeyChainModel, User
 
+from ..settings import PLUGIN_NAME
 
-log = logging.getLogger("root.rest_auth")
+
+log = logging.getLogger(PLUGIN_NAME)
+
+
+class KeyChain(KeyChainModel):
+    pass
 
 
 class RoleModelCoveredMixin(IAuthCovered):
@@ -26,19 +32,19 @@ class RoleModelCoveredMixin(IAuthCovered):
     owner_id = IntegerProperty()
 
     @property
-    def keychain(self) -> Union[KeyChainModel, None]:
+    def keychain(self) -> Union[KeyChain, None]:
         """Look up and return the keychain if it exists, None otherwise."""
 
         if self.keychain_id is not None:
             try:
-                return KeyChainModel.objects.get(pk=self.keychain_id)
-            except KeyChainModel.DoesNotExist:
+                return KeyChain.objects.get(pk=self.keychain_id)
+            except KeyChain.DoesNotExist:
                 log.error(f"KeyChain with id = {self.keychain_id} is missing")
 
         return None
 
     @keychain.setter
-    def keychain(self, keychain: KeyChainModel):
+    def keychain(self, keychain: KeyChain):
         self.keychain_id = keychain.pk
         self.save()
 
@@ -48,6 +54,7 @@ class RoleModelCoveredMixin(IAuthCovered):
 
         if self.owner_id is not None:
             try:
+                # should use auth_db via AuthRouter?
                 return User.objects.get(pk=self.owner_id)
             except User.DoesNotExist:
                 log.error(f"User with id = {self.owner_id} is missing")

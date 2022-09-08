@@ -83,4 +83,4 @@ clean_test:
 
 .PHONY: format
 format:
-	python3 -m black $(plugin) tests
+	python3 -m black --extend-exclude "migrations" $(plugin) tests
