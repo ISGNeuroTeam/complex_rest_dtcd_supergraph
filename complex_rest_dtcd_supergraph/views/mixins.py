@@ -4,7 +4,7 @@ from .. import models
 from ..settings import PLUGIN_NAME
 from .shortcuts import to_content_or_400, replace_or_400
 
-logger = logging.getLogger(PLUGIN_NAME)
+log = logging.getLogger(PLUGIN_NAME)
 
 
 class ContainerManagementMixin:
@@ -16,7 +16,7 @@ class ContainerManagementMixin:
         """Read container's content as Python primitives."""
 
         content = container.read_content()
-        logger.info("Queried content: %s", content.info)
+        log.info("Queried content: %s", content.info)
         data = content.to_dict()
 
         return data
@@ -25,5 +25,5 @@ class ContainerManagementMixin:
         """Replace container's content with new one from data."""
 
         new_content = to_content_or_400(data)
-        logger.info("Converted to content: %s", new_content.info)
+        log.info("Converted to content: %s", new_content.info)
         replace_or_400(container, new_content)
