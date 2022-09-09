@@ -10,3 +10,4 @@
 ## Nice-to-haves
 
 - Подробное логирование (операции `read` / `replace`).
+- Тесты для модулей `nodes` и `management`.
