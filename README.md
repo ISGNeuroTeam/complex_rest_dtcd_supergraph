@@ -2,7 +2,11 @@
 
 [Complex rest](https://github.com/ISGNeuroTeam/complex_rest/tree/develop) plugin for graph management.
 
-For an introduction check out the [User Guide](docs/user-guide.md) and [Extra Notes](docs/notes.md) documents, or see the [Roadmap](docs/roadmap.md) to know what to work on.
+Useful links:
+- [User Guide](docs/user-guide.md) gives a brief introduction to the plugin.
+- [Roadmap](docs/roadmap.md) contains a rough collection of future improvements.
+- [Migrations](docs/migrations.md) describes database migrations for Neo4j.
+- [Extra Notes](docs/notes.md) has a list of misc notes.
 
 ## Installation
 
