@@ -6,6 +6,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 
 ## [Unreleased]
+
+## [0.4.0] - 2022-09-13
 ### Added
 - Roadmap, notes and migrations documents.
 - Custom Django commands for Neo4j: labels installation and default root initialization.
