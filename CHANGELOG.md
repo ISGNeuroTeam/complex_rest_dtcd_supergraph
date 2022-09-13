@@ -7,10 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
-- Roadmap and notes documents.
+- Roadmap, notes and migrations documents.
 - Custom Django commands for Neo4j: labels installation and default root initialization.
 - Generic `Neo4jAPIView` with transaction control.
 - Automatic OpenAPI doc generation with `drf-spectacular`.
+- DB migration for updating from `0.3.*` to current release.
 
 ### Changed
 - User guide update.

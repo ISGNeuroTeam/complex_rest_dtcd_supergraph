@@ -91,8 +91,7 @@ For deployment we need to get a build archive - see the previous section on how 
 1. Stop `complex_rest`.
 2. Unpack the archive into `complex_rest/plugins` directory.
 3. Run the [initialization script](#initialization-script) to prepare the database.
-4. **TODO** Backup / reset / migrate the database.
-5. Start `complex_rest`.
+4. Start `complex_rest`.
 
 ## Running the tests
 
@@ -145,10 +144,8 @@ You can run it from anywhere you like:
 ## TODO
 
 - Update [User guide](docs/user-guide.md).
-- Resolve `RelationshipClassRedefined` error when trying to test `neomodel` models directly (see `test_managers.py`).
 - User-defined properties that were saved before *stay on the node after merge* even if they are missing in new structure and should be deleted (see how `create_or_update` works). We handle it in converter, but this is not nice.
 - Resolve possible **clashes** between explicit and user-defined properties on nodes when merging content.
-- Migration scripts (`upgrade.v0.v1.sh`) for this plugin.
 - Some database queries may be inefficient (`n+1` problems).
 - Add Django auth to views.
 
