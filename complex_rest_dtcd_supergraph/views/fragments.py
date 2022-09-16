@@ -9,7 +9,7 @@ import uuid
 from rest_framework import status
 from rest_framework.request import Request
 
-from rest.permissions import AllowAny
+from rest.permissions import IsAuthenticated
 from rest.response import SuccessResponse
 
 from .. import settings
@@ -32,7 +32,7 @@ class RootFragmentListView(Neo4jAPIView):
     """List existing fragments of a root or create a new one."""
 
     http_method_names = ["get", "post"]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = FragmentSerializer
 
     def get(self, request: Request, pk: uuid.UUID):
@@ -82,7 +82,7 @@ class RootFragmentDetailView(Neo4jAPIView):
     """Retrieve, update or delete this root's fragment."""
 
     http_method_names = ["get", "put", "delete"]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = FragmentSerializer
 
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):

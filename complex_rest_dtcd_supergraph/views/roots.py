@@ -7,7 +7,7 @@ import uuid
 from rest_framework import status
 from rest_framework.request import Request
 
-from rest.permissions import AllowAny
+from rest.permissions import IsAuthenticated
 from rest.response import SuccessResponse
 
 from ..models import Root
@@ -20,7 +20,7 @@ class RootListView(Neo4jAPIView):
     """List existing roots or create a new one."""
 
     http_method_names = ["get", "post"]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = RootSerializer
 
     def get(self, request: Request):
@@ -48,7 +48,7 @@ class RootDetailView(Neo4jAPIView):
     """Retrieve, update or delete a root."""
 
     http_method_names = ["get", "put", "delete"]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     serializer_class = RootSerializer
 
     def get(self, request: Request, pk: uuid.UUID):

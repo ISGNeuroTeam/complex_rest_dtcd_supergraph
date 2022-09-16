@@ -6,7 +6,7 @@ import uuid
 
 from rest_framework.request import Request
 
-from rest.permissions import AllowAny
+from rest.permissions import IsAuthenticated
 from rest.response import SuccessResponse
 
 from .. import settings
@@ -22,7 +22,7 @@ class RootGraphView(ContainerManagementMixin, Neo4jAPIView):
     """Retrieve, replace or delete graph content of a root."""
 
     http_method_names = ["get", "put", "delete"]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request, pk: uuid.UUID):
         """Read graph content of a root."""
@@ -72,7 +72,7 @@ class RootFragmentGraphView(ContainerManagementMixin, Neo4jAPIView):
     """Retrieve, replace or delete graph content of this root's fragment."""
 
     http_method_names = ["get", "put", "delete"]
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
         """Read graph content of the given root's fragment."""
