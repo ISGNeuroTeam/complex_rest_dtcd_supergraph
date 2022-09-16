@@ -107,6 +107,8 @@ class Neo4jTestCaseMixin:
 
     @classmethod
     def setUpClass(cls) -> None:
+        # FIXME this is obscure and bad
+        # routed per MRO order & calls the next class in the tree
         super().setUpClass()
         # clean db on start
         reset_db()
@@ -124,18 +126,24 @@ class Neo4jTestCaseMixin:
 class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     url = reverse("supergraph:roots")
 
-    def test_post(self):
-        # create a user & authenticate to check auto ownership assignment
-        user = User.objects.create_user(username="amy", password="pass")
-        self.client.force_authenticate(user)
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="amy", password="pass")
 
+    def setUp(self) -> None:
+        super().setUp()
+        # authenticate to pass permission checks
+        self.client.force_authenticate(self.user)
+
+    def test_post(self):
         # create an object; owner should be associated automatically
         name = "sales"
         response = self.post(data={"name": name})
         obj = response.data["root"]
         self.assertIn("id", obj)
         self.assertEqual(obj["name"], name)
-        self.assertEqual(obj["owner_id"], user.pk)
+        # check auto ownership assignment
+        self.assertEqual(obj["owner_id"], self.user.pk)
 
     def test_get(self):
         names = {"hr", "marketing", "sales"}
@@ -147,10 +155,12 @@ class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
         self.assertEqual({item["name"] for item in objects}, names)
 
     @classmethod
-    def create(cls, data: dict) -> dict:
+    def create(cls, data: dict, user: User) -> dict:
         """Send `POST` request to create a root and return it."""
 
+        CLIENT.force_authenticate(user)
         response = CLIENT.post(cls.url, data=data, format="json")
+        CLIENT.force_authenticate()
         return response.data["root"]
 
 
@@ -158,15 +168,23 @@ class TestRootListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
 class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "sales"
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="amy", password="pass")
+
     def setUp(self) -> None:
         """Create a root object to work with using the given name.
 
-        Creates a root object and saves it to `self.root`. Root ID is
-        available on `self.pk`, and URL to this object at `self.url`.
+        Authenticates `self.client` as `self.user`, creates a root object
+        and saves it to `self.root`. Root ID is available on `self.pk`,
+        and URL to this object at `self.url`.
         """
 
+        # authenticate to pass permission checks
+        self.client.force_authenticate(self.user)
+
         # default root
-        self.root = TestRootListView.create({"name": self.root_name})
+        self.root = TestRootListView.create({"name": self.root_name}, self.user)
         self.pk = self.root["id"]
         self.url = reverse("supergraph:root-detail", args=(self.pk,))
 
@@ -191,6 +209,10 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
 class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "parent"
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="amy", password="pass")
+
     def setUp(self) -> None:
         """Create a root object to work with.
 
@@ -198,22 +220,19 @@ class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase
         attributes see `TestRootDetailView.setUp()`.
         """
 
-        # create default root to work with
+        # authenticate as self.user and create default root to work with
         TestRootDetailView.setUp(self)
         self.url = reverse("supergraph:root-fragments", args=(self.pk,))
 
     def test_post(self):
-        # create a user & authenticate to check auto ownership assignment
-        user = User.objects.create_user(username="amy", password="pass")
-        self.client.force_authenticate(user)
-
         # create an object; owner should be associated automatically
         name = "child"
         response = self.post(data={"name": name})
         obj = response.data["fragment"]
         self.assertIn("id", obj)
         self.assertEqual(obj["name"], name)
-        self.assertEqual(obj["owner_id"], user.pk)
+        # check auto ownership assignment
+        self.assertEqual(obj["owner_id"], self.user.pk)
 
     def test_get(self):
         names = {"hr", "marketing", "sales"}
@@ -229,8 +248,14 @@ class TestRootFragmentDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCa
     root_name = "parent"
     fragment_name = "child"
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="amy", password="pass")
+
     def setUp(self) -> None:
         """Create a root and a fragment for it using given names.
+
+        Authenticates `self.client` as `self.user` first.
 
         The root is at `self.root`. Root ID is
         available on `self.root_pk` and the URL is at `self.root_url`.
@@ -243,7 +268,7 @@ class TestRootFragmentDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCa
         work with it in this suite of tests.
         """
 
-        # create the default root
+        # authenticate as self.user and create default root to work with
         TestRootDetailView.setUp(self)
         self.root_pk = self.pk
         self.root_url = self.url  # URL: roots/<id>
@@ -421,13 +446,17 @@ class TestRootGraphView(
 ):
     root_name = "sales"
 
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="amy", password="pass")
+
     def setUp(self) -> None:
         """Create a root object to work with.
 
         Sets `self.url` to `roots/<pk>/graph`.
         """
 
-        # create default root to work with
+        # authenticate as self.user and create default root to work with
         TestRootDetailView.setUp(self)
         self.url = reverse("supergraph:root-graph", args=(self.pk,))
 
@@ -566,6 +595,10 @@ class TestRootFragmentGraphView(
 ):
     root_name = "parent"
     fragment_name = "child"
+
+    @classmethod
+    def setUpTestData(cls) -> None:
+        cls.user = User.objects.create_user(username="amy", password="pass")
 
     def setUp(self) -> None:
         """Create graph endpoints for root and its fragment.
