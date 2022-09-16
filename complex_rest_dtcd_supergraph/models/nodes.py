@@ -64,14 +64,10 @@ class Vertex(AbstractPrimitive):
     # TODO explicit input and output ports?
     ports = RelationshipTo(Port, RELATION_TYPES.default)
 
-    def delete(self, cascade=True):
-        """Delete this vertex.
+    def delete(self):
+        """Delete this vertex and all connected ports."""
 
-        If cascade is enabled, also delete all connected ports.
-        """
-
-        if cascade:
-            self.clear()
+        self.clear()
 
         return super().delete()
 
@@ -101,15 +97,10 @@ class Container(RoleModelCoveredMixin, StructuredNode):
     vertices = RelationshipTo(Vertex, RELATION_TYPES.contains)
     groups = RelationshipTo(Group, RELATION_TYPES.contains)
 
-    def delete(self, cascade=True):
-        """Delete this container.
+    def delete(self):
+        """Delete this container and clear its content."""
 
-        If cascade is enabled, delete all related vertices and groups in
-        a cascading fashion.
-        """
-
-        if cascade:
-            self.clear()
+        self.clear()
 
         return super().delete()
 
@@ -118,7 +109,7 @@ class Container(RoleModelCoveredMixin, StructuredNode):
         """Delete all related vertices and groups in a cascading fashion."""
 
         for vertex in self.vertices.all():
-            vertex.delete(cascade=True)
+            vertex.delete()
 
         for group in self.groups.all():
             group.delete()
@@ -172,6 +163,18 @@ class Fragment(Container):
     control and ease of work.
     """
 
+    def delete(self, cascade=True):
+        """Delete this fragment.
+
+        If cascade is enabled, delete all related vertices and groups in
+        a cascading fashion.
+        """
+
+        if cascade:
+            self.clear()
+
+        return StructuredNode.delete(self)
+
 
 class Root(Container):
     """A root is a collection of fragments and content.
@@ -179,18 +182,6 @@ class Root(Container):
     Roots partition global Neo4j graph into non-overlapping subgraphs."""
 
     fragments = RelationshipTo(Fragment, RELATION_TYPES.contains)
-
-    def delete(self, cascade=True):
-        """Delete this root.
-
-        Deletes all related fragments, vertices and groups in a cascading
-        fashion.
-        """
-
-        if cascade:
-            self.clear()
-
-        return super().delete(cascade=False)
 
     def clear(self, content_only=False):
         """Delete all related fragments, vertices and groups in a cascading fashion.
@@ -205,4 +196,5 @@ class Root(Container):
             return
 
         for fragment in self.fragments.all():
-            fragment.delete(cascade=False)  # already cleared related content
+            # TODO may use cascade=False as we already cleared related content
+            fragment.delete()
