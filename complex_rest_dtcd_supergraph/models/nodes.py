@@ -2,8 +2,7 @@
 Node classes from neomodel.
 """
 
-import logging
-from typing import List, Tuple, Union
+from typing import List, Tuple
 
 from neomodel import (
     db,
@@ -116,7 +115,7 @@ class Container(RoleModelCoveredMixin, StructuredNode):
 
     @property
     def edges(self) -> List[Tuple[Port, EdgeRel, Port]]:
-        """Return a list of tuples (start, edge, end) inside this container."""
+        """Return a list of tuples (start, relation, end) inside this container."""
 
         q = (
             f"MATCH (this) WHERE id(this)={self.id} "
