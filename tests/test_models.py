@@ -20,12 +20,16 @@ from complex_rest_dtcd_supergraph.models.auth import (
     RoleModelCoveredMixin,
 )
 
+from .factories import (
+    ContainerFactory,
+    FragmentFactory,
+    GroupFactory,
+    PortFactory,
+    RootFactory,
+    VertexFactory,
+)
 from .misc import APITestCase
 from .test_views import Neo4jTestCaseMixin
-
-
-def genid():
-    return uuid.uuid4().hex
 
 
 class SampleNode(RoleModelCoveredMixin, neomodel.StructuredNode):
@@ -74,9 +78,9 @@ class TestRoleModelCoveredMixin(Neo4jTestCaseMixin, APITestCase):
 class TestVertex(Neo4jTestCaseMixin, SimpleTestCase):
     def setUp(self) -> None:
         # prepare a vertex and 2 connected ports
-        self.v = Vertex(uid=genid(), meta_="").save()
-        self.p0 = Port(uid=genid(), meta_="").save()
-        self.p1 = Port(uid=genid(), meta_="").save()
+        self.v = VertexFactory().save()
+        self.p0 = PortFactory().save()
+        self.p1 = PortFactory().save()
         self.v.ports.connect(self.p0)
         self.v.ports.connect(self.p1)
 
@@ -94,18 +98,18 @@ class TestVertex(Neo4jTestCaseMixin, SimpleTestCase):
 @tag("neo4j")
 class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
     def test_edges(self):
-        c = Container(name="container").save()
-        v0 = Vertex(uid=genid(), meta_="").save()
-        p0 = Port(uid=genid(), meta_="").save()
+        c = ContainerFactory().save()
+        v0 = VertexFactory().save()
+        p0 = PortFactory().save()
         v0.ports.connect(p0)
         c.vertices.connect(v0)
-        v1 = Vertex(uid=genid(), meta_="").save()
-        p1 = Port(uid=genid(), meta_="").save()
+        v1 = VertexFactory().save()
+        p1 = PortFactory().save()
         v1.ports.connect(p1)
         c.vertices.connect(v1)
         e_inside = p0.neighbor.connect(p1, dict(meta_="eggs"))
-        v_other = Vertex(uid=genid(), meta_="").save()
-        p_other = Port(uid=genid(), meta_="").save()
+        v_other = VertexFactory().save()
+        p_other = PortFactory().save()
         v_other.ports.connect(p_other)
         e_outside = p1.neighbor.connect(p_other, dict(meta_="spam"))
         # query the edges inside the container
@@ -118,19 +122,19 @@ class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
         self.assertEqual(end, p1)
 
     def test_reconnect_to_container(self):
-        c0 = Container(name="a").save()
-        v = Vertex(uid=genid(), meta_="").save()
+        c0 = ContainerFactory().save()
+        v = VertexFactory().save()
         c0.vertices.connect(v)
-        c1 = Container(name="b").save()
+        c1 = ContainerFactory().save()
         c1.reconnect_to_content(c0)
         self.assertEqual(c1.vertices.all(), c0.vertices.all())
 
     # FIXME
     @unittest.skip("protected via role model")
     def test_clear(self):
-        c = Container(name="container").save()
-        v = Vertex(uid=genid(), meta_="").save()
-        g = Group(uid=genid(), meta_="").save()
+        c = ContainerFactory().save()
+        v = VertexFactory().save()
+        g = GroupFactory().save()
         c.vertices.connect(v)
         c.groups.connect(g)
         c.clear()
@@ -140,9 +144,9 @@ class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
     # FIXME
     @unittest.skip("protected via role model")
     def test_delete(self):
-        c = Container(name="container").save()
-        v = Vertex(uid=genid(), meta_="").save()
-        g = Group(uid=genid(), meta_="").save()
+        c = ContainerFactory().save()
+        v = VertexFactory().save()
+        g = GroupFactory().save()
         c.vertices.connect(v)
         c.groups.connect(g)
         c.delete()
@@ -156,9 +160,9 @@ class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
 @tag("neo4j")
 class TestFragment(Neo4jTestCaseMixin, SimpleTestCase):
     def test_delete_no_cascade(self):
-        f = Fragment(name="fragment").save()
-        v = Vertex(uid=genid(), meta_="").save()
-        g = Group(uid=genid(), meta_="").save()
+        f = FragmentFactory().save()
+        v = VertexFactory().save()
+        g = GroupFactory().save()
         f.vertices.connect(v)
         f.groups.connect(g)
         f.delete(cascade=False)
@@ -172,10 +176,10 @@ class TestFragment(Neo4jTestCaseMixin, SimpleTestCase):
 @tag("neo4j")
 class TestRoot(Neo4jTestCaseMixin, SimpleTestCase):
     def setUp(self) -> None:
-        self.r = Root(name="root").save()
-        f = Fragment(name="fragment").save()
-        v = Vertex(uid=genid(), meta_="").save()
-        g = Group(uid=genid(), meta_="").save()
+        self.r = RootFactory().save()
+        f = FragmentFactory().save()
+        v = VertexFactory().save()
+        g = GroupFactory().save()
         f.vertices.connect(v)
         f.groups.connect(g)
         self.r.fragments.connect(f)
