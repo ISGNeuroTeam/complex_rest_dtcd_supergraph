@@ -206,6 +206,7 @@ class TestRootDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
         self._test_delete()
 
 
+@tag("neo4j")
 class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "parent"
 
@@ -244,6 +245,7 @@ class TestRootFragmentListView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase
         self.assertEqual({item["name"] for item in objects}, names)
 
 
+@tag("neo4j")
 class TestRootFragmentDetailView(Neo4jTestCaseMixin, APITestCaseMixin, APITestCase):
     root_name = "parent"
     fragment_name = "child"

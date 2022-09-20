@@ -2,7 +2,7 @@ import unittest
 import uuid
 
 import neomodel
-from django.test import SimpleTestCase
+from django.test import SimpleTestCase, tag
 
 from rest_auth.models import User
 
@@ -33,6 +33,7 @@ class SampleNode(RoleModelCoveredMixin, neomodel.StructuredNode):
     uid = neomodel.UniqueIdProperty()
 
 
+@tag("neo4j")
 class TestRoleModelCoveredMixin(Neo4jTestCaseMixin, APITestCase):
     """Tests for RoleModelCoveredMixin interface."""
 
@@ -45,7 +46,7 @@ class TestRoleModelCoveredMixin(Neo4jTestCaseMixin, APITestCase):
         # with keychain
         keychain = KeyChain.objects.create()
         node.keychain = keychain
-        self.assertEqual(keychain, node.keychain)
+        self.assertEqual(node.keychain, keychain)
 
         # invalid keychain
         node.keychain_id = keychain.pk - 1
@@ -61,7 +62,7 @@ class TestRoleModelCoveredMixin(Neo4jTestCaseMixin, APITestCase):
         # with owner
         owner = User.objects.create_user(username="amy", password="pass")
         node.owner = owner
-        self.assertEqual(owner, node.owner)
+        self.assertEqual(node.owner, owner)
 
         # invalid owner
         node.owner_id = owner.pk + 1
@@ -69,6 +70,7 @@ class TestRoleModelCoveredMixin(Neo4jTestCaseMixin, APITestCase):
         self.assertIsNone(node.owner)
 
 
+@tag("neo4j")
 class TestVertex(Neo4jTestCaseMixin, SimpleTestCase):
     def setUp(self) -> None:
         # prepare a vertex and 2 connected ports
@@ -80,15 +82,16 @@ class TestVertex(Neo4jTestCaseMixin, SimpleTestCase):
 
     def test_clear(self):
         self.v.clear()
-        self.assertEqual(0, len(self.v.ports))
-        self.assertEqual(0, len(Port.nodes))
+        self.assertEqual(len(self.v.ports), 0)
+        self.assertEqual(len(Port.nodes), 0)
 
     def test_delete(self):
         self.v.delete()
-        self.assertEqual(0, len(Vertex.nodes))
-        self.assertEqual(0, len(Port.nodes))
+        self.assertEqual(len(Vertex.nodes), 0)
+        self.assertEqual(len(Port.nodes), 0)
 
 
+@tag("neo4j")
 class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
     def test_edges(self):
         c = Container(name="container").save()
@@ -108,11 +111,11 @@ class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
         # query the edges inside the container
         edges = c.edges
         # checks
-        self.assertEqual(1, len(edges))  # only one relation inside the container
+        self.assertEqual(len(edges), 1)  # only one relation inside the container
         start, rel, end = edges[0]
-        self.assertEqual(p0, start)
-        self.assertEqual(e_inside.id, rel.id)
-        self.assertEqual(p1, end)
+        self.assertEqual(start, p0)
+        self.assertEqual(rel.id, e_inside.id)
+        self.assertEqual(end, p1)
 
     def test_reconnect_to_container(self):
         c0 = Container(name="a").save()
@@ -131,8 +134,8 @@ class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
         c.vertices.connect(v)
         c.groups.connect(g)
         c.clear()
-        self.assertEqual(0, len(c.vertices))
-        self.assertEqual(0, len(c.groups))
+        self.assertEqual(len(c.vertices), 0)
+        self.assertEqual(len(c.groups), 0)
 
     # FIXME
     @unittest.skip("protected via role model")
@@ -143,13 +146,14 @@ class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
         c.vertices.connect(v)
         c.groups.connect(g)
         c.delete()
-        self.assertEqual(0, len(Container.nodes))
-        self.assertEqual(0, len(Vertex.nodes))
-        self.assertEqual(0, len(Group.nodes))
+        self.assertEqual(len(Container.nodes), 0)
+        self.assertEqual(len(Vertex.nodes), 0)
+        self.assertEqual(len(Group.nodes), 0)
 
 
 # FIXME
 @unittest.skip("protected via role model")
+@tag("neo4j")
 class TestFragment(Neo4jTestCaseMixin, SimpleTestCase):
     def test_delete_no_cascade(self):
         f = Fragment(name="fragment").save()
@@ -158,13 +162,14 @@ class TestFragment(Neo4jTestCaseMixin, SimpleTestCase):
         f.vertices.connect(v)
         f.groups.connect(g)
         f.delete(cascade=False)
-        self.assertEqual(0, len(Fragment.nodes))
-        self.assertEqual(1, len(Vertex.nodes))
-        self.assertEqual(1, len(Group.nodes))
+        self.assertEqual(len(Fragment.nodes), 0)
+        self.assertEqual(len(Vertex.nodes), 1)
+        self.assertEqual(len(Group.nodes), 1)
 
 
 # FIXME
 @unittest.skip("protected via role model")
+@tag("neo4j")
 class TestRoot(Neo4jTestCaseMixin, SimpleTestCase):
     def setUp(self) -> None:
         self.r = Root(name="root").save()
@@ -179,12 +184,12 @@ class TestRoot(Neo4jTestCaseMixin, SimpleTestCase):
 
     def test_clear(self):
         self.r.clear()
-        self.assertEqual(0, len(Fragment.nodes))
-        self.assertEqual(0, len(Vertex.nodes))
-        self.assertEqual(0, len(Group.nodes))
+        self.assertEqual(len(Fragment.nodes), 0)
+        self.assertEqual(len(Vertex.nodes), 0)
+        self.assertEqual(len(Group.nodes), 0)
 
     def test_clear_content_only(self):
         self.r.clear(content_only=True)
-        self.assertEqual(1, len(Fragment.nodes))
-        self.assertEqual(0, len(Vertex.nodes))
-        self.assertEqual(0, len(Group.nodes))
+        self.assertEqual(len(Fragment.nodes), 1)
+        self.assertEqual(len(Vertex.nodes), 0)
+        self.assertEqual(len(Group.nodes), 0)
