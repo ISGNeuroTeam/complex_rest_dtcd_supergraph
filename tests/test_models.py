@@ -98,6 +98,7 @@ class TestVertex(Neo4jTestCaseMixin, SimpleTestCase):
 @tag("neo4j")
 class TestContainer(Neo4jTestCaseMixin, SimpleTestCase):
     def test_edges(self):
+        # TODO maybe use the graph from test_management?
         c = ContainerFactory().save()
         v0 = VertexFactory().save()
         p0 = PortFactory().save()
