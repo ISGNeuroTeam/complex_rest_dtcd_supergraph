@@ -1,4 +1,5 @@
 import configparser
+import os
 import uuid
 from pathlib import Path
 from types import SimpleNamespace
@@ -58,6 +59,21 @@ assert path.exists(), (
     f"Cannot find '{filename}' in this plugin's directory. "
     "Have you forgot to initialize the database with initialize.py?"
 )
+
+# graphs configuration
+
+GRAPH_BASE_PATH = ini_config['graph']['base_path']
+GRAPH_TMP_PATH = ini_config['graph']['tmp_path']
+GRAPH_ID_NAME_MAP_PATH = ini_config['graph']['id_name_map_path']
+
+if not os.path.isdir(GRAPH_BASE_PATH):
+    os.mkdir(Path(GRAPH_BASE_PATH))
+
+if not os.path.isdir(GRAPH_TMP_PATH):
+    os.mkdir(Path(GRAPH_TMP_PATH))
+
+if not os.path.isdir(GRAPH_ID_NAME_MAP_PATH):
+    os.mkdir(Path(GRAPH_ID_NAME_MAP_PATH))
 
 # TODO users can delete default root node, so uid in text file becomes old
 # TODO during the testing we reset the database after each test
