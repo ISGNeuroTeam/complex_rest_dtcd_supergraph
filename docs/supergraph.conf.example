@@ -8,5 +8,10 @@ port = 7687
 user = neo4j
 password = password
 
+[graph]
+base_path = /opt/otp/complex_rest/plugins/supergraph/graphs
+tmp_path = /opt/otp/complex_rest/plugins/supergraph/tmp
+id_name_map_path = /opt/otp/complex_rest/plugins/supergraph/id_name_map
+
 [schema]
 default_root_name = ROOT
