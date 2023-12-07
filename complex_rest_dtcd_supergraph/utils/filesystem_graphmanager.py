@@ -21,7 +21,7 @@ class FilesystemGraphManager(AbstractGraphManager):
         self.map_tmp_path = map_path + '/graph_tmp.json'
         self.default_filename = 'graph.graphml'
 
-    def read(self, graph_id):
+    def read(self, graph_id) -> dict:
         graph_data = {}
         try:
             with open(Path(self.final_path) / graph_id / self.default_filename, 'r') as graph:
