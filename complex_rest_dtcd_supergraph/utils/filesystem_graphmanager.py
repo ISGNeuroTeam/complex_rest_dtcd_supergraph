@@ -34,7 +34,7 @@ class FilesystemGraphManager(AbstractGraphManager):
         except OSError:
             raise GraphManagerException(NO_GRAPH, graph_id)
 
-    def read_all(self):
+    def read_all(self) -> list:
         graph_list = []
         with open(self.map_path, 'r') as map_file:
             id_map = json.load(map_file)
@@ -42,7 +42,7 @@ class FilesystemGraphManager(AbstractGraphManager):
                 graph_list.append({'graph_id': k, 'name': v['name']})
         return graph_list
 
-    def write(self, graph: dict):
+    def write(self, graph: dict) -> None:
         shutil.copyfile(self.map_path, self.map_backup_path)
         with open(self.map_path, 'r') as map_file:
             id_map = json.load(map_file)
@@ -61,7 +61,7 @@ class FilesystemGraphManager(AbstractGraphManager):
         os.mkdir(graph_dir)
         os.rename(self.tmp_path, Path(graph_dir / self.default_filename))  # atomic operation
 
-    def update(self, graph: dict):
+    def update(self, graph: dict) -> None:
         if 'graph_id' not in graph:
             raise GraphManagerException(NO_ID)
         if 'name' in graph:
@@ -87,7 +87,7 @@ class FilesystemGraphManager(AbstractGraphManager):
                 file.write(graph["content"])
             os.rename(self.tmp_path, Path(graph_dir) / self.default_filename)  # atomic operation
 
-    def remove(self, graph_id):
+    def remove(self, graph_id) -> None:
         graph_dir = Path(self.final_path) / graph_id
         if not os.path.isdir(graph_dir):
             raise GraphManagerException(NO_GRAPH, graph_id)
