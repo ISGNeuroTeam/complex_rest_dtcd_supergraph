@@ -9,7 +9,7 @@ import logging
 logger = logging.getLogger('supergraph')
 
 
-class Graph(APIView):
+class GraphView(APIView):
     permission_classes = (AllowAny,)
     http_method_names = ['get', 'post', 'put', 'delete']
     graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
