@@ -1,138 +1,70 @@
-"""
-Views for graph management operations for roots and fragments.
-"""
-
-import uuid
-
-import neomodel
-from rest_framework.request import Request
-
-from rest.permissions import AllowAny
-from rest.response import SuccessResponse
 from rest.views import APIView
+from rest.response import Response, status
+from rest.permissions import AllowAny
+from rest_framework.request import Request
+from ..utils.filesystem_graphmanager import FilesystemGraphManager
+from ..settings import GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH
+import logging
 
-from .. import settings
-from ..converters import GraphDataConverter
-from ..managers import Manager
-from ..models import Root
-from ..serializers import ContentSerializer, GraphSerializer
-from .fragments import get_fragment_from_root_or_404
-from .mixins import ContainerManagementMixin
-from .shortcuts import get_node_or_404
+logger = logging.getLogger('supergraph')
 
 
-class RootGraphView(ContainerManagementMixin, APIView):
-    """Retrieve, replace or delete graph content of a root."""
-
-    http_method_names = ["get", "put", "delete"]
+class Graph(APIView):
     permission_classes = (AllowAny,)
-    converter = GraphDataConverter()
-    manager = Manager()
+    http_method_names = ['get', 'post', 'put', 'delete']
+    graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
 
-    @neomodel.db.transaction
-    def get(self, request: Request, pk: uuid.UUID):
-        """Read graph content of a root."""
+    def post(self, request) -> Response:
+        graphs = request.data
+        for graph in graphs:
+            try:
+                self.graph_manager.write(graph)
+            except Exception as e:
+                return Response(
+                    {"status": "ERROR", "msg": str(e)},
+                    status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            {"status": "SUCCESS"},
+            status.HTTP_200_OK
+        )
 
-        root = get_node_or_404(Root.nodes, uid=pk.hex)
-        payload = self.read(root)
-        serializer = ContentSerializer(instance=payload)
+    def put(self, request: Request) -> Response:
+        graphs = request.data
+        for graph in graphs:
+            try:
+                self.graph_manager.update(graph)
+            except Exception as e:
+                return Response(
+                    {"status": "ERROR", "msg": str(e)},
+                    status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            {"status": "SUCCESS"},
+            status.HTTP_200_OK
+        )
 
-        return SuccessResponse(data={"graph": serializer.data})
+    def delete(self, request) -> Response:
+        ids = request.data
+        for id in ids:
+            try:
+                self.graph_manager.remove(id)
+            except Exception as e:
+                return Response(
+                    {"status": "ERROR", "msg": str(e)},
+                    status.HTTP_400_BAD_REQUEST
+                )
+        return Response(
+            {"status": "SUCCESS"},
+            status.HTTP_200_OK
+        )
 
-    @neomodel.db.transaction
-    def put(self, request: Request, pk: uuid.UUID):
-        """Replace graph content of a root."""
-
-        root = get_node_or_404(Root.nodes, uid=pk.hex)
-        serializer = GraphSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        self.replace(root, serializer.data["graph"])
-
-        return SuccessResponse()
-
-    @neomodel.db.transaction
-    def delete(self, request: Request, pk: uuid.UUID):
-        """Delete graph content of a root."""
-
-        root = get_node_or_404(Root.nodes, uid=pk.hex)
-        root.clear(content_only=True)
-
-        return SuccessResponse()
-
-
-class DefaultRootGraphView(RootGraphView):
-    """Retrieve, replace or delete graph content of the default root."""
-
-    pk = settings.DEFAULT_ROOT_UUID
-
-    def get(self, request: Request):
-        return super().get(request, self.pk)
-
-    def put(self, request: Request):
-        return super().put(request, self.pk)
-
-    def delete(self, request: Request):
-        return super().delete(request, self.pk)
-
-
-class RootFragmentGraphView(ContainerManagementMixin, APIView):
-    """Retrieve, replace or delete graph content of this root's fragment."""
-
-    http_method_names = ["get", "put", "delete"]
-    permission_classes = (AllowAny,)
-    converter = GraphDataConverter()
-    manager = Manager()
-
-    @neomodel.db.transaction
-    def get(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
-        """Read graph content of the given root's fragment."""
-
-        fragment = get_fragment_from_root_or_404(root_pk, fragment_pk)
-        payload = self.read(fragment)
-        serializer = ContentSerializer(instance=payload)
-
-        return SuccessResponse(data={"graph": serializer.data})
-
-    @neomodel.db.transaction
-    def put(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
-        """Replace graph content of this root's fragment."""
-
-        # validate incoming graph content
-        serializer = GraphSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        # query root and fragment
-        root = get_node_or_404(Root.nodes, uid=root_pk.hex)
-        fragment = get_node_or_404(root.fragments, uid=fragment_pk.hex)
-        # convert to domain classes, update fragment's content
-        self.replace(fragment, serializer.data["graph"])
-        # re-connect root to content
-        self.manager.reconnect(root, fragment)
-
-        return SuccessResponse()
-
-    @neomodel.db.transaction
-    def delete(self, request: Request, root_pk: uuid.UUID, fragment_pk: uuid.UUID):
-        """Delete graph content this root's fragment."""
-
-        fragment = get_fragment_from_root_or_404(root_pk, fragment_pk)
-        fragment.clear()
-
-        return SuccessResponse()
-
-
-class DefaultRootFragmentGraphView(RootFragmentGraphView):
-    """Retrieve, replace or delete graph content of default root's fragment."""
-
-    root_pk = settings.DEFAULT_ROOT_UUID
-
-    def get(self, request: Request, pk: uuid.UUID):
-        fragment_pk = pk
-        return super().get(request, self.root_pk, fragment_pk)
-
-    def put(self, request: Request, pk: uuid.UUID):
-        fragment_pk = pk
-        return super().put(request, self.root_pk, fragment_pk)
-
-    def delete(self, request: Request, pk: uuid.UUID):
-        fragment_pk = pk
-        return super().delete(request, self.root_pk, fragment_pk)
+    def get(self, request: Request) -> Response:
+        qs = dict(request.query_params)
+        if 'id' not in qs:
+            return Response(self.graph_manager.read_all(), status.HTTP_200_OK)
+        try:
+            graph_content = self.graph_manager.read(qs['id'][0])
+        except Exception as e:
+            return Response({"status": "ERROR", "msg": str(e)}, status.HTTP_400_BAD_REQUEST)
+        return Response(graph_content, status.HTTP_200_OK)
