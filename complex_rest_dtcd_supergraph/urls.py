@@ -5,5 +5,5 @@ from .views import GraphView
 app_name = "supergraph"
 
 urlpatterns = [
-    re_path(r'^graphContent/object/?$', GraphView.as_view()),
+    re_path(r'^complex_rest_dtcd_supergraph/v1/graph/?$', GraphView.as_view()),
 ]
