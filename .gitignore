@@ -196,3 +196,6 @@ default_root_uid.txt
 make_build/
 venv.tar.gz
 *.tar.gz
+
+# id_map folder
+id_name_map/
