@@ -2,6 +2,7 @@ import os
 import shutil
 import uuid
 import json
+import tempfile
 
 from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_ID, NAME_EXISTS
 from ..utils.abc_graphmanager import AbstractGraphManager
@@ -13,8 +14,8 @@ class FilesystemGraphManager(AbstractGraphManager):
     This is a manager that reads, writes, rewrites and deletes json files.
 
     :: final_path : path to a folder where all graph jason files are stored
-    :: tmp_path : path to a some temporary graph `graphml` file
-    :: map_path : path to a map (dictionary) `json` file, which stores {graph_id:title} pairs.
+    :: tmp_file_path : path to a some temporary graph `graphml` file
+    :: map_file_path : path to a map (dictionary) `json` file, which stores {graph_id:title} pairs.
 
     :: map_backup_path : path to a map backup `json` file: temporary storage for a map path
     :: map_tmp_path : path to a graph_tmp.json file inside a map folder
@@ -42,15 +43,15 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     """
 
-    def __init__(self, path, tmp_path, map_path):  # or better import it from settings here?
+    def __init__(self, path, tmp_folder_path, map_folder_path):  # or better import it from settings here?
         self.final_path = path  # graph base dir
-        self.tmp_path = tmp_path + '/tmp.graphml'
-        self.map_path = map_path + '/graph_map.json'  # not empty, at least {}
-        if not os.path.isfile(self.map_path):
-            with open(self.map_path, 'w') as map_file:
+        self.tmp_file_path = tmp_folder_path + '/tmp.graphml'
+        self.map_file_path = map_folder_path + '/graph_map.json'  # not empty, at least {}
+        if not os.path.isfile(self.map_file_path):
+            with open(self.map_file_path, 'w') as map_file:
                 map_file.write('{}')
-        self.map_backup_path = map_path + '/graph_backup.json'
-        self.map_tmp_path = map_path + '/graph_tmp.json'
+        self.map_backup_path = map_folder_path + '/graph_backup.json'
+        self.map_tmp_path = map_folder_path + '/graph_tmp.json'
         self.default_filename = 'graph.json'
 
     def read(self, graph_id) -> dict:
@@ -62,11 +63,11 @@ class FilesystemGraphManager(AbstractGraphManager):
                 graph_data['graph'] = graph.read()
 
             # back up current map file
-            # shutil.copyfile(self.map_path,
+            # shutil.copyfile(self.map_file_path,
             #                 self.map_backup_path)  # TODO why do we need to backup map file if we do not change it?
 
             # read the map file and get the title of the graph by its id
-            with open(self.map_path, 'r') as map_file:
+            with open(self.map_file_path, 'r') as map_file:
                 id_map = json.load(map_file)
                 graph_data['title'] = id_map[graph_id]  # this is the only place where the NO_GRAPH error may trigger
 
@@ -81,7 +82,7 @@ class FilesystemGraphManager(AbstractGraphManager):
     def read_all(self) -> list[dict]:
         """Read all graph json files"""
         graph_list = []
-        with open(self.map_path, 'r') as map_file:
+        with open(self.map_file_path, 'r') as map_file:
             id_map = json.load(map_file)
             for k, v in id_map.items():
                 graph_list.append({'graph_id': k, 'title': v})
@@ -90,10 +91,10 @@ class FilesystemGraphManager(AbstractGraphManager):
     def write(self, graph: dict) -> None:
         """Create graph json file with `graph` data"""
         # backup the map file
-        shutil.copyfile(self.map_path, self.map_backup_path)
+        shutil.copyfile(self.map_file_path, self.map_backup_path)
 
         # read the map file
-        with open(self.map_path, 'r') as map_file:
+        with open(self.map_file_path, 'r') as map_file:
             id_map = json.load(map_file)
             # check if we have this graph already
             if graph["title"] in id_map.values():
@@ -104,20 +105,20 @@ class FilesystemGraphManager(AbstractGraphManager):
         # save the name to map with new id
         id_map[unique_id] = graph["title"]
 
-        # save id_map to map_tmp_path
+        # save id_map to map_tmp
         with open(self.map_tmp_path, 'w') as map_tmp_file:
             json.dump(id_map, map_tmp_file)
-        # rename map_tmp_path to map_path
-        os.rename(self.map_tmp_path, self.map_path)  # atomic operation
+        # rename map_tmp_path to map_folder_path
+        os.rename(self.map_tmp_path, self.map_file_path)  # atomic operation
 
         # save graph['content'] to tmp_path file
-        with open(self.tmp_path, 'w') as file:
+        with open(self.tmp_file_path, 'w') as file:
             file.write(graph["graph"])
         # create new graph dir by its id
         graph_dir = Path(self.final_path) / unique_id
         os.mkdir(graph_dir)
         # move graph data from tmp_path to its new placement
-        os.rename(self.tmp_path, Path(graph_dir / self.default_filename))  # atomic operation
+        os.rename(self.tmp_file_path, Path(graph_dir / self.default_filename))  # atomic operation
 
     def update(self, graph: dict) -> None:
         """Rewrite graph json file with `graph` data"""
@@ -125,9 +126,9 @@ class FilesystemGraphManager(AbstractGraphManager):
             raise GraphManagerException(NO_ID)
         if 'title' in graph:
             # backing up the map file | why?
-            shutil.copyfile(self.map_path, self.map_backup_path)
+            shutil.copyfile(self.map_file_path, self.map_backup_path)
             # read the id_map file
-            with open(self.map_path, 'r') as map_file:
+            with open(self.map_file_path, 'r') as map_file:
                 id_map = json.load(map_file)
                 # check if we have this graph already
                 if graph["title"] in id_map.values():
@@ -143,16 +144,16 @@ class FilesystemGraphManager(AbstractGraphManager):
             # opening tmp map file for writing and saving current id_map to it
             with open(self.map_tmp_path, 'w') as map_tmp_file:
                 json.dump(id_map, map_tmp_file)
-            os.rename(self.map_tmp_path, self.map_path)  # atomic operation
+            os.rename(self.map_tmp_path, self.map_file_path)  # atomic operation
 
         # rewrite the content of the graph
         if 'graph' in graph:
             graph_dir = Path(self.final_path) / graph['graph_id']
             if not os.path.isdir(graph_dir):
                 raise GraphManagerException(NO_GRAPH, graph['graph_id'])
-            with open(self.tmp_path, 'w') as file:
+            with open(self.tmp_file_path, 'w') as file:
                 file.write(graph["graph"])
-            os.rename(self.tmp_path, Path(graph_dir) / self.default_filename)  # atomic operation
+            os.rename(self.tmp_file_path, Path(graph_dir) / self.default_filename)  # atomic operation
 
     def remove(self, graph_id) -> None:
         """Delete graph json file by 'graph_id'"""
@@ -165,10 +166,10 @@ class FilesystemGraphManager(AbstractGraphManager):
         shutil.rmtree(Path(self.final_path) / graph_id)
 
         # back up id_map file
-        shutil.copyfile(self.map_path, self.map_backup_path)
+        shutil.copyfile(self.map_file_path, self.map_backup_path)
 
         # read id_map
-        with open(self.map_path, 'r') as map_file:
+        with open(self.map_file_path, 'r') as map_file:
             id_map = json.load(map_file)
         # delete id from id_map
         del id_map[graph_id]
@@ -176,4 +177,10 @@ class FilesystemGraphManager(AbstractGraphManager):
         # save the id_map
         with open(self.map_tmp_path, 'w') as map_tmp_file:
             json.dump(id_map, map_tmp_file)
-        os.rename(self.map_tmp_path, self.map_path)  # atomic operation
+        os.rename(self.map_tmp_path, self.map_file_path)  # atomic operation
+
+
+def save_data_to_file(data: dict, destination_path: Path) -> None:
+    with tempfile.NamedTemporaryFile(delete=False) as file:
+        file.write(data)
+        os.rename(file.name, destination_path)
