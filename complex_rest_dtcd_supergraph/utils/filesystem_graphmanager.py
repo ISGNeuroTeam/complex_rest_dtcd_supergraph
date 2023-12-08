@@ -22,6 +22,7 @@ class FilesystemGraphManager(AbstractGraphManager):
         self.default_filename = 'graph.graphml'
 
     def read(self, graph_id) -> dict:
+        """Read graph json file by 'graph_id'"""
         graph_data = {}
         try:
             with open(Path(self.final_path) / graph_id / self.default_filename, 'r') as graph:
@@ -35,6 +36,7 @@ class FilesystemGraphManager(AbstractGraphManager):
             raise GraphManagerException(NO_GRAPH, graph_id)
 
     def read_all(self) -> list:
+        """Read all graph json files"""
         graph_list = []
         with open(self.map_path, 'r') as map_file:
             id_map = json.load(map_file)
@@ -43,6 +45,7 @@ class FilesystemGraphManager(AbstractGraphManager):
         return graph_list
 
     def write(self, graph: dict) -> None:
+        """Create graph json file with `graph` data"""
         shutil.copyfile(self.map_path, self.map_backup_path)
         with open(self.map_path, 'r') as map_file:
             id_map = json.load(map_file)
@@ -62,6 +65,7 @@ class FilesystemGraphManager(AbstractGraphManager):
         os.rename(self.tmp_path, Path(graph_dir / self.default_filename))  # atomic operation
 
     def update(self, graph: dict) -> None:
+        """Rewrite graph json file with `graph` data"""
         if 'graph_id' not in graph:
             raise GraphManagerException(NO_ID)
         if 'name' in graph:
@@ -88,6 +92,7 @@ class FilesystemGraphManager(AbstractGraphManager):
             os.rename(self.tmp_path, Path(graph_dir) / self.default_filename)  # atomic operation
 
     def remove(self, graph_id) -> None:
+        """Delete graph json file by 'graph_id'"""
         graph_dir = Path(self.final_path) / graph_id
         if not os.path.isdir(graph_dir):
             raise GraphManagerException(NO_GRAPH, graph_id)

@@ -14,7 +14,7 @@ class GraphView(APIView):
     http_method_names = ['get', 'post', 'put', 'delete']
     graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
 
-    def post(self, request) -> Response:
+    def post(self, request: Request) -> Response:
         graphs = request.data
         for graph in graphs:
             try:
@@ -44,7 +44,7 @@ class GraphView(APIView):
             status.HTTP_200_OK
         )
 
-    def delete(self, request) -> Response:
+    def delete(self, request: Request) -> Response:
         ids = request.data
         for id in ids:
             try:
