@@ -11,60 +11,63 @@ logger = logging.getLogger('supergraph')
 
 class GraphView(APIView):
     permission_classes = (AllowAny,)
-    http_method_names = ['get', 'post', 'put', 'delete']
+    http_method_names = ['get', 'post']
     graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
 
     def post(self, request: Request) -> Response:
         graphs = request.data
+        list_of_ids = []
         for graph in graphs:
             try:
-                self.graph_manager.write(graph)
+                list_of_ids.append(self.graph_manager.write(graph))
             except Exception as e:
                 return Response(
                     {"status": "ERROR", "msg": str(e)},
                     status.HTTP_400_BAD_REQUEST
                 )
         return Response(
-            {"status": "SUCCESS"},
-            status.HTTP_200_OK
-        )
-
-    def put(self, request: Request) -> Response:
-        graphs = request.data
-        for graph in graphs:
-            try:
-                self.graph_manager.update(graph)
-            except Exception as e:
-                return Response(
-                    {"status": "ERROR", "msg": str(e)},
-                    status.HTTP_400_BAD_REQUEST
-                )
-        return Response(
-            {"status": "SUCCESS"},
-            status.HTTP_200_OK
-        )
-
-    def delete(self, request: Request) -> Response:
-        ids = request.data
-        for id in ids:
-            try:
-                self.graph_manager.remove(id)
-            except Exception as e:
-                return Response(
-                    {"status": "ERROR", "msg": str(e)},
-                    status.HTTP_400_BAD_REQUEST
-                )
-        return Response(
-            {"status": "SUCCESS"},
+            {"status": "SUCCESS", "result": list_of_ids},
             status.HTTP_200_OK
         )
 
     def get(self, request: Request) -> Response:
-        qs = dict(request.query_params)
-        if 'id' not in qs:
-            return Response(self.graph_manager.read_all(), status.HTTP_200_OK)
+        return Response(self.graph_manager.read_all(), status.HTTP_200_OK)
+
+
+class GraphDetailView(APIView):
+    permission_classes = (AllowAny,)
+    http_method_names = ['get', 'put', 'delete']
+    graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
+
+    def put(self, request: Request, graph_id: str) -> Response:
         try:
-            graph_content = self.graph_manager.read(qs['id'][0])
+            self.graph_manager.update(request.data, graph_id)
+        except Exception as e:
+            return Response(
+                {"status": "ERROR", "msg": str(e)},
+                status.HTTP_400_BAD_REQUEST
+            )
+        return Response(
+            {"status": "SUCCESS"},
+            status.HTTP_200_OK
+        )
+
+    def get(self, request: Request, graph_id: str) -> Response:
+        try:
+            graph_content = self.graph_manager.read(graph_id)
         except Exception as e:
             return Response({"status": "ERROR", "msg": str(e)}, status.HTTP_400_BAD_REQUEST)
         return Response(graph_content, status.HTTP_200_OK)
+
+    def delete(self, request: Request, graph_id: str) -> Response:
+        try:
+            self.graph_manager.remove(graph_id)
+        except Exception as e:
+            return Response(
+                {"status": "ERROR", "msg": str(e)},
+                status.HTTP_400_BAD_REQUEST
+            )
+        return Response(
+            {"status": "SUCCESS"},
+            status.HTTP_200_OK
+        )
