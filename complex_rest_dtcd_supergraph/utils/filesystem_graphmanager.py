@@ -3,8 +3,9 @@ import shutil
 import uuid
 import json
 import tempfile
+from typing import Union, AnyStr
 
-from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_ID, NAME_EXISTS
+from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_ID, NAME_EXISTS, NO_TITLE
 from ..utils.abc_graphmanager import AbstractGraphManager
 from pathlib import Path
 
@@ -30,17 +31,20 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     id_map json file has this format now:
     {
-        'some-graph-001-uuid-id' : 'some-graph-001-title',
-        'some-graph-002-uuid-id' : 'some-graph-002-title',
+        "some-graph-001-uuid-id": "some-graph-001-title",
+        "some-graph-002-uuid-id": "some-graph-002-title"
     }
+
+    graph json file is stored at:
+        GRAPH_BASE_DIR/some-graph-001-uuid-id/graph.graphml
 
     each json graph file has this format now:
     {
-        'graph_id' : 'some-uuid64-data`,    <--- here we store its id
-        'title' : 'title-of-the-graph`,     <--- here we store its title
-        'graph': {}                         <--- here we store all the graph data: nodes, edges, groups
+        'title' : 'title-of-the-graph`,     <--- here we store graph's title | why we need to store title in graph json?
+        'nodes': {nodes info},              <--- here we store the graph nodes
+        'edges': {edges info},              <--- here we store the graph edges
+        'groups': {groups info}             <--- here we store the graph groups
     }
-
     """
 
     def __init__(self, path, tmp_folder_path, map_folder_path):  # or better import it from settings here?
@@ -55,24 +59,13 @@ class FilesystemGraphManager(AbstractGraphManager):
         self.default_filename = 'graph.json'
 
     def read(self, graph_id) -> dict:
-        """Read graph json file by 'graph_id'"""
+        """Read graph json file by 'graph_id'
+        """
         graph_data: dict = {}
         try:
             # read graph.graphml by its name and id and get the 'content' of it
             with open(Path(self.final_path) / graph_id / self.default_filename, 'r') as graph:
-                graph_data['graph'] = graph.read()
-
-            # back up current map file
-            # shutil.copyfile(self.map_file_path,
-            #                 self.map_backup_path)  # TODO why do we need to backup map file if we do not change it?
-
-            # read the map file and get the title of the graph by its id
-            with open(self.map_file_path, 'r') as map_file:
-                id_map = json.load(map_file)
-                graph_data['title'] = id_map[graph_id]  # this is the only place where the NO_GRAPH error may trigger
-
-            # add graph_id to graph data
-            graph_data['graph_id'] = graph_id
+                graph_data = json.load(graph)
 
             # return result
             return graph_data
@@ -80,13 +73,11 @@ class FilesystemGraphManager(AbstractGraphManager):
             raise GraphManagerException(NO_GRAPH, graph_id)
 
     def read_all(self) -> list[dict]:
-        """Read all graph json files"""
-        graph_list = []
+        """Read all graph json files
+        """
         with open(self.map_file_path, 'r') as map_file:
-            id_map = json.load(map_file)
-            for k, v in id_map.items():
-                graph_list.append({'graph_id': k, 'title': v})
-        return graph_list
+            graph_data = json.load(map_file)
+        return graph_data
 
     def write(self, graph: dict) -> None:
         """Create graph json file with `graph` data"""
@@ -111,49 +102,29 @@ class FilesystemGraphManager(AbstractGraphManager):
         # rename map_tmp_path to map_folder_path
         os.rename(self.map_tmp_path, self.map_file_path)  # atomic operation
 
-        # save graph['content'] to tmp_path file
-        with open(self.tmp_file_path, 'w') as file:
-            file.write(graph["graph"])
         # create new graph dir by its id
         graph_dir = Path(self.final_path) / unique_id
         os.mkdir(graph_dir)
-        # move graph data from tmp_path to its new placement
-        os.rename(self.tmp_file_path, Path(graph_dir / self.default_filename))  # atomic operation
 
-    def update(self, graph: dict) -> None:
+        # save graph to file
+        save_data_to_file(graph, Path(graph_dir / self.default_filename))
+
+    def update(self, graph: dict, graph_id: str) -> None:
         """Rewrite graph json file with `graph` data"""
-        if 'graph_id' not in graph:
-            raise GraphManagerException(NO_ID)
-        if 'title' in graph:
-            # backing up the map file | why?
-            shutil.copyfile(self.map_file_path, self.map_backup_path)
-            # read the id_map file
-            with open(self.map_file_path, 'r') as map_file:
-                id_map = json.load(map_file)
-                # check if we have this graph already
-                if graph["title"] in id_map.values():
-                    raise GraphManagerException(NAME_EXISTS, graph["title"])
-            # try:
-            # saving the name of the graph to current id_map | why? it is the same
-            # id_map[graph['graph_id']] = graph["title"]
-            # except KeyError:
-            # this error is thrown when there is no such id in the map
-            # may be it is simpler to just check if current id is in id_map?
-            # raise GraphManagerException(NO_GRAPH, graph['graph_id'])
+        if 'title' not in graph:
+            raise GraphManagerException(NO_TITLE)
 
-            # opening tmp map file for writing and saving current id_map to it
-            with open(self.map_tmp_path, 'w') as map_tmp_file:
-                json.dump(id_map, map_tmp_file)
-            os.rename(self.map_tmp_path, self.map_file_path)  # atomic operation
+        # read the id_map file
+        with open(self.map_file_path, 'r') as map_file:
+            id_map = json.load(map_file)
+
+        graph_dir = Path(self.final_path) / graph_id
+        # check if we don't have this graph or there is no such dir
+        if graph["title"] not in id_map.values() or not os.path.isdir(graph_dir):
+            raise GraphManagerException(NO_GRAPH, graph_id)
 
         # rewrite the content of the graph
-        if 'graph' in graph:
-            graph_dir = Path(self.final_path) / graph['graph_id']
-            if not os.path.isdir(graph_dir):
-                raise GraphManagerException(NO_GRAPH, graph['graph_id'])
-            with open(self.tmp_file_path, 'w') as file:
-                file.write(graph["graph"])
-            os.rename(self.tmp_file_path, Path(graph_dir) / self.default_filename)  # atomic operation
+        save_data_to_file(graph["graph"], Path(graph_dir) / self.default_filename)
 
     def remove(self, graph_id) -> None:
         """Delete graph json file by 'graph_id'"""
@@ -174,13 +145,10 @@ class FilesystemGraphManager(AbstractGraphManager):
         # delete id from id_map
         del id_map[graph_id]
 
-        # save the id_map
-        with open(self.map_tmp_path, 'w') as map_tmp_file:
-            json.dump(id_map, map_tmp_file)
-        os.rename(self.map_tmp_path, self.map_file_path)  # atomic operation
+        save_data_to_file(id_map, self.map_file_path)
 
 
-def save_data_to_file(data: dict, destination_path: Path) -> None:
+def save_data_to_file(data: Union[dict, AnyStr], destination_path: Path) -> None:
     with tempfile.NamedTemporaryFile(delete=False) as file:
         file.write(data)
         os.rename(file.name, destination_path)

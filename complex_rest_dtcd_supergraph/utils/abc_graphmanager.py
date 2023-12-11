@@ -19,7 +19,7 @@ class AbstractGraphManager(ABC):
         pass
 
     @abstractmethod
-    def update(self, graph: dict) -> None:
+    def update(self, graph: dict, graph_id: str) -> None:
         """Rewrite graph json file with `graph` data"""
         pass
 
