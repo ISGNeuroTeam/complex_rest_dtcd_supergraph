@@ -41,7 +41,7 @@ class GraphDetailViewTestCase(TestCase):
         # test get
         response = self.client.get(f'/complex_rest_dtcd_supergraph/v1/graphs/{self.graph_id}/')
         self.assertEqual(response.status_code, 200)
-        # test post
+        # test put
         data = {'graph': 'updated graph data'}
         response = self.client.put(f'/complex_rest_dtcd_supergraph/v1/graphs/{self.graph_id}/', data)
         self.assertEqual(response.status_code, 200)
