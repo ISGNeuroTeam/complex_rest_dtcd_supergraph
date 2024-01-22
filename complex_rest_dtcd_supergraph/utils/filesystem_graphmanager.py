@@ -3,6 +3,7 @@ import shutil
 import uuid
 import json
 import tempfile
+from json import JSONDecodeError
 from typing import Union, AnyStr
 
 from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_ID, NAME_EXISTS, NO_TITLE
@@ -63,8 +64,11 @@ class FilesystemGraphManager(AbstractGraphManager):
         try:
             # read graph.graphml by its name and id and get the 'content' of it
             file_path = Path(self.final_path) / str(graph_id) / self.default_filename
+            graph_data: dict = {}
             with open(file_path, 'r') as graph:
-                graph_data = json.load(graph)
+                file_content = graph.read()
+                if file_content:
+                    graph_data = json.loads(file_content)
 
             # return result
             return graph_data
@@ -74,22 +78,29 @@ class FilesystemGraphManager(AbstractGraphManager):
     def read_all(self) -> list[dict]:
         """Read all graph json files
         """
+        graph_data: dict = {}
         with open(self.map_file_path, 'r') as map_file:
-            graph_data = json.load(map_file)
+            file_content = map_file.read()
+            if file_content:
+                graph_data = json.loads(file_content)
         result = [{"id": graph_id, "title": title} for graph_id, title in graph_data.items()]
         return result
 
-    def write(self, graph: dict) -> dict:
+    def write(self, graph: Union[dict, str]) -> dict:
         """Create graph json file with `graph` data"""
         # backup the map file
         shutil.copyfile(self.map_file_path, self.map_backup_path)
 
+        id_map = {}
         # read the map file
         with open(self.map_file_path, 'r') as map_file:
-            id_map = json.load(map_file)
-            # check if we have this graph already
-            if graph["title"] in id_map.values():
-                raise GraphManagerException(NAME_EXISTS, graph["title"])
+            file_content = map_file.read()
+            if file_content:
+                id_map = json.loads(file_content)
+
+                # check if we have this graph already
+                if graph["title"] in id_map.values():
+                    raise GraphManagerException(NAME_EXISTS, graph["title"])
 
         # create unique id
         unique_id = str(uuid.uuid4())
@@ -108,13 +119,16 @@ class FilesystemGraphManager(AbstractGraphManager):
 
         # save graph to file
         save_data_to_file(graph, Path(graph_dir / self.default_filename))
-        return {unique_id: graph['title']}
+        return {'graph_id': unique_id, 'title': graph['title']}
 
     def update(self, graph: dict, graph_id: str) -> None:
         """Rewrite graph json file with `graph` data"""
         # read the id_map file
+        id_map: dict = {}
         with open(self.map_file_path, 'r') as map_file:
-            id_map = json.load(map_file)
+            file_content = map_file.read()
+            if file_content:
+                id_map = json.loads(file_content)
 
         graph_dir = Path(self.final_path) / str(graph_id)
         # check if we don't have this graph or there is no such dir
@@ -128,21 +142,24 @@ class FilesystemGraphManager(AbstractGraphManager):
         """Delete graph json file by 'graph_id'"""
         graph_dir = Path(self.final_path) / graph_id
         # check if we have graph with this id
-        # if not os.path.isdir(graph_dir):
-        #     raise GraphManagerException(NO_GRAPH, graph_id)
+        if not os.path.isdir(graph_dir):
+            raise GraphManagerException(NO_GRAPH, graph_id)
 
         # delete directory, and it's content
-        # shutil.rmtree(Path(self.final_path) / str(graph_id))
+        shutil.rmtree(Path(self.final_path) / str(graph_id))
 
         # back up id_map file
         shutil.copyfile(self.map_file_path, self.map_backup_path)
 
         # read id_map
+        id_map: dict = {}
         with open(self.map_file_path, 'r') as map_file:
-            id_map = json.load(map_file)
+            file_content = map_file.read()
+            if file_content:
+                id_map = json.loads(file_content)
         # delete id from id_map
         del id_map[graph_id]
-
+        # save map file
         save_data_to_file(id_map, self.map_file_path)
 
 
@@ -151,3 +168,4 @@ def save_data_to_file(data: Union[dict, AnyStr], destination_path: Path) -> None
         file.write(json.dumps(data).encode('utf-8'))
         file.flush()
         os.rename(file.name, destination_path)
+

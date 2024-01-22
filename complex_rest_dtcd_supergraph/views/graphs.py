@@ -1,3 +1,5 @@
+import json
+
 from rest.views import APIView
 from rest.response import Response, status
 from rest.permissions import AllowAny
@@ -15,18 +17,17 @@ class GraphView(APIView):
     graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
 
     def post(self, request: Request) -> Response:
-        graphs = request.data
-        list_of_ids = []
-        for graph in graphs:
-            try:
-                list_of_ids.append(self.graph_manager.write(graph))
-            except Exception as e:
-                return Response(
-                    {"status": "ERROR", "msg": str(e)},
-                    status.HTTP_400_BAD_REQUEST
-                )
+        graph = request.data
+
+        try:
+            id_and_title = (self.graph_manager.write(graph))
+        except Exception as e:
+            return Response(
+                {"status": "ERROR", "msg": str(e)},
+                status.HTTP_400_BAD_REQUEST
+            )
         return Response(
-            {"status": "SUCCESS", "result": list_of_ids},
+            {"status": "SUCCESS", "result": id_and_title},
             status.HTTP_200_OK
         )
 
