@@ -199,3 +199,5 @@ venv.tar.gz
 
 # id_map folder
 id_name_map/
+tmp/
+graphs/
