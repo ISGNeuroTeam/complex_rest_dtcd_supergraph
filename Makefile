@@ -9,6 +9,11 @@ expression := s/complex_rest_dtcd_//
 version := $(shell fgrep -m 1 __version__ setup.py | cut -d = -f 2 | tr -d " '\"" )
 branch := $(shell git name-rev $$(git rev-parse HEAD) | cut -d\  -f2 | cut -d ^ -f1 | sed -re 's/^(remotes\/)?origin\///' | tr '/' '_')
 
+define clean_docker_containers
+	@echo "Stopping and removing docker containers"
+	docker-compose -f docker-compose-dev.yml stop
+	if [[ $$(docker ps -aq -f name=supergraph) ]]; then docker rm $$(docker ps -aq -f name=supergraph);  fi;
+endef
 
 all:
 	echo -e "Required section:\n\
@@ -76,3 +81,14 @@ clean_test:
 .PHONY: format
 format:
 	python3 -m black $(plugin) tests
+
+docker_dev:
+	$(call clean_docker_containers)
+	@echo "Start develop..."
+	mkdir -p ./logs
+	cp ./docs/docker/supergraph.conf ./complex_rest_dtcd_supergraph/
+	cp ./docs/docker/rest_keycloak.conf ./complex_rest_dtcd_supergraph/rest.conf
+	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-dev.yml up -d
+
+docker_dev_stop:
+	CURRENT_UID=$$(id -u):$$(id -g) docker-compose -f docker-compose-dev.yml stop

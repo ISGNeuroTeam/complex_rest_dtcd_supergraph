@@ -1,0 +1,213 @@
+{
+  "realm" : "wdcplatform",
+  "users" : [ {
+    "id" : "0d91b850-0146-44ea-8f7b-13d3469d1f9f",
+    "createdTimestamp" : 1701763554711,
+    "username" : "admin",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : true,
+    "firstName" : "admin",
+    "lastName" : "admin",
+    "credentials" : [ {
+      "id" : "1f61f107-6886-49b1-b696-3ff734b59fba",
+      "type" : "password",
+      "userLabel" : "My password",
+      "createdDate" : 1701763618689,
+      "secretData" : "{\"value\":\"0r0TMrKr2StZXX1ehCqbwngEOkyh4L93ZZGwP3TNH+M=\",\"salt\":\"IFJip+JzK9XQeYOETkBeLQ==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/admin" ]
+  }, {
+    "id" : "419f04b7-6283-4cfb-bd6d-26c65e3e6514",
+    "createdTimestamp" : 1693347934991,
+    "username" : "amy",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Amy",
+    "lastName" : "Kroker",
+    "email" : "amy@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=Amy Wong+sn=Kroker,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "amy" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "6cb2191b-e8bb-4e06-abde-fe50cf69ed70",
+    "createdTimestamp" : 1693347786701,
+    "username" : "bender",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Bender Bending",
+    "lastName" : "Rodríguez",
+    "email" : "bender@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=Bender Bending Rodríguez,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "bender" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/ship_crew", "/ship_crew" ]
+  }, {
+    "id" : "abdefe54-cb77-4363-9e9d-b0531f89ed79",
+    "createdTimestamp" : 1693347935002,
+    "username" : "fry",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Philip J.",
+    "lastName" : "Fry",
+    "email" : "fry@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=Philip J. Fry,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "fry" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/ship_crew", "/ship_crew" ]
+  }, {
+    "id" : "15df9600-6709-4b97-a12e-833705364d97",
+    "createdTimestamp" : 1693347935011,
+    "username" : "hermes",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Hermes",
+    "lastName" : "Conrad",
+    "email" : "hermes@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=Hermes Conrad,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "hermes" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/admin_staff", "/admin_staff" ]
+  }, {
+    "id" : "9eda1db6-ea6a-427f-be02-072570499710",
+    "createdTimestamp" : 1693347935020,
+    "username" : "leela",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Turanga",
+    "lastName" : "Turanga",
+    "email" : "leela@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=Turanga Leela,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "leela" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/ship_crew", "/ship_crew" ]
+  }, {
+    "id" : "9e35c7f1-bd54-4da5-9cde-727d7286c84d",
+    "createdTimestamp" : 1693347935028,
+    "username" : "professor",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "Hubert J.",
+    "lastName" : "Farnsworth",
+    "email" : "professor@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=Hubert J. Farnsworth,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "professor" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/admin_staff", "/admin_staff" ]
+  }, {
+    "id" : "a7cdf58f-7791-4c53-90d8-f10a995578fc",
+    "createdTimestamp" : 1693205466549,
+    "username" : "service-account-complex_rest",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "serviceAccountClientId" : "complex_rest",
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "clientRoles" : {
+      "realm-management" : [ "manage-users", "view-realm" ],
+      "complex_rest" : [ "uma_protection" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  }, {
+    "id" : "2e4656fc-6ee0-4d46-a500-60d150f97cd2",
+    "createdTimestamp" : 1693205498649,
+    "username" : "test_user",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "first_test_name",
+    "lastName" : "las_test_name",
+    "email" : "test@gmail.com",
+    "credentials" : [ {
+      "id" : "1e1f10b7-5b12-469e-a356-cb16f4295ffc",
+      "type" : "password",
+      "createdDate" : 1693205848343,
+      "secretData" : "{\"value\":\"fncZfzSBljJ9TlsQjGVR+zYffwzV71kZxSla9lVdRGc=\",\"salt\":\"rvh+sD65m72yzIQ2DUZjWA==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "role1", "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ "/test_group" ]
+  }, {
+    "id" : "fcd8cb8a-1d03-42cd-8424-4c9f6f7cf12e",
+    "createdTimestamp" : 1693347935037,
+    "username" : "zoidberg",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "firstName" : "John A.",
+    "lastName" : "Zoidberg",
+    "email" : "zoidberg@planetexpress.com",
+    "federationLink" : "c34a631c-78c1-40dd-9c0f-dc56a504a9f6",
+    "attributes" : {
+      "LDAP_ENTRY_DN" : [ "cn=John A. Zoidberg,ou=people,dc=planetexpress,dc=com" ],
+      "LDAP_ID" : [ "zoidberg" ]
+    },
+    "credentials" : [ ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-wdcplatform" ],
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

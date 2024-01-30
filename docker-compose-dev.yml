@@ -1,0 +1,111 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: postgres:12.9
+    environment:
+      - POSTGRES_DB=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "5433:5432"
+
+  redis:
+    image: redis
+    ports:
+      - "6380:6379"
+
+  zookeeper:
+    image: 'bitnami/zookeeper:3.6.3'
+    environment:
+      - ALLOW_ANONYMOUS_LOGIN=yes
+  kafka:
+    image: 'bitnami/kafka:3.0.0'
+    ports:
+      - "9092:9092"
+    environment:
+      - ALLOW_PLAINTEXT_LISTENER=yes
+      - KAFKA_CFG_ZOOKEEPER_CONNECT=zookeeper:2181
+    depends_on:
+      - zookeeper
+
+  ldap:
+    image: 'rroemhild/test-openldap'
+    ports:
+      - "10389:10389"
+      - "10636:10636"
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0.1
+
+    user: ${CURRENT_UID}
+    ports:
+      - "8090:8090"
+    volumes:
+      - ./:/complex_rest_dtcd_supergraph
+    depends_on:
+      - ldap
+    environment:
+      - KEYCLOAK_ADMIN=admin
+      - KEYCLOAK_ADMIN_PASSWORD=admin
+      - KC_HTTP_PORT=8090
+      - KC_FEATURES=account-api,account2,authorization,client-policies,impersonation,docker,scripts
+    # entrypoint: /opt/entrypoint.sh
+    entrypoint: /complex_rest_dtcd_supergraph/docs/docker/keycloak/entrypoint.sh
+    command: /opt/keycloak/bin/kc.sh start-dev
+
+  celery-worker:
+    build:
+      context: ./
+      dockerfile: ./docs/docker/complex_rest/Dockerfile
+    image: "complex_rest_for_supergraph_worker:0.5.1"
+    volumes:
+      - ./complex_rest_dtcd_supergraph:/complex_rest/plugins/complex_rest_dtcd_supergraph
+      - ./logs:/complex_rest/logs
+    user: ${CURRENT_UID}
+
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    command: "celery --app core.celeryapp:app worker --loglevel=INFO --concurrency 8"
+
+  celery-beat:
+    build:
+      context: ./
+      dockerfile: ./docs/docker/complex_rest/Dockerfile
+    image: "complex_rest_for_supergraph_celery:0.5.1"
+    volumes:
+      - ./complex_rest_dtcd_supergraph:/complex_rest/plugins/complex_rest_dtcd_supergraph
+      - ./logs:/complex_rest/logs
+    user: ${CURRENT_UID}
+
+    depends_on:
+      - postgres
+      - redis
+      - kafka
+    command: "celery --app core.celeryapp:app beat -l INFO --scheduler django_celery_beat.schedulers:DatabaseScheduler"
+
+  complex_rest:
+    build:
+      context: ./
+      dockerfile: ./docs/docker/complex_rest/Dockerfile
+    image: "complex_rest_dtcd_supergraph:0.5.1"
+
+    volumes:
+      - ./complex_rest_dtcd_supergraph:/complex_rest/plugins/complex_rest_dtcd_supergraph
+      - ./logs:/complex_rest/logs
+      - ./tests:/complex_rest/tests
+
+    environment:
+      - REST_CONF=/complex_rest/plugins/complex_rest_dtcd_supergraph/rest.conf
+
+    user: ${CURRENT_UID}
+    ports:
+      - "8080:8080"
+    command: "python /complex_rest/complex_rest/manage.py runserver [::]:8080"
+
+    depends_on:
+      - postgres
+      - redis
+      - kafka

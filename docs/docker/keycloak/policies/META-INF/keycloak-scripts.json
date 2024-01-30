@@ -1,0 +1,19 @@
+{
+  "policies": [
+    {
+      "name": "Always allow policy",
+      "fileName": "always-allow-policy.js",
+      "description": "A policy that grants access only for users within this realm"
+    },
+    {
+      "name": "Only Owner Policy",
+      "fileName": "only-owner-policy.js",
+      "description": "Defines that only the resource owner is allowed to do something"
+    },
+    {
+      "name": "Always deny policy",
+      "fileName": "always-deny-policy.js",
+      "description": "A policy that deny access"
+    }
+  ]
+}

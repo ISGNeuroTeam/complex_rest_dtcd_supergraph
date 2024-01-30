@@ -1,0 +1,26 @@
+{
+  "realm" : "master",
+  "users" : [ {
+    "id" : "2bfb02ce-157c-405f-8294-862f557175d7",
+    "createdTimestamp" : 1693202081095,
+    "username" : "admin",
+    "enabled" : true,
+    "totp" : false,
+    "emailVerified" : false,
+    "credentials" : [ {
+      "id" : "bf55149e-7121-493a-9646-bbccb5b46af2",
+      "type" : "password",
+      "createdDate" : 1693202081244,
+      "secretData" : "{\"value\":\"H//8aIF1Q40RY1r7v58jy7BkyCV1nfMaojCMWzT9p24=\",\"salt\":\"OCsDtljyTv/qn+bBmMn99A==\",\"additionalParameters\":{}}",
+      "credentialData" : "{\"hashIterations\":27500,\"algorithm\":\"pbkdf2-sha256\",\"additionalParameters\":{}}"
+    } ],
+    "disableableCredentialTypes" : [ ],
+    "requiredActions" : [ ],
+    "realmRoles" : [ "default-roles-master", "admin" ],
+    "clientRoles" : {
+      "wdcplatform-realm" : [ "view-users", "view-authorization", "manage-clients", "query-clients", "query-users", "manage-realm", "query-realms", "manage-events", "view-realm", "manage-users", "manage-identity-providers", "query-groups", "manage-authorization", "view-identity-providers", "create-client", "view-clients", "view-events" ]
+    },
+    "notBefore" : 0,
+    "groups" : [ ]
+  } ]
+}

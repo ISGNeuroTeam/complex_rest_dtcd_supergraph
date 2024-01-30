@@ -39,7 +39,7 @@ If you are a developer, then follow this section.
 2. Enter the folder, copy or symlink configuration files from `docs/` to `complex_rest_dtcd_supergraph/` with the following commands:
     ```sh
     cd repo
-    cp docs/supergraph.conf.example  complex_rest_dtcd_supergraph/supergraph.conf
+    cp docs/supergraph.conf  complex_rest_dtcd_supergraph/supergraph.conf
     ```
 3. Create a virtual environment:
     ```sh
