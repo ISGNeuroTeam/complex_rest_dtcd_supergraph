@@ -1,15 +1,25 @@
+from logging import getLogger
 import os
 import shutil
 import uuid
 import json
 import tempfile
 from json import JSONDecodeError
+from pathlib import Path
 from typing import Union, AnyStr
 
-from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_ID, NAME_EXISTS, NO_TITLE
-from ..utils.abc_graphmanager import AbstractGraphManager
-from pathlib import Path
+from core.globals import global_vars
 
+from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_ID, NAME_EXISTS, NO_TITLE, NOT_ALLOWED
+from ..utils.abc_graphmanager import AbstractGraphManager
+from rest_auth.authorization import has_perm_on_keycloak
+from rest_auth.keycloak_client import KeycloakResources, KeycloakError
+from rest.response import ErrorResponse
+from ..settings import ROLE_MODEL_READ, ROLE_MODEL_WRITE, ROLE_MODEL_UPDATE, ROLE_MODEL_REMOVE, ROLE_MODEL_READ_ALL
+
+
+
+log = getLogger('complex_rest_dtcd_supergraph')
 
 class FilesystemGraphManager(AbstractGraphManager):
     """
@@ -48,10 +58,13 @@ class FilesystemGraphManager(AbstractGraphManager):
     }
     """
 
+    keycloak_resource = KeycloakResources()
+
     def __init__(self, path, tmp_folder_path, map_folder_path):  # or better import it from settings here?
         self.final_path = path  # graph base dir
         self.tmp_file_path = tmp_folder_path + '/tmp.graphml'
         self.map_file_path = map_folder_path + '/graph_map.json'  # not empty, at least {}
+        self.tmp_folder_path = tmp_folder_path
         if not os.path.isfile(self.map_file_path):
             with open(self.map_file_path, 'w') as map_file:
                 map_file.write('{}')
@@ -61,6 +74,9 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     def read(self, graph_id) -> dict:
         """Read graph json file by 'graph_id'"""
+        print(f"{global_vars['auth_header']=}")
+        if not has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_READ, graph_id):
+            raise GraphManagerException(NOT_ALLOWED, graph_id)
         try:
             # read graph.graphml by its name and id and get the 'content' of it
             file_path = Path(self.final_path) / str(graph_id) / self.default_filename
@@ -79,6 +95,9 @@ class FilesystemGraphManager(AbstractGraphManager):
         """Read all graph json files
         """
         graph_data: dict = {}
+
+        has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_READ_ALL, 'GraphManager')
+
         with open(self.map_file_path, 'r') as map_file:
             file_content = map_file.read()
             if file_content:
@@ -118,7 +137,19 @@ class FilesystemGraphManager(AbstractGraphManager):
         os.mkdir(graph_dir)
 
         # save graph to file
-        save_data_to_file(graph, Path(graph_dir / self.default_filename))
+        save_data_to_file(graph, Path(graph_dir / self.default_filename), self.tmp_folder_path)
+        # send data to keycloak
+        try:
+            keycloak_record = self.keycloak_resource.create(
+                unique_id,
+                f'supergraph.{unique_id}',
+                'supergraph.graph',
+                None,
+                [ROLE_MODEL_WRITE, ROLE_MODEL_UPDATE, ROLE_MODEL_REMOVE, ROLE_MODEL_READ]
+            )
+        except KeycloakError as err:
+            log.error(f'Error occured while creating resource {str(err)}')
+            return ErrorResponse(f"Failed to create object in Keycloak: {err}")
         return {'graph_id': unique_id, 'title': graph['title']}
 
     def update(self, graph: dict, graph_id: str) -> None:
@@ -136,7 +167,7 @@ class FilesystemGraphManager(AbstractGraphManager):
             raise GraphManagerException(NO_GRAPH, graph_id)
 
         # rewrite the content of the graph
-        save_data_to_file(graph, Path(graph_dir) / self.default_filename)
+        save_data_to_file(graph, Path(graph_dir) / self.default_filename, self.tmp_folder_path)
 
     def remove(self, graph_id: str) -> None:
         """Delete graph json file by 'graph_id'"""
@@ -160,12 +191,11 @@ class FilesystemGraphManager(AbstractGraphManager):
         # delete id from id_map
         del id_map[graph_id]
         # save map file
-        save_data_to_file(id_map, self.map_file_path)
+        save_data_to_file(id_map, self.map_file_path, self.tmp_folder_path)
 
 
-def save_data_to_file(data: Union[dict, AnyStr], destination_path: Path) -> None:
-    with tempfile.NamedTemporaryFile(delete=False) as file:
+def save_data_to_file(data: Union[dict, AnyStr], destination_path: Path, tmp_folder: Path) -> None:
+    with tempfile.NamedTemporaryFile(delete=False, dir=tmp_folder) as file:
         file.write(json.dumps(data).encode('utf-8'))
         file.flush()
         os.rename(file.name, destination_path)
-

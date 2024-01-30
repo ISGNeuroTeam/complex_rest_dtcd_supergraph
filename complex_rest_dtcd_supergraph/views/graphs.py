@@ -2,7 +2,7 @@ import json
 
 from rest.views import APIView
 from rest.response import Response, status
-from rest.permissions import AllowAny
+from rest.permissions import IsAuthenticated
 from rest_framework.request import Request
 from ..utils.filesystem_graphmanager import FilesystemGraphManager
 from ..settings import GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH
@@ -12,20 +12,21 @@ logger = logging.getLogger('supergraph')
 
 
 class GraphView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     http_method_names = ['get', 'post']
     graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
 
     def post(self, request: Request) -> Response:
         graph = request.data
 
-        try:
-            id_and_title = (self.graph_manager.write(graph))
-        except Exception as e:
-            return Response(
-                {"status": "ERROR", "msg": str(e)},
-                status.HTTP_400_BAD_REQUEST
-            )
+        id_and_title = (self.graph_manager.write(graph))
+        # try:
+        #     id_and_title = (self.graph_manager.write(graph))
+        # except Exception as e:
+        #     return Response(
+        #         {"status": "ERROR", "msg": str(e)},
+        #         status.HTTP_400_BAD_REQUEST
+        #     )
         return Response(
             {"status": "SUCCESS", "result": id_and_title},
             status.HTTP_200_OK
@@ -36,7 +37,7 @@ class GraphView(APIView):
 
 
 class GraphDetailView(APIView):
-    permission_classes = (AllowAny,)
+    permission_classes = (IsAuthenticated,)
     http_method_names = ['get', 'put', 'delete']
     graph_manager = FilesystemGraphManager(GRAPH_BASE_PATH, GRAPH_TMP_PATH, GRAPH_ID_NAME_MAP_PATH)
 
