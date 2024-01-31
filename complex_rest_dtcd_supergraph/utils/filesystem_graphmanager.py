@@ -14,6 +14,7 @@ from ..utils.graphmanager_exception import GraphManagerException, NO_GRAPH, NO_I
 from ..utils.abc_graphmanager import AbstractGraphManager
 from rest_auth.authorization import has_perm_on_keycloak
 from rest_auth.keycloak_client import KeycloakResources, KeycloakError
+from rest_auth.exceptions import AccessDeniedError
 from rest.response import ErrorResponse
 from ..settings import ROLE_MODEL_READ, ROLE_MODEL_WRITE, ROLE_MODEL_UPDATE, ROLE_MODEL_REMOVE, ROLE_MODEL_READ_ALL
 
@@ -74,9 +75,9 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     def read(self, graph_id) -> dict:
         """Read graph json file by 'graph_id'"""
-        print(f"{global_vars['auth_header']=}")
+        print(f"filesystem.read(): {graph_id=}")
         if not has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_READ, graph_id):
-            raise GraphManagerException(NOT_ALLOWED, graph_id)
+            raise AccessDeniedError(f'Resource {graph_id} is not allowed to read graph')
         try:
             # read graph.graphml by its name and id and get the 'content' of it
             file_path = Path(self.final_path) / str(graph_id) / self.default_filename
@@ -96,7 +97,8 @@ class FilesystemGraphManager(AbstractGraphManager):
         """
         graph_data: dict = {}
 
-        has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_READ_ALL, 'GraphManager')
+        if not has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_READ_ALL, 'GraphManager'):
+            raise AccessDeniedError
 
         with open(self.map_file_path, 'r') as map_file:
             file_content = map_file.read()
@@ -107,6 +109,8 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     def write(self, graph: Union[dict, str]) -> dict:
         """Create graph json file with `graph` data"""
+        if not has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_WRITE, ""):
+            raise AccessDeniedError(f'{global_vars.get_current_user().username} is not allowed to create graph')
         # backup the map file
         shutil.copyfile(self.map_file_path, self.map_backup_path)
 
@@ -144,7 +148,7 @@ class FilesystemGraphManager(AbstractGraphManager):
                 unique_id,
                 f'supergraph.{unique_id}',
                 'supergraph.graph',
-                None,
+                global_vars.get_current_user().username,
                 [ROLE_MODEL_WRITE, ROLE_MODEL_UPDATE, ROLE_MODEL_REMOVE, ROLE_MODEL_READ]
             )
         except KeycloakError as err:
@@ -154,6 +158,8 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     def update(self, graph: dict, graph_id: str) -> None:
         """Rewrite graph json file with `graph` data"""
+        if not has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_UPDATE, graph_id):
+            raise AccessDeniedError(f'Resource {graph_id} is not allowed to update')
         # read the id_map file
         id_map: dict = {}
         with open(self.map_file_path, 'r') as map_file:
@@ -171,6 +177,9 @@ class FilesystemGraphManager(AbstractGraphManager):
 
     def remove(self, graph_id: str) -> None:
         """Delete graph json file by 'graph_id'"""
+        if not has_perm_on_keycloak(global_vars['auth_header'], ROLE_MODEL_REMOVE, graph_id):
+            raise AccessDeniedError(f'Resource {graph_id} is not allowed to be removed')
+        self.keycloak_resource.delete(graph_id)
         graph_dir = Path(self.final_path) / graph_id
         # check if we have graph with this id
         if not os.path.isdir(graph_dir):
